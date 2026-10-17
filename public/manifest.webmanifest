@@ -1,11 +1,11 @@
 {
   "name": "Rassegna Rossa",
   "short_name": "Rassegna",
-  "description": "Aggregatore live di fonti socialiste, comuniste, sindacali e anticoloniali.",
+  "description": "Notizie, fonti e percorsi di lettura per uno sguardo internazionale.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f7f2",
-  "theme_color": "#171312",
+  "background_color": "#f6f3ec",
+  "theme_color": "#f6f3ec",
   "icons": [
     {
       "src": "/favicon.svg",

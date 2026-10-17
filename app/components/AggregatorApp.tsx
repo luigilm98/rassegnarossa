@@ -1,26 +1,22 @@
 "use client";
 
 import {
-  Activity,
+  ArrowDown,
+  ArrowRight,
   ArrowUpRight,
+  BookOpen,
   Bookmark,
   BookmarkCheck,
-  CheckCircle2,
-  Clock3,
+  ChevronDown,
+  CircleHelp,
   ExternalLink,
-  Filter,
   Globe2,
   Languages,
-  LibraryBig,
-  ListFilter,
   Loader2,
   Newspaper,
-  PanelRightOpen,
-  Radio,
   RefreshCcw,
   Search,
-  ShieldAlert,
-  Sparkles,
+  SlidersHorizontal,
   X,
 } from "lucide-react";
 import {
@@ -31,1445 +27,1830 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type {
-  Region,
-  SourceDefinition,
-  SourceKind,
-  TopicDefinition,
+import {
+  SOURCE_CATALOG,
+  TOPIC_TAXONOMY,
+  REGION_ORDER,
+  RADAR_CHANNEL_COUNT,
+  type SourceDefinition,
 } from "@/app/data/catalog";
 import { THEORY_LIBRARY } from "@/app/data/library";
+import { DOSSIERS, READING_PATHS, GLOSSARY } from "@/app/data/editorial";
+import {
+  filterArticles,
+  mergeArticles,
+  restoreSavedArticles,
+  safeWebUrl,
+  type ReadingArticle as Article,
+} from "@/app/lib/reading";
 
-type Article = {
-  id: string;
-  sourceId: string;
-  sourceName: string;
-  sourceHomepage: string;
-  region: Region;
-  country: string;
-  language: string;
-  kind: SourceKind;
-  ideologies: string[];
-  title: string;
-  link: string;
-  publishedAt: string | null;
-  author: string | null;
-  excerpt: string;
-  categories: string[];
-  topics: string[];
-  image: string | null;
-  score: number;
-};
-
+type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo";
 type SourceStatus = {
   sourceId: string;
   name: string;
   ok: boolean;
   count: number;
-  feedUrl: string | null;
   error: string | null;
-  fetchedAt: string;
   cached: boolean;
 };
-
-type SourcesPayload = {
-  sources: SourceDefinition[];
-  radarChannelCount: number;
-  radarArticleWindow: number;
-  topics: TopicDefinition[];
-  regions: Region[];
-  languages: string[];
-  ideologies: string[];
-  kinds: SourceKind[];
-};
-
-type SourceViewItem = SourceDefinition & {
-  articleCount: number;
-  dynamic: boolean;
+type DirectorySource = SourceDefinition & {
+  count: number;
   status?: SourceStatus;
+  discovered?: boolean;
 };
-
-type TranslationState = {
-  status: "idle" | "loading" | "ready" | "error";
-  text: string;
-  error?: string;
-};
-
 const ALL = "all";
-const SOURCES_PER_BATCH = 10;
-const LIMIT_PER_SOURCE = 150;
-const FRESHNESS = [
-  { id: "24h", label: "24h", hours: 24 },
-  { id: "7d", label: "7g", hours: 24 * 7 },
-  { id: "30d", label: "30g", hours: 24 * 30 },
-  { id: "all", label: "Tutto", hours: Infinity },
-];
-const SORTS = [
-  { id: "fresh", label: "Recenti" },
-  { id: "score", label: "Rilevanza" },
-  { id: "source", label: "Fonte" },
-];
-
-const LANGUAGE_NAMES: Record<string, string> = {
-  ar: "Arabo",
-  de: "Tedesco",
-  el: "Greco",
+const PAGE_SIZE = 24;
+const LANGUAGES: Record<string, string> = {
+  it: "Italiano",
   en: "Inglese",
   es: "Spagnolo",
-  fa: "Persiano",
+  pt: "Portoghese",
   fr: "Francese",
-  id: "Indonesiano",
-  it: "Italiano",
+  de: "Tedesco",
+  ar: "Arabo",
+  zh: "Cinese",
+  ru: "Russo",
+  el: "Greco",
+  fa: "Persiano",
   ja: "Giapponese",
   ko: "Coreano",
-  pl: "Polacco",
-  pt: "Portoghese",
-  ru: "Russo",
+  hi: "Hindi",
   tr: "Turco",
+  id: "Indonesiano",
   vi: "Vietnamita",
-  zh: "Cinese",
+};
+const NAV: { id: View; label: string }[] = [
+  { id: "notizie", label: "La rassegna" },
+  { id: "fonti", label: "Atlante delle fonti" },
+  { id: "teoria", label: "Biblioteca" },
+  { id: "salvati", label: "Salvati" },
+  { id: "metodo", label: "Il progetto" },
+];
+const HEADINGS = {
+  notizie: {
+    overline: "NOTIZIE · ANALISI · PROSPETTIVE",
+    title: (
+      <>
+        Il mondo, da un’altra
+        <br />
+        <em>prospettiva.</em>
+      </>
+    ),
+    description:
+      "Voci e idee dal lavoro, dai movimenti e dal Sud globale. Una rassegna per collegare le notizie, capire i conflitti, allargare lo sguardo.",
+  },
+  fonti: {
+    overline: "L’ATLANTE",
+    title: (
+      <>
+        Le voci. I luoghi.
+        <br />
+        <em>Le prospettive.</em>
+      </>
+    ),
+    description:
+      "Giornali, riviste, sindacati e movimenti: esplora le fonti per paese, lingua e orientamento. Il punto di partenza di ogni notizia resta visibile.",
+  },
+  teoria: {
+    overline: "LA BIBLIOTECA",
+    title: (
+      <>
+        Capire il presente.
+        <br />
+        <em>Leggere in profondità.</em>
+      </>
+    ),
+    description:
+      "Testi, concetti e percorsi di lettura per dare contesto alle notizie. Una biblioteca aperta, da attraversare un’idea alla volta.",
+  },
+  salvati: {
+    overline: "IL TUO TACCUINO",
+    title: (
+      <>
+        Le letture che
+        <br />
+        <em>vuoi ritrovare.</em>
+      </>
+    ),
+    description:
+      "Conserva gli articoli che meritano tempo. Le schede restano in questo browser, anche quando chiudi la rassegna. Nessun account necessario.",
+  },
+  metodo: {
+    overline: "IL PROGETTO",
+    title: (
+      <>
+        Molte fonti.
+        <br />
+        <em>Uno sguardo consapevole.</em>
+      </>
+    ),
+    description:
+      "Rassegna Rossa è uno strumento per orientarsi nell’informazione socialista, comunista, sindacale e anticoloniale. Qui spieghiamo come funziona e quali sono i suoi limiti.",
+  },
 };
 
 export function AggregatorApp() {
-  const [sources, setSources] = useState<SourceDefinition[]>([]);
-  const [topics, setTopics] = useState<TopicDefinition[]>([]);
-  const [regions, setRegions] = useState<Region[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [ideologies, setIdeologies] = useState<string[]>([]);
-  const [kinds, setKinds] = useState<SourceKind[]>([]);
+  const [view, setView] = useState<View>("notizie");
   const [articles, setArticles] = useState<Article[]>([]);
   const [statuses, setStatuses] = useState<Record<string, SourceStatus>>({});
-  const [radarChannelCount, setRadarChannelCount] = useState(0);
-  const [radarArticleWindow, setRadarArticleWindow] = useState(0);
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
-  const [selectedSourceId, setSelectedSourceId] = useState<string>(ALL);
-  const [activeView, setActiveView] = useState<"notizie" | "teoria" | "fonti">(
-    "notizie",
-  );
-  const [region, setRegion] = useState<string>(ALL);
-  const [language, setLanguage] = useState<string>(ALL);
-  const [ideology, setIdeology] = useState<string>(ALL);
-  const [kind, setKind] = useState<string>(ALL);
-  const [topic, setTopic] = useState<string>(ALL);
-  const [freshness, setFreshness] = useState("7d");
-  const [sort, setSort] = useState("fresh");
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [savedArticles, setSavedArticles] = useState<Article[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
+  const [storageWarning, setStorageWarning] = useState(false);
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [region, setRegion] = useState(ALL);
+  const [language, setLanguage] = useState(ALL);
+  const [kind, setKind] = useState(ALL);
+  const [ideology, setIdeology] = useState(ALL);
+  const [topic, setTopic] = useState(ALL);
+  const [sourceId, setSourceId] = useState(ALL);
+  const [days, setDays] = useState("7");
+  const [sort, setSort] = useState("fresh");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState({
+    done: 0,
+    total: SOURCE_CATALOG.length,
+  });
   const [lastRefresh, setLastRefresh] = useState<string | null>(null);
-  const [savedIds, setSavedIds] = useState<Set<string>>(() => new Set());
-  const [readerMode, setReaderMode] = useState<"originale" | "tradotto">(
-    "originale",
-  );
-  const [translations, setTranslations] = useState<Record<string, TranslationState>>(
-    {},
-  );
-  const refreshToken = useRef(0);
+  const [dateLabel, setDateLabel] = useState("L’informazione, oltre i confini");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const refreshNumber = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+  const readerDialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const saved =
-      localStorage.getItem("rassegna-rossa.saved") ??
-      localStorage.getItem("internazionale.saved");
-    if (saved) {
-      setSavedIds(new Set(JSON.parse(saved) as string[]));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "rassegna-rossa.saved",
-      JSON.stringify(Array.from(savedIds)),
+    setDateLabel(
+      new Intl.DateTimeFormat("it-IT", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date()),
     );
-  }, [savedIds]);
-
-  useEffect(() => {
-    let mounted = true;
-    fetch("/api/sources")
-      .then((response) => response.json() as Promise<SourcesPayload>)
-      .then((payload) => {
-        if (!mounted) {
-          return;
-        }
-        setSources(payload.sources);
-        setRadarChannelCount(payload.radarChannelCount);
-        setRadarArticleWindow(payload.radarArticleWindow);
-        setTopics(payload.topics);
-        setRegions(payload.regions);
-        setLanguages(payload.languages);
-        setIdeologies(payload.ideologies);
-        setKinds(payload.kinds);
-      })
-      .catch(() => {
-        if (mounted) {
-          setSources([]);
-        }
-      });
-    return () => {
-      mounted = false;
-    };
+    try {
+      const restored = restoreSavedArticles(
+        localStorage.getItem("rassegna-rossa.saved-articles"),
+      );
+      let rawIds: unknown = [];
+      try {
+        rawIds = JSON.parse(
+          localStorage.getItem("rassegna-rossa.saved") ??
+            localStorage.getItem("internazionale.saved") ??
+            "[]",
+        );
+      } catch {
+        /* Valid saved cards still restore if legacy IDs are corrupt. */
+      }
+      setSavedIds(
+        new Set([
+          ...restored.map((a) => a.id),
+          ...(Array.isArray(rawIds)
+            ? rawIds.filter((id): id is string => typeof id === "string")
+            : []),
+        ]),
+      );
+      setSavedArticles(restored);
+    } catch {
+      setStorageWarning(true);
+    }
+    setStorageReady(true);
   }, []);
 
-  const sourceLookup = useMemo(() => {
-    return new Map(sources.map((source) => [source.id, source]));
-  }, [sources]);
-
-  const eligibleSources = useMemo(() => {
-    return sources.filter((source) => {
-      return (
-        (region === ALL || source.region === region) &&
-        (language === ALL || source.language === language) &&
-        (ideology === ALL ||
-          source.ideologies.includes(ideology) ||
-          source.kind === "radar") &&
-        (kind === ALL || source.kind === kind)
+  useEffect(() => {
+    if (!storageReady) return;
+    try {
+      localStorage.setItem(
+        "rassegna-rossa.saved",
+        JSON.stringify(Array.from(savedIds)),
       );
+      localStorage.setItem(
+        "rassegna-rossa.saved-articles",
+        JSON.stringify(savedArticles),
+      );
+    } catch {
+      setStorageWarning(true);
+    }
+  }, [savedIds, savedArticles, storageReady]);
+
+  useEffect(() => {
+    // Old saved IDs become persistent article cards when their feed is fetched again.
+    if (!articles.length || !storageReady) return;
+    setSavedArticles((current) => {
+      const matching = articles.filter((a) => savedIds.has(a.id));
+      const next = mergeArticles(
+        current.filter((a) => savedIds.has(a.id)),
+        matching,
+      );
+      return JSON.stringify(next) === JSON.stringify(current) ? current : next;
     });
-  }, [ideology, kind, language, region, sources]);
+  }, [articles, savedIds, storageReady]);
+
+  const reset = useCallback(() => {
+    setQuery("");
+    setRegion(ALL);
+    setLanguage(ALL);
+    setKind(ALL);
+    setIdeology(ALL);
+    setTopic(ALL);
+    setSourceId(ALL);
+    setDays("7");
+    setSort("fresh");
+    setVisibleCount(PAGE_SIZE);
+  }, []);
+  const navigate = (next: View) => {
+    setView(next);
+    reset();
+    setFiltersOpen(false);
+  };
+  const stopRefresh = () => {
+    ++refreshNumber.current;
+    abortRef.current?.abort();
+    setLoading(false);
+    setLastRefresh(new Date().toISOString());
+  };
+  const pickTopic = (id: string) => {
+    reset();
+    setView("notizie");
+    setTopic(id);
+    document
+      .getElementById("letture")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const eligibleSources = useMemo(
+    () =>
+      SOURCE_CATALOG.filter(
+        (s) =>
+          (region === ALL || s.region === region) &&
+          (language === ALL || s.language === language) &&
+          (kind === ALL || s.kind === kind) &&
+          (ideology === ALL ||
+            s.ideologies.includes(ideology) ||
+            s.kind === "radar") &&
+          (sourceId === ALL || s.id === sourceId),
+      ),
+    [region, language, kind, ideology, sourceId],
+  );
 
   const refresh = useCallback(
-    async (mode: "all" | "filtered" | "source" = "all") => {
-      const token = refreshToken.current + 1;
-      refreshToken.current = token;
-      const selectedCatalogSource = sourceLookup.get(selectedSourceId);
-      const targetSources =
-        mode === "source" && selectedCatalogSource
-          ? [selectedCatalogSource]
-          : mode === "filtered"
-            ? eligibleSources
-            : sources;
-      const ids = targetSources.map((source) => source.id);
-      const chunks = chunk(ids, SOURCES_PER_BATCH);
-
+    async (scope: "all" | "selection" = "all") => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+      const run = ++refreshNumber.current;
+      const targets = (scope === "all" ? SOURCE_CATALOG : eligibleSources)
+        .slice()
+        .sort((a, b) => b.priority - a.priority);
+      const batches: string[][] = [];
+      for (let i = 0; i < targets.length; i += 10)
+        batches.push(targets.slice(i, i + 10).map((s) => s.id));
       setLoading(true);
-      setProgress({ done: 0, total: chunks.length });
-      setLastRefresh(null);
-      if (mode === "all") {
-        setArticles([]);
-        setStatuses({});
-      }
-
+      setProgress({ done: 0, total: targets.length });
       let cursor = 0;
-      const workers = Array.from(
-        { length: Math.min(3, chunks.length || 1) },
-        async () => {
-          while (cursor < chunks.length) {
-            const current = cursor;
-            cursor += 1;
-            const idsChunk = chunks[current];
+      await Promise.all(
+        Array.from({ length: Math.min(3, batches.length) }, async () => {
+          while (cursor < batches.length && !controller.signal.aborted) {
+            const ids = batches[cursor++];
             try {
               const response = await fetch(
-                `/api/articles?sourceIds=${encodeURIComponent(
-                  idsChunk.join(","),
-                )}&limitPerSource=${LIMIT_PER_SOURCE}`,
+                `/api/articles?sourceIds=${encodeURIComponent(ids.join(","))}&limitPerSource=100`,
+                { signal: controller.signal },
               );
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
               const payload = (await response.json()) as {
                 articles: Article[];
                 statuses: SourceStatus[];
               };
-
-              if (refreshToken.current !== token) {
+              if (
+                !Array.isArray(payload.articles) ||
+                !Array.isArray(payload.statuses)
+              )
+                throw new Error("Risposta non valida");
+              if (run !== refreshNumber.current || controller.signal.aborted)
                 return;
-              }
-
-              setArticles((currentArticles) =>
-                mergeArticles(currentArticles, payload.articles),
+              setArticles((current) =>
+                mergeArticles(current, payload.articles),
               );
-              setStatuses((currentStatuses) => {
-                const next = { ...currentStatuses };
-                for (const status of payload.statuses) {
-                  next[status.sourceId] = status;
-                }
-                return next;
-              });
+              setStatuses((current) => ({
+                ...current,
+                ...Object.fromEntries(
+                  payload.statuses.map((s) => [s.sourceId, s]),
+                ),
+              }));
             } catch {
-              if (refreshToken.current === token) {
-                setStatuses((currentStatuses) => {
-                  const next = { ...currentStatuses };
-                  for (const id of idsChunk) {
-                    next[id] = {
+              if (run !== refreshNumber.current || controller.signal.aborted)
+                return;
+              setStatuses((current) => ({
+                ...current,
+                ...Object.fromEntries(
+                  ids.map((id) => [
+                    id,
+                    {
                       sourceId: id,
-                      name: sourceLookup.get(id)?.name ?? id,
+                      name: SOURCE_CATALOG.find((s) => s.id === id)?.name ?? id,
                       ok: false,
                       count: 0,
-                      feedUrl: null,
-                      error: "Richiesta non riuscita",
-                      fetchedAt: new Date().toISOString(),
+                      error: "Fonte non raggiungibile in questo tentativo",
                       cached: false,
-                    };
-                  }
-                  return next;
-                });
-              }
+                    },
+                  ]),
+                ),
+              }));
             } finally {
-              if (refreshToken.current === token) {
-                setProgress((currentProgress) => ({
-                  done: Math.min(currentProgress.done + 1, currentProgress.total),
-                  total: currentProgress.total,
+              if (run === refreshNumber.current)
+                setProgress((current) => ({
+                  ...current,
+                  done: Math.min(current.total, current.done + ids.length),
                 }));
-              }
             }
           }
-        },
+        }),
       );
-
-      await Promise.all(workers);
-      if (refreshToken.current === token) {
+      if (run === refreshNumber.current) {
         setLoading(false);
         setLastRefresh(new Date().toISOString());
       }
     },
-    [eligibleSources, selectedSourceId, sourceLookup, sources],
+    [eligibleSources],
   );
 
   useEffect(() => {
-    if (sources.length && !articles.length && !loading) {
-      void refresh("all");
-    }
-  }, [articles.length, loading, refresh, sources.length]);
+    void refresh("all");
+    return () => {
+      abortRef.current?.abort();
+      ++refreshNumber.current;
+    };
+    // Initial collection is independent of the reading filters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const filteredArticles = useMemo(() => {
-    const selectedFreshness = FRESHNESS.find((item) => item.id === freshness);
-    const maxAgeHours = selectedFreshness?.hours ?? Infinity;
-    const normalizedQuery = query.trim().toLowerCase();
-    const now = Date.now();
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        event.key !== "/" ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey ||
+        readerDialog.current?.open ||
+        target?.isContentEditable ||
+        target?.closest("input, textarea, select")
+      )
+        return;
+      const search = document.getElementById("rassegna-search");
+      if (search) {
+        event.preventDefault();
+        search.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
-    return articles
-      .filter((article) => {
-        const matchesSource =
-          selectedSourceId === ALL || article.sourceId === selectedSourceId;
-        const matchesMap =
-          (region === ALL || article.region === region) &&
-          (language === ALL || article.language === language) &&
-          (ideology === ALL || article.ideologies.includes(ideology)) &&
-          (kind === ALL || article.kind === kind);
-        const matchesTopic = topic === ALL || article.topics.includes(topic);
-        const ageHours = article.publishedAt
-          ? (now - Date.parse(article.publishedAt)) / 36e5
-          : 0;
-        const matchesFreshness =
-          freshness === "all" || !article.publishedAt || ageHours <= maxAgeHours;
-        const haystack = `${article.title} ${article.excerpt} ${article.sourceName} ${article.categories.join(
-          " ",
-        )}`.toLowerCase();
-        const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
-
-        return (
-          matchesSource &&
-          matchesMap &&
-          matchesTopic &&
-          matchesFreshness &&
-          matchesQuery
-        );
-      })
-      .sort((left, right) => {
-        if (sort === "score") {
-          return right.score - left.score;
-        }
-        if (sort === "source") {
-          return left.sourceName.localeCompare(right.sourceName);
-        }
-        const leftDate = left.publishedAt ? Date.parse(left.publishedAt) : 0;
-        const rightDate = right.publishedAt ? Date.parse(right.publishedAt) : 0;
-        return rightDate - leftDate || right.score - left.score;
-      });
+  const allArticles = useMemo(
+    () => mergeArticles(savedArticles, articles),
+    [savedArticles, articles],
+  );
+  const filtered = useMemo(
+    () =>
+      filterArticles(
+        view === "salvati"
+          ? allArticles.filter((a) => savedIds.has(a.id))
+          : articles,
+        {
+          query,
+          region,
+          language,
+          kind,
+          ideology,
+          topic,
+          source: sourceId,
+          days: view === "salvati" ? Infinity : Number(days),
+          sort,
+        },
+      ),
+    [
+      view,
+      allArticles,
+      articles,
+      savedIds,
+      query,
+      region,
+      language,
+      kind,
+      ideology,
+      topic,
+      sourceId,
+      days,
+      sort,
+    ],
+  );
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
   }, [
-    articles,
-    freshness,
-    ideology,
-    kind,
-    language,
+    view,
     query,
     region,
-    selectedSourceId,
-    sort,
+    language,
+    kind,
+    ideology,
     topic,
+    sourceId,
+    days,
+    sort,
   ]);
-
-  const selectedArticle = useMemo(() => {
-    return (
-      filteredArticles.find((article) => article.id === selectedArticleId) ??
-      filteredArticles[0] ??
-      null
-    );
-  }, [filteredArticles, selectedArticleId]);
-
+  const selectedArticle = allArticles.find((a) => a.id === selectedId) ?? null;
   useEffect(() => {
-    if (selectedArticle && selectedArticle.id !== selectedArticleId) {
-      setSelectedArticleId(selectedArticle.id);
+    if (selectedArticle) {
+      if (!readerDialog.current?.open) readerDialog.current?.showModal();
+      readerDialog.current?.scrollTo({ top: 0 });
     }
-  }, [selectedArticle, selectedArticleId]);
+  }, [selectedArticle]);
 
-  const sourceDirectory = useMemo(() => {
+  const toggleSave = (article: Article) => {
+    const saving = !savedIds.has(article.id);
+    setSavedIds((current) => {
+      const next = new Set(current);
+      saving ? next.add(article.id) : next.delete(article.id);
+      return next;
+    });
+    setSavedArticles((current) =>
+      saving
+        ? mergeArticles(current, [article])
+        : current.filter((a) => a.id !== article.id),
+    );
+  };
+  const directory = useMemo(() => {
     const counts = new Map<string, number>();
+    const sources = new Map<string, DirectorySource>(
+      SOURCE_CATALOG.filter((s) => s.kind !== "radar").map((s) => [
+        s.id,
+        { ...s, count: 0, status: statuses[s.id] },
+      ]),
+    );
     for (const article of articles) {
       counts.set(article.sourceId, (counts.get(article.sourceId) ?? 0) + 1);
+      if (!sources.has(article.sourceId))
+        sources.set(article.sourceId, {
+          id: article.sourceId,
+          name: article.sourceName,
+          homepage: article.sourceHomepage,
+          region: article.region,
+          country: article.country,
+          language: article.language,
+          kind: article.kind,
+          ideologies: article.ideologies,
+          tags: article.topics,
+          priority: 1,
+          count: 0,
+          discovered: true,
+        });
     }
-
-    const directory = new Map<string, SourceViewItem>();
-    for (const source of sources) {
-      if (source.kind === "radar") {
-        continue;
-      }
-      directory.set(source.id, {
-        ...source,
-        articleCount: counts.get(source.id) ?? 0,
-        dynamic: false,
-        status: statuses[source.id],
-      });
-    }
-
-    for (const article of articles) {
-      const existing = directory.get(article.sourceId);
-      if (existing) {
-        existing.articleCount = counts.get(article.sourceId) ?? existing.articleCount;
-        existing.ideologies = Array.from(
-          new Set([...existing.ideologies, ...article.ideologies]),
-        );
-        existing.tags = Array.from(new Set([...existing.tags, ...article.topics]));
-        continue;
-      }
-
-      directory.set(article.sourceId, {
-        id: article.sourceId,
-        name: article.sourceName,
-        homepage: article.sourceHomepage,
-        region: article.region,
-        country: article.country,
-        language: article.language,
-        kind: article.kind,
-        ideologies: article.ideologies,
-        tags: article.topics,
-        priority: Math.max(1, Math.round(article.score / 20)),
-        articleCount: counts.get(article.sourceId) ?? 1,
-        dynamic: true,
-      });
-    }
-
-    return Array.from(directory.values()).sort((left, right) => {
-      return (
-        right.articleCount - left.articleCount ||
-        Number(right.dynamic) - Number(left.dynamic) ||
-        left.name.localeCompare(right.name)
-      );
-    });
-  }, [articles, sources, statuses]);
-
-  const visibleSourceDirectory = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return sourceDirectory.filter((source) => {
-      const matchesMap =
-        (region === ALL || source.region === region) &&
-        (language === ALL || source.language === language) &&
-        (ideology === ALL || source.ideologies.includes(ideology)) &&
-        (kind === ALL || source.kind === kind);
-      const haystack = `${source.name} ${source.country} ${source.language} ${source.kind} ${source.ideologies.join(
-        " ",
-      )} ${source.tags.join(" ")}`.toLowerCase();
-      const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
-
-      return matchesMap && matchesQuery;
-    });
-  }, [ideology, kind, language, query, region, sourceDirectory]);
-
-  const selectedSource = useMemo(() => {
-    const sourceId =
-      selectedSourceId !== ALL ? selectedSourceId : selectedArticle?.sourceId;
-    return sourceId
-      ? sourceDirectory.find((source) => source.id === sourceId) ?? null
-      : null;
-  }, [selectedArticle?.sourceId, selectedSourceId, sourceDirectory]);
-
-  const relatedArticles = useMemo(() => {
-    const sourceId =
-      selectedSourceId !== ALL ? selectedSourceId : selectedArticle?.sourceId;
-    const base = sourceId
-      ? articles.filter((article) => article.sourceId === sourceId)
-      : filteredArticles;
-
-    return base
-      .slice()
-      .sort((left, right) => {
-        const leftDate = left.publishedAt ? Date.parse(left.publishedAt) : 0;
-        const rightDate = right.publishedAt ? Date.parse(right.publishedAt) : 0;
-        return rightDate - leftDate || right.score - left.score;
-      })
-      .slice(0, 30);
-  }, [articles, filteredArticles, selectedArticle?.sourceId, selectedSourceId]);
-
-  const availableLanguages = useMemo(() => {
-    return Array.from(
-      new Set([...languages, ...articles.map((article) => article.language)]),
-    ).sort();
-  }, [articles, languages]);
-
-  const availableIdeologies = useMemo(() => {
-    return Array.from(
-      new Set([
-        ...ideologies,
-        ...articles.flatMap((article) => article.ideologies),
-      ]),
-    ).sort();
-  }, [articles, ideologies]);
-
-  const stats = useMemo(() => {
-    const ok = Object.values(statuses).filter((status) => status.ok).length;
-    const countries = new Set(sourceDirectory.map((source) => source.country)).size;
-    const emerged = sourceDirectory.filter((source) => source.dynamic).length;
-    return {
-      ok,
-      countries,
-      catalog: sources.length,
-      emerged,
-      indexed: articles.length,
-      visible: filteredArticles.length,
-      saved: savedIds.size,
-    };
-  }, [
-    articles.length,
-    filteredArticles.length,
-    savedIds.size,
-    sourceDirectory,
-    sources.length,
-    statuses,
-  ]);
-
-  const translateSelected = async () => {
-    if (!selectedArticle) {
-      return;
-    }
-
-    const text = `${selectedArticle.title}. ${selectedArticle.excerpt}`;
-    setTranslations((current) => ({
-      ...current,
-      [selectedArticle.id]: { status: "loading", text: "" },
-    }));
-
-    try {
-      const response = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          text,
-          from: selectedArticle.language,
-          to: "it",
-        }),
-      });
-      const payload = (await response.json()) as {
-        translatedText?: string;
-        error?: string;
-      };
-      if (!response.ok || !payload.translatedText) {
-        throw new Error(payload.error ?? "Traduzione non disponibile");
-      }
-      setTranslations((current) => ({
-        ...current,
-        [selectedArticle.id]: {
-          status: "ready",
-          text: payload.translatedText,
-        },
-      }));
-    } catch (error) {
-      setTranslations((current) => ({
-        ...current,
-        [selectedArticle.id]: {
-          status: "error",
-          text: "",
-          error: error instanceof Error ? error.message : "Errore di traduzione",
-        },
-      }));
-    }
-  };
-
-  const resetFilters = () => {
-    setRegion(ALL);
-    setLanguage(ALL);
-    setIdeology(ALL);
-    setKind(ALL);
-    setTopic(ALL);
-    setFreshness("7d");
-    setSort("fresh");
-    setQuery("");
-    setSelectedSourceId(ALL);
-  };
-
-  const selectedTranslation = selectedArticle
-    ? translations[selectedArticle.id] ?? { status: "idle", text: "" }
-    : { status: "idle", text: "" };
+    return Array.from(sources.values())
+      .map((s) => ({ ...s, count: counts.get(s.id) ?? 0 }))
+      .sort((a, b) => a.name.localeCompare(b.name, "it"));
+  }, [articles, statuses]);
+  const visibleSources = useMemo(
+    () =>
+      directory.filter(
+        (s) =>
+          (region === ALL || s.region === region) &&
+          (language === ALL || s.language === language) &&
+          (kind === ALL || s.kind === kind) &&
+          (ideology === ALL || s.ideologies.includes(ideology)) &&
+          (!query.trim() ||
+            `${s.name} ${s.country} ${s.tags.join(" ")} ${s.ideologies.join(" ")}`
+              .toLowerCase()
+              .includes(query.trim().toLowerCase())),
+      ),
+    [directory, region, language, kind, ideology, query],
+  );
+  const languages = useMemo(
+    () => [...new Set(SOURCE_CATALOG.map((s) => s.language))].sort(),
+    [],
+  );
+  const ideologies = useMemo(
+    () =>
+      [...new Set(SOURCE_CATALOG.flatMap((s) => s.ideologies))]
+        .filter((i) => i !== "radar" && i !== "trasversale")
+        .sort(),
+    [],
+  );
+  const countries = new Set(
+    SOURCE_CATALOG.filter((s) => s.kind !== "radar").map((s) => s.country),
+  ).size;
+  const okCount = Object.values(statuses).filter((s) => s.ok).length;
+  const failedCount = Object.values(statuses).filter((s) => !s.ok).length;
+  const filterCount =
+    [region, language, kind, ideology, topic, sourceId].filter((f) => f !== ALL)
+      .length + (query ? 1 : 0);
+  const heading = HEADINGS[view];
 
   return (
-    <main className="app-shell">
-      <section className="topbar" aria-label="Pannello principale">
-        <div className="brand-block">
-          <div className="brand-mark" aria-hidden="true">
-            <Newspaper size={24} />
-          </div>
-          <div>
-            <p className="eyebrow">Aggregatore socialista globale</p>
-            <h1>Rassegna Rossa</h1>
-          </div>
+    <div className="app-shell">
+      <a className="skip-link" href="#letture">
+        Vai ai contenuti
+      </a>
+      <header className="site-header">
+        <div className="utility-bar">
+          <span>{dateLabel}</span>
+          <span>
+            <span className="live-dot" /> Fonti aperte. Sguardo internazionale.
+          </span>
         </div>
-
-        <div className="command-strip">
-          <div className="search-box">
-            <Search size={18} aria-hidden="true" />
-            <input
-              aria-label="Cerca articoli"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cerca classe, guerra, Cina, sciopero..."
-            />
-            {query ? (
+        <div className="masthead">
+          <button
+            className="wordmark"
+            onClick={() => navigate("notizie")}
+            aria-label="Rassegna Rossa, pagina iniziale"
+          >
+            <span className="brand-symbol" aria-hidden="true">
+              <Globe2 size={30} strokeWidth={1.3} />
+            </span>
+            <span>
+              rassegna<span className="wordmark-red">rossa</span>
+              <span className="brand-period">.</span>
+            </span>
+          </button>
+          <p className="brand-note">
+            Le notizie passano.
+            <br />
+            <strong>Le connessioni restano.</strong>
+          </p>
+        </div>
+        <nav className="main-nav" aria-label="Navigazione principale">
+          <div className="nav-links">
+            {NAV.map((item) => (
               <button
-                className="icon-button ghost"
-                type="button"
-                onClick={() => setQuery("")}
-                aria-label="Cancella ricerca"
+                key={item.id}
+                aria-current={view === item.id ? "page" : undefined}
+                onClick={() => navigate(item.id)}
               >
-                <X size={16} />
+                {item.label}
+                {item.id === "salvati" && savedIds.size > 0 ? (
+                  <span className="nav-count">{savedIds.size}</span>
+                ) : null}
               </button>
+            ))}
+          </div>
+          <span className="nav-caption">
+            Un osservatorio, molte voci <ArrowUpRight size={14} />
+          </span>
+        </nav>
+      </header>
+
+      <main>
+        <section
+          className={`editorial-hero ${view !== "notizie" ? "hero-compact" : ""}`}
+          aria-labelledby="page-title"
+        >
+          <div className="hero-copy">
+            <p className="eyebrow">
+              <span className="small-square" /> {heading.overline}
+            </p>
+            <h1 id="page-title">{heading.title}</h1>
+            <p className="hero-description">{heading.description}</p>
+            {view === "notizie" ? (
+              <div className="hero-links">
+                <a href="#letture" className="button button-dark">
+                  Entra nella rassegna <ArrowDown size={16} />
+                </a>
+                <button
+                  className="text-link"
+                  onClick={() => navigate("teoria")}
+                >
+                  Esplora la biblioteca <ArrowUpRight size={16} />
+                </button>
+              </div>
             ) : null}
           </div>
-
-          <button
-            className="icon-text-button primary"
-            type="button"
-            onClick={() => void refresh("all")}
-            disabled={loading || !sources.length}
-          >
-            {loading ? <Loader2 className="spin" size={17} /> : <RefreshCcw size={17} />}
-            <span>{loading ? "Sincronizzo" : "Aggiorna mondo"}</span>
-          </button>
-        </div>
-      </section>
-
-      <section className="status-grid" aria-label="Metriche">
-        <Metric icon={<Globe2 size={18} />} label="Canali attivi" value={stats.catalog} />
-        <Metric icon={<Activity size={18} />} label="Radar globali" value={radarChannelCount} />
-        <Metric icon={<Radio size={18} />} label="Articoli raccolti" value={stats.indexed} />
-        <Metric icon={<ListFilter size={18} />} label="Fonti emerse" value={stats.emerged} />
-        <Metric icon={<CheckCircle2 size={18} />} label="Articoli filtrati" value={stats.visible} />
-      </section>
-
-      <section className="workspace">
-        <aside className="left-rail" aria-label="Filtri e navigazione">
-          <div className="view-tabs" role="tablist" aria-label="Sezioni">
-            <ViewButton
-              active={activeView === "notizie"}
-              icon={<Radio size={17} />}
-              label="Notizie"
-              onClick={() => setActiveView("notizie")}
-            />
-            <ViewButton
-              active={activeView === "teoria"}
-              icon={<LibraryBig size={17} />}
-              label="Teoria"
-              onClick={() => setActiveView("teoria")}
-            />
-            <ViewButton
-              active={activeView === "fonti"}
-              icon={<ListFilter size={17} />}
-              label="Fonti"
-              onClick={() => setActiveView("fonti")}
-            />
-          </div>
-
-          <FilterGroup title="Mappa">
-            <SelectFilter label="Area" value={region} onChange={setRegion}>
-              <option value={ALL}>Tutte le aree</option>
-              {regions.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </SelectFilter>
-            <SelectFilter label="Lingua" value={language} onChange={setLanguage}>
-              <option value={ALL}>Tutte le lingue</option>
-              {availableLanguages.map((item) => (
-                <option key={item} value={item}>
-                  {LANGUAGE_NAMES[item] ?? item.toUpperCase()}
-                </option>
-              ))}
-            </SelectFilter>
-            <SelectFilter label="Linea" value={ideology} onChange={setIdeology}>
-              <option value={ALL}>Tutte le linee</option>
-              {availableIdeologies.map((item) => (
-                <option key={item} value={item}>
-                  {capitalize(item)}
-                </option>
-              ))}
-            </SelectFilter>
-            <SelectFilter label="Tipo" value={kind} onChange={setKind}>
-              <option value={ALL}>Tutti i tipi</option>
-              {kinds.map((item) => (
-                <option key={item} value={item}>
-                  {capitalize(item)}
-                </option>
-              ))}
-            </SelectFilter>
-          </FilterGroup>
-
-          <FilterGroup title="Fonte">
-            {selectedSource ? (
-              <div className="selected-source">
-                <span>
-                  <strong>{selectedSource.name}</strong>
-                  <small>
-                    {selectedSource.articleCount.toLocaleString("it-IT")} articoli ·{" "}
-                    {selectedSource.dynamic ? "emersa dal radar" : "catalogata"}
-                  </small>
-                </span>
-                <button
-                  className="icon-button ghost"
-                  type="button"
-                  onClick={() => setSelectedSourceId(ALL)}
-                  aria-label="Libera fonte"
-                  title="Libera fonte"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ) : (
-              <div className="source-hint">
-                <strong>{visibleSourceDirectory.length.toLocaleString("it-IT")}</strong>
-                <span>fonti nella selezione corrente</span>
-                <small>
-                  {radarChannelCount.toLocaleString("it-IT")} radar · finestra{" "}
-                  {radarArticleWindow.toLocaleString("it-IT")} articoli
-                </small>
-              </div>
-            )}
-            <button
-              className="icon-text-button quiet"
-              type="button"
-              onClick={() => setActiveView("fonti")}
-            >
-              <ListFilter size={16} />
-              <span>Lista fonti</span>
-            </button>
-            <button
-              className="icon-text-button quiet"
-              type="button"
-              onClick={() => void refresh("source")}
-              disabled={
-                loading ||
-                selectedSourceId === ALL ||
-                !sourceLookup.has(selectedSourceId)
-              }
-            >
-              <RefreshCcw size={16} />
-              <span>Aggiorna fonte</span>
-            </button>
-          </FilterGroup>
-
-          <FilterGroup title="Taglio">
-            <div className="chip-grid">
-              <button
-                className={topic === ALL ? "chip active" : "chip"}
-                type="button"
-                onClick={() => setTopic(ALL)}
-              >
-                Tutti
-              </button>
-              {topics.map((item) => (
-                <button
-                  key={item.id}
-                  className={topic === item.id ? "chip active" : "chip"}
-                  type="button"
-                  onClick={() => setTopic(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
+          {view === "notizie" ? (
+            <div className="hero-art" aria-hidden="true">
+              <OrbitalGlobe />
+              <span className="globe-note">
+                NESSUN CONFINE
+                <br />
+                ALLA COMPRENSIONE.
+              </span>
+              <span className="globe-coordinate">
+                RR / OSSERVATORIO GLOBALE
+              </span>
             </div>
-          </FilterGroup>
-
-          <FilterGroup title="Tempo">
-            <div className="segmented">
-              {FRESHNESS.map((item) => (
-                <button
-                  key={item.id}
-                  className={freshness === item.id ? "active" : ""}
-                  type="button"
-                  onClick={() => setFreshness(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
+          ) : (
+            <div className="hero-index" aria-hidden="true">
+              {view === "fonti"
+                ? "02"
+                : view === "teoria"
+                  ? "03"
+                  : view === "salvati"
+                    ? "04"
+                    : "05"}
+              <span>RASSEGNA ROSSA</span>
             </div>
-            <SelectFilter label="Ordina" value={sort} onChange={setSort}>
-              {SORTS.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
-              ))}
-            </SelectFilter>
-            <button className="icon-text-button quiet" type="button" onClick={resetFilters}>
-              <Filter size={16} />
-              <span>Ripulisci filtri</span>
-            </button>
-            <button
-              className="icon-text-button quiet"
-              type="button"
-              onClick={() => void refresh("filtered")}
-              disabled={loading || !eligibleSources.length}
-            >
-              <RefreshCcw size={16} />
-              <span>Aggiorna selezione</span>
-            </button>
-          </FilterGroup>
-        </aside>
-
-        <section className="content-pane" aria-live="polite">
-          {activeView === "notizie" ? (
-            <NewsView
-              articles={filteredArticles}
-              loading={loading}
-              progress={progress}
-              lastRefresh={lastRefresh}
-              selectedArticleId={selectedArticle?.id ?? null}
-              savedIds={savedIds}
-              onSelect={(article) => {
-                setSelectedArticleId(article.id);
-                setActiveView("notizie");
-              }}
-              onToggleSave={(articleId) =>
-                setSavedIds((current) => toggleSet(current, articleId))
-              }
-            />
-          ) : null}
-
-          {activeView === "teoria" ? (
-            <TheoryView
-              articles={filteredArticles.filter((article) =>
-                article.topics.some((item) => item === "teoria" || item === "storia"),
-              )}
-              onSelectArticle={(article) => {
-                setSelectedArticleId(article.id);
-                setActiveView("notizie");
-              }}
-            />
-          ) : null}
-
-          {activeView === "fonti" ? (
-            <SourcesView
-              sources={visibleSourceDirectory}
-              selectedSourceId={selectedSourceId}
-              onSelect={(sourceId) => {
-                setSelectedSourceId(sourceId);
-                setActiveView("notizie");
-              }}
-              onClear={() => setSelectedSourceId(ALL)}
-            />
-          ) : null}
+          )}
         </section>
 
-        <aside className="reader-pane" aria-label="Esploratore fonte">
-          <ExplorerPanel
+        <div className="edition-line">
+          <span>
+            <span className="live-dot" />{" "}
+            {loading
+              ? "Raccolta delle notizie in corso"
+              : "Una rete di prospettive"}
+          </span>
+          <span>
+            {directory.filter((s) => !s.discovered).length} fonti in catalogo{" "}
+            <i>/</i> {countries} paesi <i>/</i> {languages.length} lingue
+          </span>
+          <button onClick={() => navigate("metodo")}>
+            Come leggiamo le fonti <ArrowUpRight size={14} />
+          </button>
+        </div>
+
+        {view === "notizie" ? (
+          <section className="dossier-strip" aria-label="Percorsi tematici">
+            {DOSSIERS.slice(0, 4).map((d) => (
+              <button
+                key={d.id}
+                onClick={() => pickTopic(d.id)}
+                className={topic === d.id ? "active" : ""}
+              >
+                <span>{d.number} / ESPLORA</span>
+                <strong>{d.short}</strong>
+                <ArrowUpRight size={18} />
+              </button>
+            ))}
+          </section>
+        ) : null}
+
+        <section
+          id="letture"
+          className="reading-section"
+          aria-label="Contenuti della rassegna"
+        >
+          {view === "notizie" || view === "salvati" || view === "fonti" ? (
+            <>
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">
+                    {view === "fonti"
+                      ? "L’INFORMAZIONE HA UN’ORIGINE"
+                      : view === "salvati"
+                        ? "IL TEMPO DI APPROFONDIRE"
+                        : "DALLA RETE AL CONTESTO"}
+                  </p>
+                  <h2>
+                    {view === "notizie"
+                      ? "La rassegna"
+                      : view === "salvati"
+                        ? "Le tue letture"
+                        : "Atlante delle fonti"}
+                    <span className="section-count">
+                      {view === "fonti"
+                        ? visibleSources.length
+                        : filtered.length}
+                    </span>
+                  </h2>
+                </div>
+                {view !== "salvati" ? (
+                  <button
+                    className="button button-outline"
+                    disabled={loading}
+                    onClick={() =>
+                      void refresh(
+                        filterCount && eligibleSources.length
+                          ? "selection"
+                          : "all",
+                      )
+                    }
+                  >
+                    {loading ? (
+                      <Loader2 size={15} className="spin" />
+                    ) : (
+                      <RefreshCcw size={15} />
+                    )}
+                    <span>{loading ? "Aggiornamento" : "Aggiorna mondo"}</span>
+                  </button>
+                ) : (
+                  <span className="local-note">
+                    <Bookmark size={15} /> Solo in questo browser
+                  </span>
+                )}
+              </div>
+              <div className="filter-toolbar">
+                <label className="search-box">
+                  <Search size={18} />
+                  <input
+                    id="rassegna-search"
+                    aria-label={
+                      view === "fonti" ? "Cerca fonti" : "Cerca articoli"
+                    }
+                    placeholder={
+                      view === "fonti"
+                        ? "Cerca una fonte, un paese…"
+                        : "Cerca notizie, fonti, parole chiave…"
+                    }
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                  {query ? (
+                    <button
+                      onClick={() => setQuery("")}
+                      aria-label="Cancella ricerca"
+                    >
+                      <X size={16} />
+                    </button>
+                  ) : (
+                    <kbd>/</kbd>
+                  )}
+                </label>
+                <label className="inline-select">
+                  <Globe2 size={16} />
+                  <span className="sr-only">Area geografica</span>
+                  <select
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                  >
+                    <option value={ALL}>Tutto il mondo</option>
+                    {REGION_ORDER.map((r) => (
+                      <option key={r}>{r}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} />
+                </label>
+                {view === "notizie" ? (
+                  <label className="inline-select">
+                    <span className="sr-only">Periodo</span>
+                    <select
+                      value={days}
+                      onChange={(e) => setDays(e.target.value)}
+                    >
+                      <option value="1">Ultime 24 ore</option>
+                      <option value="7">Ultimi 7 giorni</option>
+                      <option value="30">Ultimi 30 giorni</option>
+                      <option value="Infinity">Tutte le date</option>
+                    </select>
+                    <ChevronDown size={14} />
+                  </label>
+                ) : null}
+                <button
+                  className={`filter-toggle ${filtersOpen ? "active" : ""}`}
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                  aria-expanded={filtersOpen}
+                  aria-controls="advanced-filters"
+                >
+                  <SlidersHorizontal size={16} /> Filtri{" "}
+                  {filterCount > 0 ? <span>{filterCount}</span> : null}
+                </button>
+              </div>
+              {filtersOpen ? (
+                <div id="advanced-filters" className="advanced-filters">
+                  <Select label="Lingua" value={language} change={setLanguage}>
+                    <option value={ALL}>Tutte le lingue</option>
+                    {languages.map((l) => (
+                      <option value={l} key={l}>
+                        {LANGUAGES[l] ?? l.toUpperCase()}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select label="Tipo di fonte" value={kind} change={setKind}>
+                    <option value={ALL}>Tutti i tipi</option>
+                    {[...new Set(directory.map((s) => s.kind))].map((k) => (
+                      <option key={k}>{k}</option>
+                    ))}
+                  </Select>
+                  <Select
+                    label="Orientamento dichiarato nel catalogo"
+                    value={ideology}
+                    change={setIdeology}
+                  >
+                    <option value={ALL}>Tutti gli orientamenti</option>
+                    {ideologies.map((i) => (
+                      <option key={i}>{i}</option>
+                    ))}
+                  </Select>
+                  {view !== "fonti" ? (
+                    <Select label="Ordina per" value={sort} change={setSort}>
+                      <option value="fresh">Più recenti</option>
+                      <option value="score">Punteggio tematico</option>
+                      <option value="source">Nome della fonte</option>
+                    </Select>
+                  ) : null}
+                  <button className="text-link" onClick={reset}>
+                    <X size={14} /> Azzera filtri
+                  </button>
+                </div>
+              ) : null}
+              {view !== "fonti" ? (
+                <div className="topic-tabs" aria-label="Argomenti">
+                  <button
+                    onClick={() => setTopic(ALL)}
+                    aria-pressed={topic === ALL}
+                  >
+                    Tutti i temi
+                  </button>
+                  {TOPIC_TAXONOMY.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setTopic(t.id)}
+                      aria-pressed={topic === t.id}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+              {sourceId !== ALL ? (
+                <div className="active-source">
+                  <Newspaper size={16} />
+                  <span>
+                    Fonte:{" "}
+                    <strong>
+                      {directory.find((s) => s.id === sourceId)?.name ??
+                        sourceId}
+                    </strong>
+                  </span>
+                  <button
+                    onClick={() => setSourceId(ALL)}
+                    aria-label="Mostra tutte le fonti"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+              ) : null}
+              {storageWarning ? (
+                <p className="notice" role="status">
+                  Il browser non ha consentito l’accesso ai salvataggi. Puoi
+                  continuare a leggere, ma i nuovi preferiti potrebbero non
+                  restare dopo la chiusura.
+                </p>
+              ) : null}
+              {loading && view !== "salvati" ? (
+                <div className="sync-progress" role="status">
+                  <div>
+                    <span>
+                      <Loader2 size={13} className="spin" /> Le notizie arrivano
+                      progressivamente
+                    </span>
+                    <span>
+                      {progress.done} / {progress.total} canali{" "}
+                      <button onClick={stopRefresh}>Interrompi</button>
+                    </span>
+                  </div>
+                  <progress
+                    value={progress.done}
+                    max={progress.total || 1}
+                    aria-label="Raccolta dei canali"
+                  />
+                </div>
+              ) : null}
+              {view === "fonti" ? (
+                <SourcesDirectory
+                  sources={visibleSources}
+                  onSelect={(id) => {
+                    reset();
+                    setView("notizie");
+                    setSourceId(id);
+                  }}
+                />
+              ) : (
+                <div className="news-layout">
+                  <div className="news-main">
+                    {topic !== ALL ? (
+                      <div className="topic-intro">
+                        <p className="eyebrow">PERCORSO TEMATICO</p>
+                        <h3>
+                          {DOSSIERS.find((d) => d.id === topic)?.title ??
+                            TOPIC_TAXONOMY.find((t) => t.id === topic)?.label}
+                        </h3>
+                        <p>
+                          {DOSSIERS.find((d) => d.id === topic)?.description ??
+                            "Una selezione automatica dai feed: confronta le voci e risali sempre alla fonte originale."}
+                        </p>
+                      </div>
+                    ) : null}
+                    <div className="news-grid" aria-label="Articoli">
+                      {filtered.slice(0, visibleCount).map((article, index) => (
+                        <ArticleCard
+                          key={article.id}
+                          article={article}
+                          featured={index === 0 && view === "notizie"}
+                          saved={savedIds.has(article.id)}
+                          onSelect={() => setSelectedId(article.id)}
+                          onSave={() => toggleSave(article)}
+                        />
+                      ))}
+                    </div>
+                    {!filtered.length ? (
+                      <EmptyState
+                        loading={loading && view !== "salvati"}
+                        saved={view === "salvati"}
+                        filtered={filterCount > 0 || topic !== ALL}
+                        onReset={reset}
+                        onExplore={() =>
+                          navigate(view === "salvati" ? "notizie" : "fonti")
+                        }
+                        onRetry={() =>
+                          void refresh(
+                            filterCount && eligibleSources.length
+                              ? "selection"
+                              : "all",
+                          )
+                        }
+                      />
+                    ) : null}
+                    {filtered.length > visibleCount ? (
+                      <button
+                        className="button button-outline load-more"
+                        onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+                      >
+                        Altri{" "}
+                        {Math.min(PAGE_SIZE, filtered.length - visibleCount)}{" "}
+                        articoli <ArrowDown size={16} />
+                        <span>
+                          {visibleCount} di {filtered.length}
+                        </span>
+                      </button>
+                    ) : null}
+                    {!loading && failedCount > 0 && view === "notizie" ? (
+                      <p className="feed-note">
+                        <CircleHelp size={15} /> {failedCount} canali non hanno
+                        risposto. Le notizie disponibili restano leggibili.{" "}
+                        <button onClick={() => navigate("fonti")}>
+                          Consulta le fonti
+                        </button>
+                      </p>
+                    ) : null}
+                  </div>
+                  <aside
+                    className="editorial-sidebar"
+                    aria-label="Per orientarti"
+                  >
+                    <div className="sidebar-section">
+                      <p className="eyebrow">IL FILO DELLE NOTIZIE</p>
+                      <h3>
+                        Segui una domanda.
+                        <br />
+                        <em>Non solo un titolo.</em>
+                      </h3>
+                      <div className="sidebar-topics">
+                        {DOSSIERS.map((d) => (
+                          <button key={d.id} onClick={() => pickTopic(d.id)}>
+                            <span>{d.number}</span>
+                            <strong>{d.title}</strong>
+                            <ArrowUpRight size={15} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="library-promo">
+                      <BookOpen size={26} strokeWidth={1.3} />
+                      <p className="eyebrow">OLTRE L’ATTUALITÀ</p>
+                      <h3>
+                        Le idee hanno
+                        <br />
+                        una storia.
+                      </h3>
+                      <p>
+                        Dieci punti di partenza, tre percorsi. Da Marx alla
+                        riproduzione sociale.
+                      </p>
+                      <button
+                        className="text-link"
+                        onClick={() => navigate("teoria")}
+                      >
+                        Apri la biblioteca <ArrowRight size={16} />
+                      </button>
+                      <span className="promo-letter" aria-hidden="true">
+                        R
+                      </span>
+                    </div>
+                    <div className="sidebar-section network-note">
+                      <p className="eyebrow">L’OSSERVATORIO</p>
+                      <div>
+                        <strong>{okCount}</strong>
+                        <span>
+                          canali che hanno risposto
+                          <br />
+                          in questa sessione
+                        </span>
+                      </div>
+                      <p>
+                        {RADAR_CHANNEL_COUNT} canali radar affiancano le fonti
+                        del catalogo. Sono strumenti di ricerca, non editori né
+                        garanzie di attendibilità.
+                      </p>
+                      <button
+                        className="text-link"
+                        onClick={() => navigate("metodo")}
+                      >
+                        Leggi il metodo <ArrowUpRight size={14} />
+                      </button>
+                      {lastRefresh ? (
+                        <small>
+                          Ultimo tentativo: {relativeTime(lastRefresh)}
+                        </small>
+                      ) : null}
+                    </div>
+                  </aside>
+                </div>
+              )}
+            </>
+          ) : null}
+          {view === "teoria" ? (
+            <LibraryView query={query} setQuery={setQuery} />
+          ) : null}
+          {view === "metodo" ? (
+            <MethodView onSources={() => navigate("fonti")} />
+          ) : null}
+        </section>
+      </main>
+      <footer className="site-footer">
+        <div className="footer-top">
+          <span className="footer-brand">
+            rassegna<span>rossa.</span>
+          </span>
+          <p>
+            Per capire il mondo,
+            <br />
+            mettiamo in relazione le sue voci.
+          </p>
+          <button className="text-link" onClick={() => navigate("metodo")}>
+            Il progetto e il metodo <ArrowUpRight size={16} />
+          </button>
+        </div>
+        <div className="footer-bottom">
+          <span>Aggregatore socialista globale · Notizie, teoria, fonti.</span>
+          <span>
+            Ogni contenuto appartiene alla sua fonte. I salvati restano nel tuo
+            browser.
+          </span>
+        </div>
+      </footer>
+      <dialog
+        ref={readerDialog}
+        className="reader-dialog"
+        aria-labelledby="reader-title"
+        onClose={() => setSelectedId(null)}
+        onCancel={() => setSelectedId(null)}
+      >
+        {selectedArticle ? (
+          <ArticleReader
+            key={selectedArticle.id}
             article={selectedArticle}
-            source={selectedSource}
-            relatedArticles={relatedArticles}
-            readerMode={readerMode}
-            setReaderMode={setReaderMode}
-            translation={selectedTranslation}
-            onTranslate={() => void translateSelected()}
-            onSelectArticle={(article) => {
-              setSelectedArticleId(article.id);
-              setActiveView("notizie");
-            }}
-            saved={selectedArticle ? savedIds.has(selectedArticle.id) : false}
-            onToggleSave={() => {
-              if (selectedArticle) {
-                setSavedIds((current) => toggleSet(current, selectedArticle.id));
-              }
-            }}
+            saved={savedIds.has(selectedArticle.id)}
+            onSave={() => toggleSave(selectedArticle)}
+            onClose={() => readerDialog.current?.close()}
+            related={articles
+              .filter(
+                (a) =>
+                  a.sourceId === selectedArticle.sourceId &&
+                  a.id !== selectedArticle.id,
+              )
+              .slice(0, 3)}
+            onSelect={setSelectedId}
           />
-        </aside>
-      </section>
-    </main>
-  );
-}
-
-function Metric({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: number;
-}) {
-  return (
-    <div className="metric">
-      <span aria-hidden="true">{icon}</span>
-      <div>
-        <strong>{value.toLocaleString("it-IT")}</strong>
-        <small>{label}</small>
-      </div>
+        ) : null}
+      </dialog>
     </div>
   );
 }
 
-function ViewButton({
-  active,
-  icon,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  icon: ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      aria-pressed={active}
-      className={active ? "view-tab active" : "view-tab"}
-      type="button"
-      onClick={onClick}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
-  );
-}
-
-function FilterGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="filter-group">
-      <h2>{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-function SelectFilter({
+function Select({
   label,
   value,
-  onChange,
+  change,
   children,
 }: {
   label: string;
   value: string;
-  onChange: (value: string) => void;
+  change: (value: string) => void;
   children: ReactNode;
 }) {
   return (
-    <label className="select-filter">
+    <label className="select-field">
       <span>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
+      <select value={value} onChange={(e) => change(e.target.value)}>
         {children}
       </select>
     </label>
   );
 }
 
-function NewsView({
-  articles,
-  loading,
-  progress,
-  lastRefresh,
-  selectedArticleId,
-  savedIds,
-  onSelect,
-  onToggleSave,
-}: {
-  articles: Article[];
-  loading: boolean;
-  progress: { done: number; total: number };
-  lastRefresh: string | null;
-  selectedArticleId: string | null;
-  savedIds: Set<string>;
-  onSelect: (article: Article) => void;
-  onToggleSave: (articleId: string) => void;
-}) {
+function OrbitalGlobe() {
   return (
-    <div className="news-view">
-      <div className="section-head">
-        <div>
-          <p className="eyebrow">Flusso vivo</p>
-          <h2>Notizie navigabili</h2>
-        </div>
-        <div className="sync-state">
-          {loading ? (
-            <>
-              <Loader2 className="spin" size={16} />
-              <span>
-                {progress.done}/{progress.total || 1}
-              </span>
-            </>
-          ) : (
-            <>
-              <Clock3 size={16} />
-              <span>{lastRefresh ? relativeTime(lastRefresh) : "In attesa"}</span>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="article-list">
-        {articles.map((article) => (
-          <ArticleCard
-            key={article.id}
-            article={article}
-            active={article.id === selectedArticleId}
-            saved={savedIds.has(article.id)}
-            onSelect={() => onSelect(article)}
-            onToggleSave={() => onToggleSave(article.id)}
-          />
-        ))}
-        {!articles.length && !loading ? (
-          <div className="empty-state">
-            <ShieldAlert size={28} />
-            <strong>Nessun articolo nel taglio scelto</strong>
-            <span>Cambia area, tempo o tema e rilancia la rete.</span>
-          </div>
-        ) : null}
-      </div>
-    </div>
+    <svg viewBox="0 0 500 370" className="orbital-globe">
+      <defs>
+        <clipPath id="globe-clip">
+          <circle cx="255" cy="180" r="139" />
+        </clipPath>
+        <pattern
+          id="globe-dots"
+          width="8"
+          height="8"
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx="2" cy="2" r="1" fill="currentColor" opacity=".28" />
+        </pattern>
+      </defs>
+      <circle cx="255" cy="180" r="139" fill="url(#globe-dots)" />
+      <g fill="none" stroke="currentColor" strokeWidth=".8" opacity=".65">
+        <circle cx="255" cy="180" r="139" />
+        <ellipse cx="255" cy="180" rx="94" ry="139" />
+        <ellipse cx="255" cy="180" rx="44" ry="139" />
+        <ellipse cx="255" cy="180" rx="139" ry="46" />
+        <ellipse cx="255" cy="180" rx="139" ry="96" />
+        <path d="M116 180h278M255 41v278" />
+      </g>
+      <g clipPath="url(#globe-clip)" fill="currentColor" opacity=".85">
+        <path d="m163 86 27-19 31 10 4 24-17 13 3 21-15 13-6 24-23-8-8-31-17-19zm29 95 29 8 13 26-6 30-17 25-7 28-15-16 3-33-15-31zM263 89l24-11 13 16 25-3 9 12 24 1 31 20-11 21-29 3-15-13-20 7-14-17-22 4-5-19-19-1zm7 49 28 2 21 22-5 36-17 31-19-13-7-32-16-20zm73 29 16-10 14 20-4 22-14-5zm5 76 24-9 22 16-5 22-27-3-20-12z" />
+      </g>
+      <g fill="none" stroke="currentColor">
+        <ellipse
+          cx="255"
+          cy="180"
+          rx="221"
+          ry="69"
+          transform="rotate(-28 255 180)"
+          strokeWidth="1.3"
+        />
+        <ellipse
+          cx="255"
+          cy="180"
+          rx="204"
+          ry="91"
+          transform="rotate(34 255 180)"
+          strokeDasharray="3 6"
+          opacity=".6"
+        />
+      </g>
+      <circle cx="100" cy="251" r="5" fill="currentColor" />
+      <circle cx="420" cy="109" r="7" fill="currentColor" />
+      <path
+        d="M100 251h-42v29M420 109h32V79"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth=".8"
+      />
+    </svg>
   );
 }
 
 function ArticleCard({
   article,
-  active,
+  featured = false,
   saved,
   onSelect,
-  onToggleSave,
+  onSave,
 }: {
   article: Article;
-  active: boolean;
+  featured?: boolean;
   saved: boolean;
   onSelect: () => void;
-  onToggleSave: () => void;
+  onSave: () => void;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const image = safeWebUrl(article.image);
   return (
-    <article className={active ? "article-card active" : "article-card"}>
-      <button className="article-main" type="button" onClick={onSelect}>
-        <span className="article-meta">
-          <span>{article.sourceName}</span>
-          <span>{article.country}</span>
-          <span>{article.publishedAt ? relativeTime(article.publishedAt) : "Senza data"}</span>
-        </span>
-        <h3>{article.title}</h3>
-        <p>{article.excerpt || "Anteprima non disponibile dal feed."}</p>
-        <span className="topic-row">
-          {article.topics.slice(0, 4).map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-          {article.ideologies.slice(0, 2).map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-        </span>
+    <article className={`article-card ${featured ? "featured" : ""}`}>
+      <button className="article-open" onClick={onSelect}>
+        {image && !imageFailed ? (
+          <div className="article-image">
+            <img
+              src={image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onError={() => setImageFailed(true)}
+            />
+            <span className="image-category">{article.region}</span>
+          </div>
+        ) : featured ? (
+          <div className="article-typographic" aria-hidden="true">
+            <Globe2 size={80} strokeWidth={0.5} />
+            <span>VOCI DAL MONDO</span>
+          </div>
+        ) : null}
+        <div className="article-copy">
+          <div className="article-meta">
+            <span>{article.sourceName}</span>
+            <span>
+              {article.publishedAt
+                ? relativeTime(article.publishedAt)
+                : "Data non indicata"}
+            </span>
+          </div>
+          <h3>{article.title}</h3>
+          <p>
+            {article.excerpt ||
+              "Questo feed non fornisce un estratto. Apri la scheda per leggere l’articolo sul sito della fonte."}
+          </p>
+        </div>
       </button>
-      <div className="article-actions">
-        <button
-          className="icon-button"
-          type="button"
-          onClick={onToggleSave}
-          aria-label={saved ? "Rimuovi dai salvati" : "Salva articolo"}
-          title={saved ? "Rimuovi dai salvati" : "Salva articolo"}
-        >
-          {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
-        </button>
-        <a
-          className="icon-button"
-          href={article.link}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Apri fonte"
-          title="Apri fonte"
-        >
-          <ArrowUpRight size={17} />
-        </a>
+      <div className="article-bottom">
+        <span>
+          {article.country} <i>·</i>{" "}
+          {LANGUAGES[article.language] ?? article.language.toUpperCase()}
+        </span>
+        <div>
+          <button
+            className={`save-button ${saved ? "is-saved" : ""}`}
+            onClick={onSave}
+            aria-label={
+              saved
+                ? `Rimuovi dai salvati: ${article.title}`
+                : `Salva articolo: ${article.title}`
+            }
+            aria-pressed={saved}
+          >
+            {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+          </button>
+          <button
+            className="read-button"
+            onClick={onSelect}
+            aria-label={`Leggi la scheda: ${article.title}`}
+          >
+            <ArrowUpRight size={19} />
+          </button>
+        </div>
       </div>
     </article>
   );
 }
 
-function TheoryView({
-  articles,
-  onSelectArticle,
+function EmptyState({
+  loading,
+  saved,
+  filtered,
+  onReset,
+  onExplore,
+  onRetry,
 }: {
-  articles: Article[];
-  onSelectArticle: (article: Article) => void;
+  loading: boolean;
+  saved: boolean;
+  filtered: boolean;
+  onReset: () => void;
+  onExplore: () => void;
+  onRetry: () => void;
 }) {
   return (
-    <div className="theory-view">
-      <div className="section-head">
-        <div>
-          <p className="eyebrow">Biblioteca rossa</p>
-          <h2>Teoria, storia, lessico</h2>
-        </div>
-        <Sparkles size={20} />
+    <div className="empty-state">
+      <span className="empty-icon">
+        {loading ? (
+          <Loader2 size={27} className="spin" />
+        ) : saved ? (
+          <Bookmark size={27} />
+        ) : (
+          <Search size={27} />
+        )}
+      </span>
+      <p className="eyebrow">
+        {loading
+          ? "COLLEGHIAMO LE FONTI"
+          : saved
+            ? "IL TUO TACCUINO"
+            : "UNO SGUARDO PIÙ AMPIO"}
+      </p>
+      <h3>
+        {loading
+          ? "Le prime voci stanno arrivando."
+          : saved
+            ? "Le letture importanti, tutte qui."
+            : "Nessun articolo in questa selezione."}
+      </h3>
+      <p>
+        {loading
+          ? "Ogni fonte ha i suoi tempi. Gli articoli compariranno appena disponibili; nel frattempo puoi esplorare il catalogo e la biblioteca."
+          : saved
+            ? "Usa il segnalibro sulle schede per conservare titolo, estratto e link. I vecchi segnalibri saranno recuperati quando le relative notizie torneranno nei feed."
+            : "Prova un altro tema, una finestra temporale più ampia oppure consulta direttamente le fonti. L’assenza di risultati non significa assenza di notizie."}
+      </p>
+      <div className="empty-actions">
+        {filtered ? (
+          <button className="button button-dark" onClick={onReset}>
+            Azzera filtri <X size={14} />
+          </button>
+        ) : null}
+        <button className="button button-outline" onClick={onExplore}>
+          {saved ? "Esplora le notizie" : "Esplora le fonti"}
+          <ArrowRight size={15} />
+        </button>
+        {!saved && !loading ? (
+          <button className="text-link" onClick={onRetry}>
+            <RefreshCcw size={14} /> Riprova aggiornamento
+          </button>
+        ) : null}
       </div>
+    </div>
+  );
+}
 
-      <div className="theory-grid">
-        {THEORY_LIBRARY.map((item) => (
-          <article className="theory-card" key={item.id}>
-            <span className="lane">{item.lane}</span>
-            <h3>{item.title}</h3>
-            <p className="byline">
-              {item.author} · {item.period}
+function SourcesDirectory({
+  sources,
+  onSelect,
+}: {
+  sources: DirectorySource[];
+  onSelect: (id: string) => void;
+}) {
+  const [limit, setLimit] = useState(36);
+  return (
+    <>
+      <div className="directory-intro">
+        <p>
+          Ogni fonte ha una storia e un punto di vista. Le etichette sono
+          classificazioni del catalogo, non certificazioni editoriali. Le fonti
+          emerse dai radar sono indicate separatamente.
+        </p>
+        <span>
+          <span className="status-dot status-ok" /> Feed disponibile{" "}
+          <span className="status-dot status-wait" /> Non verificato o non
+          disponibile
+        </span>
+      </div>
+      <div className="source-grid">
+        {sources.slice(0, limit).map((s) => (
+          <article className="source-card" key={s.id}>
+            <div className="source-card-top">
+              <span className="source-monogram" aria-hidden="true">
+                {s.name
+                  .replace(/^(the|il|la|le) /i, "")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </span>
+              <span
+                className={`source-availability ${(s.status ? s.status.ok : s.count > 0) ? "available" : ""}`}
+              >
+                <span
+                  className={`status-dot ${(s.status ? s.status.ok : s.count > 0) ? "status-ok" : "status-wait"}`}
+                />
+                {s.status && !s.status.ok
+                  ? "Ultimo tentativo fallito"
+                  : s.count
+                    ? `${s.count} articoli`
+                    : s.status?.ok
+                      ? "Feed disponibile"
+                      : "Non ancora verificato"}
+              </span>
+            </div>
+            <span className="source-region">
+              {s.region} / {s.country}
+            </span>
+            <h3>{s.name}</h3>
+            <p>
+              {LANGUAGES[s.language] ?? s.language.toUpperCase()} <i>·</i>{" "}
+              {s.kind}
+              {s.discovered ? " · Emersa dal radar" : ""}
             </p>
-            <p>{item.summary}</p>
-            <div className="topic-row">
-              {item.tags.map((tag) => (
+            <div className="source-tags">
+              {s.ideologies.slice(0, 3).map((tag) => (
                 <span key={tag}>{tag}</span>
               ))}
             </div>
-            <div className="link-row">
-              {item.links.map((link) => (
-                <a key={link.url} href={link.url} target="_blank" rel="noreferrer">
-                  <ExternalLink size={15} />
-                  {link.label}
-                </a>
-              ))}
+            <div className="source-card-actions">
+              <button className="text-link" onClick={() => onSelect(s.id)}>
+                Leggi le notizie <ArrowRight size={15} />
+              </button>
+              <a
+                href={safeWebUrl(s.homepage) ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Apri il sito di ${s.name}`}
+              >
+                <ExternalLink size={17} />
+              </a>
             </div>
           </article>
         ))}
       </div>
+      {!sources.length ? (
+        <p className="notice">
+          Nessuna fonte corrisponde alla ricerca. Prova un altro paese, una
+          lingua diversa o azzera i filtri.
+        </p>
+      ) : null}
+      {sources.length > limit ? (
+        <button
+          className="button button-outline load-more"
+          onClick={() => setLimit((n) => n + 36)}
+        >
+          Mostra altre fonti <ArrowDown size={15} />
+        </button>
+      ) : null}
+    </>
+  );
+}
 
-      <div className="section-head compact">
+function LibraryView({
+  query,
+  setQuery,
+}: {
+  query: string;
+  setQuery: (s: string) => void;
+}) {
+  const [path, setPath] = useState("all");
+  const active = READING_PATHS.find((p) => p.id === path);
+  const books = THEORY_LIBRARY.filter(
+    (book) =>
+      (!active || active.books.includes(book.id)) &&
+      `${book.title} ${book.author} ${book.summary} ${book.tags.join(" ")}`
+        .toLowerCase()
+        .includes(query.trim().toLowerCase()),
+  );
+  return (
+    <div className="library-view">
+      <div className="section-heading">
         <div>
-          <p className="eyebrow">Dai feed</p>
-          <h2>Articoli teorici e storici</h2>
+          <p className="eyebrow">NON SERVE LEGGERE TUTTO. SERVE INIZIARE.</p>
+          <h2>Tre percorsi, molte domande.</h2>
         </div>
+        <BookOpen size={24} strokeWidth={1.3} />
       </div>
-      <div className="article-list compact-list">
-        {articles.slice(0, 12).map((article) => (
-          <ArticleCard
-            key={article.id}
-            article={article}
-            active={false}
-            saved={false}
-            onSelect={() => onSelectArticle(article)}
-            onToggleSave={() => undefined}
-          />
+      <div className="reading-paths">
+        {READING_PATHS.map((p, i) => (
+          <button
+            className={`reading-path ${path === p.id ? "active" : ""}`}
+            key={p.id}
+            onClick={() => setPath(path === p.id ? ALL : p.id)}
+            aria-pressed={path === p.id}
+          >
+            <span className="path-number">0{i + 1}</span>
+            <span className="eyebrow">{p.subtitle}</span>
+            <h3>{p.title}</h3>
+            <p>{p.description}</p>
+            <span className="path-link">
+              {p.books.length} letture <ArrowUpRight size={17} />
+            </span>
+          </button>
         ))}
       </div>
-    </div>
-  );
-}
-
-function SourcesView({
-  sources,
-  selectedSourceId,
-  onSelect,
-  onClear,
-}: {
-  sources: SourceViewItem[];
-  selectedSourceId: string;
-  onSelect: (sourceId: string) => void;
-  onClear: () => void;
-}) {
-  return (
-    <div className="sources-view">
-      <div className="section-head">
+      <div className="library-toolbar">
         <div>
-          <p className="eyebrow">Atlante fonti</p>
-          <h2>{sources.length.toLocaleString("it-IT")} fonti navigabili</h2>
+          <p className="eyebrow">TESTI E ORIZZONTI</p>
+          <h2>{active?.title ?? "La biblioteca aperta"}</h2>
         </div>
-        {selectedSourceId !== ALL ? (
-          <button className="icon-text-button quiet compact-action" type="button" onClick={onClear}>
-            <X size={15} />
-            <span>Tutte</span>
+        <label className="search-box">
+          <Search size={17} />
+          <input
+            aria-label="Cerca nella biblioteca"
+            placeholder="Un autore, un testo, un concetto…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+        {active ? (
+          <button className="text-link" onClick={() => setPath(ALL)}>
+            Tutti i testi <X size={15} />
           </button>
         ) : null}
       </div>
-      <div className="source-table" role="table" aria-label="Fonti">
-        {sources.map((source) => {
-          return (
+      <div className="book-grid">
+        {books.map((book, index) => (
+          <article className="book-card" key={book.id}>
             <div
-              className={
-                selectedSourceId === source.id ? "source-row active" : "source-row"
-              }
-              key={source.id}
+              className={`book-cover book-tone-${index % 4}`}
+              aria-hidden="true"
             >
-              <button
-                className="source-row-main"
-                type="button"
-                onClick={() => onSelect(source.id)}
-              >
-                <span
-                  className={
-                    source.status?.ok || source.articleCount > 0
-                      ? "source-dot ok"
-                      : "source-dot"
-                  }
-                />
-                <span>
-                  <strong>{source.name}</strong>
-                  <small>
-                    {source.country} ·{" "}
-                    {LANGUAGE_NAMES[source.language] ?? source.language.toUpperCase()} ·{" "}
-                    {source.kind}
-                  </small>
-                </span>
-                <span className="source-tags">
-                  {source.ideologies.slice(0, 3).map((item) => (
-                    <i key={item}>{item}</i>
-                  ))}
-                </span>
-                <span className="source-count">
-                  {source.articleCount > 0
-                    ? `${source.articleCount.toLocaleString("it-IT")} articoli`
-                    : source.status
-                      ? source.status.ok
-                        ? `${source.status.count} item`
-                        : "errore"
-                      : "in attesa"}
-                </span>
-              </button>
-              <a
-                className="icon-button"
-                href={source.homepage}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`Apri ${source.name}`}
-                title={`Apri ${source.name}`}
-              >
-                <ExternalLink size={16} />
-              </a>
+              <span>LA BIBLIOTECA / RASSEGNA ROSSA</span>
+              <strong>{book.title}</strong>
+              <em>{book.author}</em>
+              <span className="cover-year">{book.period}</span>
             </div>
-          );
-        })}
+            <div className="book-info">
+              <p className="eyebrow">{book.lane}</p>
+              <h3>{book.title}</h3>
+              <p className="book-author">
+                {book.author} · {book.period}
+              </p>
+              <p>{book.summary}</p>
+              <div className="book-links">
+                {book.links.map((link) => (
+                  <a
+                    href={link.url}
+                    key={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.label}
+                    <ArrowUpRight size={15} />
+                  </a>
+                ))}
+              </div>
+              <small>
+                {["dipendenza", "femminismo-marxista"].includes(book.id)
+                  ? "Percorso tematico: i link portano a riviste e archivi di approfondimento."
+                  : book.id === "gramsciana"
+                    ? "Il link porta alla Fondazione Gramsci, non al testo integrale dei Quaderni."
+                    : "Testo disponibile presso l’archivio esterno indicato."}
+              </small>
+            </div>
+          </article>
+        ))}
       </div>
-    </div>
-  );
-}
-
-function ExplorerPanel({
-  article,
-  source,
-  relatedArticles,
-  readerMode,
-  setReaderMode,
-  translation,
-  onTranslate,
-  onSelectArticle,
-  saved,
-  onToggleSave,
-}: {
-  article: Article | null;
-  source: SourceViewItem | null;
-  relatedArticles: Article[];
-  readerMode: "originale" | "tradotto";
-  setReaderMode: (mode: "originale" | "tradotto") => void;
-  translation: TranslationState;
-  onTranslate: () => void;
-  onSelectArticle: (article: Article) => void;
-  saved: boolean;
-  onToggleSave: () => void;
-}) {
-  if (!article && !source) {
-    return (
-      <div className="reader-empty">
-        <PanelRightOpen size={30} />
-        <strong>Seleziona una fonte</strong>
-        <span>La coda articoli apparira qui.</span>
-      </div>
-    );
-  }
-
-  const translatedUrl = article
-    ? `https://translate.google.com/translate?sl=auto&tl=it&u=${encodeURIComponent(
-        article.link,
-      )}`
-    : "";
-  const readerUrl = readerMode === "tradotto" ? translatedUrl : article?.link ?? "";
-
-  return (
-    <div className="reader explorer">
-      <div className="reader-header source-reader-header">
-        <div>
-          <p className="eyebrow">
-            {source?.dynamic ? "Fonte emersa" : "Fonte catalogata"}
-          </p>
-          <h2>{source?.name ?? article?.sourceName}</h2>
-          <small>
-            {source?.country ?? article?.country} ·{" "}
-            {LANGUAGE_NAMES[source?.language ?? article?.language ?? ""] ??
-              source?.language ??
-              article?.language}{" "}
-            · {relatedArticles.length.toLocaleString("it-IT")} articoli in coda
-          </small>
+      {!books.length ? (
+        <div className="notice">
+          Nessun testo trovato. Prova un altro autore o cancella la ricerca.
         </div>
-        {source ? (
-          <a
-            className="icon-button"
-            href={source.homepage}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`Apri ${source.name}`}
-            title={`Apri ${source.name}`}
-          >
-            <ExternalLink size={17} />
-          </a>
-        ) : null}
-      </div>
-
-      {relatedArticles.length ? (
-        <div className="source-article-stack">
-          {relatedArticles.map((item) => (
-            <button
-              key={item.id}
-              className={article?.id === item.id ? "source-article active" : "source-article"}
-              type="button"
-              onClick={() => onSelectArticle(item)}
-            >
-              <span>{item.publishedAt ? relativeTime(item.publishedAt) : "Senza data"}</span>
-              <strong>{item.title}</strong>
-            </button>
+      ) : null}
+      <section className="glossary">
+        <div>
+          <p className="eyebrow">LE PAROLE PER ORIENTARSI</p>
+          <h2>
+            Un piccolo lessico,
+            <br />
+            <em>una porta d’ingresso.</em>
+          </h2>
+          <p>
+            Definizioni introduttive, non esaustive. I concetti assumono
+            significati diversi nelle diverse tradizioni: i testi sono il luogo
+            per approfondirli.
+          </p>
+        </div>
+        <div>
+          {GLOSSARY.map((g) => (
+            <details key={g.term}>
+              <summary>
+                {g.term}
+                <span>+</span>
+              </summary>
+              <p>{g.definition}</p>
+            </details>
           ))}
         </div>
-      ) : null}
-
-      {article ? (
-        <div className="reader-current">
-          <div className="reader-current-title">
-            <p className="eyebrow">{article.sourceName}</p>
-            <h3>{article.title}</h3>
-          </div>
-          <button
-            className="icon-button"
-            type="button"
-            onClick={onToggleSave}
-            aria-label={saved ? "Rimuovi dai salvati" : "Salva articolo"}
-            title={saved ? "Rimuovi dai salvati" : "Salva articolo"}
-          >
-            {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
-          </button>
-        </div>
-      ) : null}
-
-      <div className="reader-tools">
-        <div className="segmented">
-          <button
-            className={readerMode === "originale" ? "active" : ""}
-            type="button"
-            onClick={() => setReaderMode("originale")}
-          >
-            Originale
-          </button>
-          <button
-            className={readerMode === "tradotto" ? "active" : ""}
-            type="button"
-            onClick={() => setReaderMode("tradotto")}
-          >
-            Tradotto
-          </button>
-        </div>
-        <button
-          className="icon-text-button quiet"
-          type="button"
-          onClick={onTranslate}
-          disabled={!article || translation.status === "loading"}
-        >
-          {translation.status === "loading" ? (
-            <Loader2 className="spin" size={16} />
-          ) : (
-            <Languages size={16} />
-          )}
-          <span>Scheda IT</span>
-        </button>
-        {article ? (
-          <a
-            className="icon-button"
-            href={article.link}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Apri in nuova scheda"
-            title="Apri in nuova scheda"
-          >
-            <ExternalLink size={17} />
-          </a>
-        ) : null}
-      </div>
-
-      <div className="translation-box">
-        {!article ? (
-          <p>Seleziona un articolo dalla coda della fonte.</p>
-        ) : translation.status === "ready" ? (
-          <p>{translation.text}</p>
-        ) : translation.status === "error" ? (
-          <p>{translation.error}</p>
-        ) : (
-          <p>{article.excerpt || "Anteprima non disponibile dal feed."}</p>
-        )}
-      </div>
-
-      {article ? (
-        <iframe
-          key={readerUrl}
-          className="article-frame"
-          src={readerUrl}
-          title={article.title}
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-        />
-      ) : null}
+      </section>
     </div>
   );
 }
 
-function mergeArticles(current: Article[], incoming: Article[]) {
-  const merged = new Map(current.map((article) => [article.id, article]));
-  for (const article of incoming) {
-    merged.set(article.id, article);
-  }
-  return Array.from(merged.values()).sort((left, right) => {
-    const leftDate = left.publishedAt ? Date.parse(left.publishedAt) : 0;
-    const rightDate = right.publishedAt ? Date.parse(right.publishedAt) : 0;
-    return rightDate - leftDate || right.score - left.score;
-  });
+function MethodView({ onSources }: { onSources: () => void }) {
+  return (
+    <div className="method-view">
+      <div className="method-intro">
+        <p className="eyebrow">DALLE FONTI ALLE DOMANDE</p>
+        <h2>
+          Una rassegna per leggere.
+          <br />
+          <em>Non un verdetto su cosa pensare.</em>
+        </h2>
+        <p>
+          Mettiamo vicine prospettive che spesso restano lontane: il lavoro e la
+          geopolitica, l’attualità e la teoria, le voci locali e le relazioni
+          globali. La selezione ha un orientamento esplicito. Non pretende di
+          rappresentare tutte le posizioni né di sostituire il confronto con le
+          fonti.
+        </p>
+      </div>
+      <div className="method-grid">
+        {[
+          {
+            n: "01",
+            title: "Da dove arrivano le notizie",
+            text: "Un catalogo di fonti e canali radar alimenta la raccolta tramite feed RSS e Atom. I radar sono ricerche tematiche: possono far emergere editori non inclusi nel catalogo. Una corrispondenza con una parola chiave non prova un orientamento politico.",
+          },
+          {
+            n: "02",
+            title: "Come sono organizzate",
+            text: "Titoli ed estratti vengono ordinati per data, filtrati per provenienza e classificati con parole chiave. Il punteggio tematico è un’euristica, non una misura di verità, qualità o rilevanza assoluta. Una data mancante o errata può influire sull’ordine.",
+          },
+          {
+            n: "03",
+            title: "Cosa puoi leggere qui",
+            text: "Ogni scheda offre ciò che il feed rende disponibile, con il link all’articolo originale. Non ospitiamo una copia integrale autorevole. Alcuni editori limitano estratti o anteprime: il sito originale resta il riferimento.",
+          },
+          {
+            n: "04",
+            title: "Traduzioni e servizi esterni",
+            text: "La traduzione della scheda invia titolo ed estratto a MyMemory su tua richiesta e può contenere errori. La traduzione della pagina apre Google Translate. Immagini e anteprime possono comportare richieste ai siti degli editori.",
+          },
+          {
+            n: "05",
+            title: "Il tuo taccuino resta tuo",
+            text: "I salvati sono memorizzati in localStorage, solo in questo browser. Non sono sincronizzati e non richiedono un account. Cancellare i dati del browser elimina anche le schede salvate. Non conserviamo una cronologia personale di lettura sul server.",
+          },
+          {
+            n: "06",
+            title: "Disponibilità, attribuzione, limiti",
+            text: "I feed possono cambiare, non rispondere o essere incompleti. Le cache sono temporanee e ogni aggiornamento è un tentativo di raccolta. Testi e immagini appartengono ai rispettivi titolari: la presenza in rassegna non implica adesione dell’editore al progetto.",
+          },
+        ].map((item) => (
+          <article key={item.n}>
+            <span>{item.n}</span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+      <div className="method-outro">
+        <Globe2 size={34} strokeWidth={1} />
+        <div>
+          <h3>Parti dalle voci.</h3>
+          <p>Scopri chi pubblica, da dove scrive e con quale prospettiva.</p>
+        </div>
+        <button className="button button-dark" onClick={onSources}>
+          Esplora le fonti <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
 }
 
-function toggleSet(current: Set<string>, value: string) {
-  const next = new Set(current);
-  if (next.has(value)) {
-    next.delete(value);
-  } else {
-    next.add(value);
-  }
-  return next;
-}
-
-function chunk<T>(items: T[], size: number) {
-  const chunks: T[][] = [];
-  for (let index = 0; index < items.length; index += size) {
-    chunks.push(items.slice(index, index + size));
-  }
-  return chunks;
+function ArticleReader({
+  article,
+  saved,
+  onSave,
+  onClose,
+  related,
+  onSelect,
+}: {
+  article: Article;
+  saved: boolean;
+  onSave: () => void;
+  onClose: () => void;
+  related: Article[];
+  onSelect: (id: string) => void;
+}) {
+  const [translation, setTranslation] = useState<{
+    status: string;
+    text: string;
+  }>({ status: "idle", text: "" });
+  const [embed, setEmbed] = useState(false);
+  const translate = async () => {
+    setTranslation({ status: "loading", text: "" });
+    try {
+      const response = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          text: `${article.title}. ${article.excerpt}`,
+          from: article.language,
+          to: "it",
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.translatedText)
+        throw new Error(
+          "Traduzione non disponibile. Puoi continuare a leggere il testo originale.",
+        );
+      setTranslation({ status: "ready", text: result.translatedText });
+    } catch {
+      setTranslation({
+        status: "error",
+        text: "La traduzione non è disponibile in questo momento. Riprova oppure apri l’originale.",
+      });
+    }
+  };
+  return (
+    <div className="article-reader">
+      <div className="reader-top">
+        <span className="eyebrow">LA SCHEDA / RASSEGNA ROSSA</span>
+        <button
+          className="icon-button"
+          onClick={onClose}
+          aria-label="Chiudi lettura"
+          autoFocus
+        >
+          <X size={21} />
+        </button>
+      </div>
+      <div className="reader-content">
+        <div className="reader-meta">
+          <span>{article.sourceName}</span>
+          <span>{article.country}</span>
+          <span>
+            {article.publishedAt
+              ? relativeTime(article.publishedAt)
+              : "Data non indicata"}
+          </span>
+        </div>
+        <h2 id="reader-title">{article.title}</h2>
+        <p className="reader-byline">
+          {article.author ? `${article.author} · ` : ""}
+          {LANGUAGES[article.language] ?? article.language.toUpperCase()}
+        </p>
+        <p className="reader-excerpt">
+          {article.excerpt ||
+            "La fonte non fornisce un estratto per questo articolo. Il testo completo è disponibile sul sito dell’editore."}
+        </p>
+        <div className="reader-actions">
+          <a
+            href={safeWebUrl(article.link) ?? undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="button button-dark"
+          >
+            Leggi sulla fonte <ArrowUpRight size={16} />
+          </a>
+          <button
+            className={`button button-outline ${saved ? "is-saved" : ""}`}
+            onClick={onSave}
+            aria-pressed={saved}
+          >
+            {saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+            {saved ? "Salvato" : "Salva lettura"}
+          </button>
+        </div>
+        <div className="reader-translation">
+          <div>
+            <Languages size={19} />
+            <strong>Una lingua in più, una distanza in meno.</strong>
+          </div>
+          <p>
+            Traduci titolo ed estratto in italiano con MyMemory. Il testo viene
+            inviato al servizio esterno e la traduzione può contenere errori.
+          </p>
+          <button
+            className="text-link"
+            onClick={() => void translate()}
+            disabled={translation.status === "loading"}
+          >
+            {translation.status === "loading" ? (
+              <Loader2 size={15} className="spin" />
+            ) : (
+              <Languages size={15} />
+            )}
+            {translation.status === "loading"
+              ? "Traduzione in corso…"
+              : translation.status === "ready"
+                ? "Traduci di nuovo"
+                : "Traduci la scheda"}
+          </button>
+          {translation.status === "ready" || translation.status === "error" ? (
+            <p
+              className={`translation-result ${translation.status}`}
+              role="status"
+            >
+              {translation.text}
+            </p>
+          ) : null}
+          <a
+            href={`https://translate.google.com/translate?sl=${encodeURIComponent(article.language)}&tl=it&u=${encodeURIComponent(safeWebUrl(article.link) ?? "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-link"
+          >
+            Apri la pagina con Google Translate <ArrowUpRight size={14} />
+          </a>
+        </div>
+        <details className="reader-embed">
+          <summary>
+            Anteprima del sito originale <ChevronDown size={16} />
+          </summary>
+          <p>
+            Caricando l’anteprima contatti il sito della fonte. Alcuni editori
+            bloccano l’incorporamento: in quel caso usa “Leggi sulla fonte”.
+          </p>
+          {embed ? (
+            <iframe
+              title={`Anteprima: ${article.title}`}
+              src={safeWebUrl(article.link) ?? undefined}
+              sandbox="allow-scripts allow-popups allow-forms"
+              referrerPolicy="no-referrer"
+              loading="lazy"
+            />
+          ) : (
+            <button
+              className="button button-outline"
+              onClick={() => setEmbed(true)}
+            >
+              Carica anteprima esterna <ExternalLink size={15} />
+            </button>
+          )}
+        </details>
+        {related.length ? (
+          <section className="reader-related">
+            <p className="eyebrow">DALLA STESSA FONTE</p>
+            {related.map((a) => (
+              <button key={a.id} onClick={() => onSelect(a.id)}>
+                <span>{a.title}</span>
+                <ArrowUpRight size={17} />
+              </button>
+            ))}
+          </section>
+        ) : null}
+        <p className="reader-attribution">
+          Titolo ed estratto sono attribuiti a {article.sourceName}. La fonte
+          originale rimane il riferimento per contenuto completo, aggiornamenti
+          e correzioni.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function relativeTime(iso: string) {
-  const date = Date.parse(iso);
-  if (!Number.isFinite(date)) {
-    return "data incerta";
-  }
-  const seconds = Math.round((date - Date.now()) / 1000);
-  const divisions: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["year", 60 * 60 * 24 * 365],
-    ["month", 60 * 60 * 24 * 30],
-    ["day", 60 * 60 * 24],
-    ["hour", 60 * 60],
-    ["minute", 60],
-  ];
+  const time = Date.parse(iso);
+  if (!Number.isFinite(time)) return "Data non indicata";
+  const seconds = Math.round((time - Date.now()) / 1000);
   const formatter = new Intl.RelativeTimeFormat("it", { numeric: "auto" });
-
-  for (const [unit, amount] of divisions) {
-    if (Math.abs(seconds) >= amount || unit === "minute") {
+  for (const [unit, amount] of [
+    ["year", 31536e3],
+    ["month", 2592e3],
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ] as [Intl.RelativeTimeFormatUnit, number][])
+    if (Math.abs(seconds) >= amount)
       return formatter.format(Math.round(seconds / amount), unit);
-    }
-  }
   return "ora";
-}
-
-function capitalize(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }

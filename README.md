@@ -8,8 +8,10 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Ricerca, ordinamento, finestra temporale e aggiornamento dei feed.
 - Catalogo delle fonti e radar internazionale.
 - Traduzione di titoli e descrizioni tramite MyMemory; collegamento alla traduzione della pagina originale.
-- Articoli salvati nel browser tramite `localStorage`.
-- Biblioteca con collegamenti a opere e archivi esterni.
+- Schede salvate nel browser tramite `localStorage`: titolo, estratto e link ritrovabili anche dopo una nuova visita.
+- Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
+- Sei percorsi tematici e una pagina trasparente su metodo, attribuzione e limiti.
+- Lettore in una finestra dedicata, con traduzione su richiesta e anteprima esterna facoltativa.
 
 Le etichette e i punteggi sono euristiche del catalogo, non verifiche di attendibilità. I contenuti restano attribuiti e collegati agli editori originali.
 
@@ -29,7 +31,7 @@ npm run build
 npm test
 ```
 
-`npm test` compila il progetto e verifica il rendering server della pagina principale. Non verifica la disponibilità di tutti i feed esterni o la qualità delle traduzioni.
+`npm test` compila il progetto e verifica rendering e API senza rete, filtri, fusione degli aggiornamenti e ripristino dei salvataggi. Non verifica la disponibilità di tutti i feed esterni, la qualità delle traduzioni o il comportamento completo nei browser.
 
 ## Mappa del repository
 
@@ -38,6 +40,8 @@ npm test
 | `app/components/AggregatorApp.tsx` | Interfaccia, filtri, aggiornamenti, traduzioni e salvataggi locali |
 | `app/data/catalog.ts` | Fonti, tassonomia e canali radar |
 | `app/data/library.ts` | Biblioteca di teoria |
+| `app/data/editorial.ts` | Percorsi tematici, itinerari e glossario |
+| `app/lib/reading.ts` | Filtri, fusione degli articoli, URL e ripristino dei salvati |
 | `app/api/sources/route.ts` | Catalogo e filtri disponibili |
 | `app/api/articles/route.ts` | Raccolta concorrente, deduplicazione e ordinamento |
 | `app/lib/feed.ts` | Scoperta e parsing RSS/Atom, cache e punteggi |

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Rassegna Rossa",
     description:
-      "Notizie, teoria e storia del socialismo e del comunismo in un'unica UI.",
+      "Notizie, fonti e percorsi di lettura per uno sguardo internazionale sul mondo del lavoro, dei movimenti e del pensiero socialista.",
     type: "website",
   },
 };
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#171312",
+  themeColor: "#f6f3ec",
 };
 
 export default function RootLayout({
