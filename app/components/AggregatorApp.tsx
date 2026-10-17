@@ -263,6 +263,7 @@ export function AggregatorApp() {
     setView(next);
     reset();
     setFiltersOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const stopRefresh = () => {
     ++refreshNumber.current;
@@ -912,6 +913,7 @@ export function AggregatorApp() {
                     reset();
                     setView("notizie");
                     setSourceId(id);
+                    requestAnimationFrame(() => document.getElementById("letture")?.scrollIntoView({ behavior: "smooth", block: "start" }));
                   }}
                 />
               ) : (
