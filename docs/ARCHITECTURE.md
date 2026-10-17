@@ -2,9 +2,9 @@
 
 ## Flusso attuale
 
-La pagina React richiede il catalogo a `/api/sources` e aggiorna le notizie in gruppi di fonti tramite `/api/articles`. Il server seleziona le fonti dal catalogo, scopre i feed RSS/Atom, analizza gli elementi, attribuisce argomenti e punteggi euristici, deduplica per link e ordina i risultati. L'interfaccia applica ricerca e filtri e conserva gli articoli salvati in `localStorage`.
+Il catalogo è disponibile già nella pagina. Il client raccoglie le notizie tramite `/api/articles`, con richieste indipendenti per ciascuna fonte. Il server seleziona le fonti dal catalogo, scopre i feed RSS/Atom, analizza gli elementi, attribuisce argomenti e punteggi euristici, deduplica per link e ordina i risultati. L'interfaccia applica ricerca e filtri e conserva gli articoli salvati in `localStorage`.
 
-`/api/articles` limita ogni richiesta a 14 fonti, usa concorrenza 6 e restituisce al massimo 2.500 articoli. Il client usa gruppi da 10 fonti e richiede fino a 100 articoli per fonte. Le cache dei feed durano 10 minuti, quelle di scoperta un'ora; gli errori dei feed sono memorizzati per un intervallo inferiore. Tutto resta nella memoria dell'istanza, senza garanzia di persistenza.
+`/api/articles` limita ogni richiesta a 14 fonti, usa concorrenza 6 e restituisce al massimo 2.500 articoli. Il client parte da 16 canali, con sei richieste indipendenti concorrenti e fino a 24 articoli per fonte. La raccolta aggiuntiva è esplicita, a pagine di 16. Ogni richiesta client ha un timeout di 10 secondi e un’operazione di raccolta termina entro 25 secondi, conservando le risposte parziali. Le cache dei feed durano 10 minuti, quelle di scoperta un’ora; gli errori per un minuto. I feed dichiarati vengono contattati direttamente, senza aprire prima la homepage. La lettura è limitata a due indirizzi conosciuti e a un budget di otto secondi per fonte. Le risposte riuscite possono usare la cache edge per due minuti; la disponibilità dipende dal runtime.
 
 `POST /api/translate` inoltra il testo a MyMemory, limita l'input a 2.200 caratteri e suddivide le richieste in blocchi. La cache dura 24 ore in memoria. Quando la lingua sorgente è `auto`, l'implementazione usa `en` per MyMemory: non è rilevamento automatico affidabile. I collegamenti alla traduzione di pagine aprono Google Translate.
 
@@ -44,3 +44,14 @@ Il lettore usa un dialog nativo con chiusura da tastiera e ritorno del focus. Il
 `rassegna-rossa.saved` mantiene gli ID storici e `rassegna-rossa.saved-articles` conserva le schede. Il ripristino valida i dati e accetta solo link HTTP(S) senza credenziali incorporate. Vecchi ID diventano schede persistenti quando il relativo articolo viene ritrovato nel feed. Non è un archivio integrale degli articoli e non esiste sincronizzazione tra dispositivi.
 
 Percorsi e glossario sono contenuti introduttivi redatti nel progetto; le copertine tipografiche sono decorative. I link della biblioteca distinguono testi integrali e portali di approfondimento. Non sono aggiunte notizie dimostrative ai feed reali.
+
+
+## Lingua, fonti visibili e cache del browser
+
+La lingua preferita deriva da `navigator.languages` o dalla scelta manuale in `rassegna-rossa.language`: la priorità non usa GPS né servizi di geolocalizzazione IP. Influisce sull’ordine di testate e titoli senza nascondere altre lingue. Il filtro lingua rimane un controllo distinto. Il periodo iniziale è di 30 giorni; aprendo una fonte vengono mostrati tutti gli articoli recuperati, anche quelli più vecchi.
+
+`rassegna-rossa.feed-cache` conserva fino a 300 schede. Una copia di meno di dieci minuti viene riutilizzata senza avviare automaticamente un’altra raccolta. Fino a un giorno può essere mostrata durante un aggiornamento; la data di recupero è visibile. La cache non è una cronologia delle aperture degli articoli e può essere eliminata dai dati del browser.
+
+OttolinaTV, Dazibao e la rubrica Dazibao di OttolinaTV sono raggiungibili direttamente dalla rassegna, anche senza articoli recuperati. I canali YouTube configurati possono leggere i titoli dalla sezione pubblica dei video: il parser usa JSON senza eseguire script, accetta solo il tab selezionato ed evita di inventare date esatte da etichette relative. Se il formato cambia o il sito blocca la richiesta, rimane il link alla fonte originale.
+
+Fonti aggiunte in questa revisione: Dazibao (`youtube.com/@dazibao`), Pagine Esteri (`pagineesteri.it/feed/`), Radio Onda d’Urto (`radiondadurto.org/feed/`) e Radio Onda Rossa (feed completo pubblicato nella pagina “Segui”). Verificare periodicamente questi indirizzi: un controllo riuscito non garantisce disponibilità futura.

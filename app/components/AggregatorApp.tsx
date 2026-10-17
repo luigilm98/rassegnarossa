@@ -40,9 +40,15 @@ import {
   filterArticles,
   mergeArticles,
   restoreSavedArticles,
+  restoreNewsSnapshot,
   safeWebUrl,
   type ReadingArticle as Article,
 } from "@/app/lib/reading";
+import {
+  preferredLanguageFor,
+  rankSources,
+  nextSourcePage,
+} from "@/app/lib/source-selection";
 
 type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo";
 type SourceStatus = {
@@ -164,18 +170,23 @@ export function AggregatorApp() {
   const [ideology, setIdeology] = useState(ALL);
   const [topic, setTopic] = useState(ALL);
   const [sourceId, setSourceId] = useState(ALL);
-  const [days, setDays] = useState("7");
+  const [days, setDays] = useState("30");
   const [sort, setSort] = useState("fresh");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState({
     done: 0,
-    total: SOURCE_CATALOG.length,
+    total: 16,
   });
   const [lastRefresh, setLastRefresh] = useState<string | null>(null);
   const [dateLabel, setDateLabel] = useState("L’informazione, oltre i confini");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [preferredLanguage, setPreferredLanguage] = useState("it");
+  const [newsUpdatedAt, setNewsUpdatedAt] = useState(0);
+  const [attemptedIds, setAttemptedIds] = useState<Set<string>>(new Set());
+  const [refreshNotice, setRefreshNotice] = useState("");
+  const attemptedRef = useRef<Set<string>>(new Set());
   const refreshNumber = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const readerDialog = useRef<HTMLDialogElement>(null);
@@ -255,7 +266,7 @@ export function AggregatorApp() {
     setIdeology(ALL);
     setTopic(ALL);
     setSourceId(ALL);
-    setDays("7");
+    setDays("30");
     setSort("fresh");
     setVisibleCount(PAGE_SIZE);
   }, []);
@@ -296,96 +307,200 @@ export function AggregatorApp() {
   );
 
   const refresh = useCallback(
-    async (scope: "all" | "selection" = "all") => {
+    async (
+      scope: "initial" | "all" | "selection" | "more" = "all",
+      preferred = preferredLanguage,
+      explicitIds?: string[],
+    ) => {
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
       const run = ++refreshNumber.current;
-      const targets = (scope === "all" ? SOURCE_CATALOG : eligibleSources)
-        .slice()
-        .sort((a, b) => b.priority - a.priority);
-      const batches: string[][] = [];
-      for (let i = 0; i < targets.length; i += 10)
-        batches.push(targets.slice(i, i + 10).map((s) => s.id));
+      const ordered = rankSources(SOURCE_CATALOG, preferred);
+      const targets = explicitIds
+        ? ordered.filter((source) => explicitIds.includes(source.id))
+        : scope === "more"
+          ? nextSourcePage(eligibleSources, preferred, attemptedRef.current)
+          : scope === "selection"
+            ? rankSources(eligibleSources, preferred).slice(0, 16)
+            : scope === "all" && attemptedRef.current.size
+              ? ordered
+                  .filter((source) => attemptedRef.current.has(source.id))
+                  .slice(0, 32)
+              : ordered.slice(0, 16);
       setLoading(true);
+      setRefreshNotice("");
       setProgress({ done: 0, total: targets.length });
+      const runTimeout = setTimeout(() => {
+        if (run !== refreshNumber.current) return;
+        setRefreshNotice(
+          "Aggiornamento parziale: alcune fonti richiedono più tempo. Le altre notizie restano disponibili.",
+        );
+        controller.abort();
+      }, 25000);
       let cursor = 0;
-      await Promise.all(
-        Array.from({ length: Math.min(3, batches.length) }, async () => {
-          while (cursor < batches.length && !controller.signal.aborted) {
-            const ids = batches[cursor++];
-            try {
-              const response = await fetch(
-                `/api/articles?sourceIds=${encodeURIComponent(ids.join(","))}&limitPerSource=100`,
-                { signal: controller.signal },
-              );
-              if (!response.ok) throw new Error(`HTTP ${response.status}`);
-              const payload = (await response.json()) as {
-                articles: Article[];
-                statuses: SourceStatus[];
-              };
-              if (
-                !Array.isArray(payload.articles) ||
-                !Array.isArray(payload.statuses)
-              )
-                throw new Error("Risposta non valida");
-              if (run !== refreshNumber.current || controller.signal.aborted)
-                return;
-              setArticles((current) =>
-                mergeArticles(current, payload.articles),
-              );
-              setStatuses((current) => ({
-                ...current,
-                ...Object.fromEntries(
-                  payload.statuses.map((s) => [s.sourceId, s]),
-                ),
-              }));
-            } catch {
-              if (run !== refreshNumber.current || controller.signal.aborted)
-                return;
-              setStatuses((current) => ({
-                ...current,
-                ...Object.fromEntries(
-                  ids.map((id) => [
-                    id,
-                    {
-                      sourceId: id,
-                      name: SOURCE_CATALOG.find((s) => s.id === id)?.name ?? id,
-                      ok: false,
-                      count: 0,
-                      error: "Fonte non raggiungibile in questo tentativo",
-                      cached: false,
-                    },
-                  ]),
-                ),
-              }));
-            } finally {
-              if (run === refreshNumber.current)
-                setProgress((current) => ({
+      try {
+        await Promise.all(
+          Array.from({ length: Math.min(6, targets.length) }, async () => {
+            while (cursor < targets.length && !controller.signal.aborted) {
+              const source = targets[cursor++];
+              const requestController = new AbortController();
+              const abort = () => requestController.abort();
+              controller.signal.addEventListener("abort", abort, {
+                once: true,
+              });
+              const timeout = setTimeout(abort, 10000);
+              try {
+                const response = await fetch(
+                  `/api/articles?sourceIds=${encodeURIComponent(source.id)}&limitPerSource=24`,
+                  { signal: requestController.signal },
+                );
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const payload = (await response.json()) as {
+                  articles: Article[];
+                  statuses: SourceStatus[];
+                };
+                if (
+                  !Array.isArray(payload.articles) ||
+                  !Array.isArray(payload.statuses)
+                )
+                  throw new Error("Risposta non valida");
+                if (run !== refreshNumber.current || controller.signal.aborted)
+                  return;
+                setArticles((current) =>
+                  mergeArticles(current, payload.articles),
+                );
+                if (payload.articles.length) setNewsUpdatedAt(Date.now());
+                setStatuses((current) => ({
                   ...current,
-                  done: Math.min(current.total, current.done + ids.length),
+                  ...Object.fromEntries(
+                    payload.statuses.map((status) => [status.sourceId, status]),
+                  ),
                 }));
+              } catch {
+                if (run !== refreshNumber.current || controller.signal.aborted)
+                  return;
+                setStatuses((current) => ({
+                  ...current,
+                  [source.id]: {
+                    sourceId: source.id,
+                    name: source.name,
+                    ok: false,
+                    count: 0,
+                    error:
+                      "La fonte non ha risposto in tempo. Puoi aprire direttamente il suo sito.",
+                    cached: false,
+                  },
+                }));
+              } finally {
+                clearTimeout(timeout);
+                controller.signal.removeEventListener("abort", abort);
+                if (
+                  run === refreshNumber.current &&
+                  !controller.signal.aborted
+                ) {
+                  attemptedRef.current.add(source.id);
+                  setAttemptedIds(new Set(attemptedRef.current));
+                  setProgress((current) => ({
+                    ...current,
+                    done: Math.min(current.total, current.done + 1),
+                  }));
+                }
+              }
             }
-          }
-        }),
-      );
-      if (run === refreshNumber.current) {
-        setLoading(false);
-        setLastRefresh(new Date().toISOString());
+          }),
+        );
+      } finally {
+        clearTimeout(runTimeout);
+        if (run === refreshNumber.current) {
+          setLoading(false);
+          setLastRefresh(new Date().toISOString());
+        }
       }
     },
-    [eligibleSources],
+    [eligibleSources, preferredLanguage],
   );
 
   useEffect(() => {
-    void refresh("all");
+    const available = [
+      ...new Set(SOURCE_CATALOG.map((source) => source.language)),
+    ];
+    let preferred = preferredLanguageFor(
+      navigator.languages?.length ? navigator.languages : [navigator.language],
+      available,
+    );
+    let fresh = false;
+    try {
+      const chosen = localStorage.getItem("rassegna-rossa.language");
+      if (chosen === ALL || (chosen && available.includes(chosen)))
+        preferred = chosen;
+      const snapshot = restoreNewsSnapshot(
+        localStorage.getItem("rassegna-rossa.feed-cache"),
+      );
+      if (snapshot) {
+        setArticles(snapshot.articles);
+        setNewsUpdatedAt(snapshot.updatedAt);
+        setLastRefresh(new Date(snapshot.updatedAt).toISOString());
+        fresh = snapshot.fresh;
+        const ids = new Set(
+          snapshot.articles
+            .map((article) => article.sourceId)
+            .filter((id) => SOURCE_CATALOG.some((source) => source.id === id)),
+        );
+        attemptedRef.current = ids;
+        setAttemptedIds(new Set(ids));
+      }
+    } catch {
+      /* Caching is optional, including in private browsing. */
+    }
+    setPreferredLanguage(preferred);
+    if (fresh) setLoading(false);
+    else void refresh("initial", preferred);
     return () => {
       abortRef.current?.abort();
       ++refreshNumber.current;
     };
-    // Initial collection is independent of the reading filters.
+    // Only the initial page loads automatically; subsequent pages are explicit.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!storageReady || !newsUpdatedAt || !articles.length) return;
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(
+          "rassegna-rossa.feed-cache",
+          JSON.stringify({
+            updatedAt: newsUpdatedAt,
+            articles: articles.slice(0, 300),
+          }),
+        );
+      } catch {
+        /* Never discard bookmarks to make room for a feed cache. */
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [articles, newsUpdatedAt, storageReady]);
+
+  const choosePriority = (value: string) => {
+    setPreferredLanguage(value);
+    try {
+      localStorage.setItem("rassegna-rossa.language", value);
+    } catch {}
+    void refresh("initial", value);
+  };
+  const openSource = (id: string) => {
+    reset();
+    setView("notizie");
+    setSourceId(id);
+    setDays("Infinity");
+    void refresh("selection", preferredLanguage, [id]);
+    requestAnimationFrame(() =>
+      document
+        .getElementById("letture")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+  };
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -430,6 +545,7 @@ export function AggregatorApp() {
           source: sourceId,
           days: view === "salvati" ? Infinity : Number(days),
           sort,
+          preferredLanguage,
         },
       ),
     [
@@ -446,6 +562,7 @@ export function AggregatorApp() {
       sourceId,
       days,
       sort,
+      preferredLanguage,
     ],
   );
   useEffect(() => {
@@ -511,8 +628,13 @@ export function AggregatorApp() {
     }
     return Array.from(sources.values())
       .map((s) => ({ ...s, count: counts.get(s.id) ?? 0 }))
-      .sort((a, b) => a.name.localeCompare(b.name, "it"));
-  }, [articles, statuses]);
+      .sort(
+        (a, b) =>
+          Number(b.language === preferredLanguage) -
+            Number(a.language === preferredLanguage) ||
+          a.name.localeCompare(b.name, "it"),
+      );
+  }, [articles, statuses, preferredLanguage]);
   const visibleSources = useMemo(
     () =>
       directory.filter(
@@ -542,7 +664,7 @@ export function AggregatorApp() {
   const countries = new Set(
     SOURCE_CATALOG.filter((s) => s.kind !== "radar").map((s) => s.country),
   ).size;
-  const okCount = Object.values(statuses).filter((s) => s.ok).length;
+  const okCount = new Set(articles.map((article) => article.sourceId)).size;
   const failedCount = Object.values(statuses).filter((s) => !s.ok).length;
   const filterCount =
     [region, language, kind, ideology, topic, sourceId].filter((f) => f !== ALL)
@@ -661,7 +783,7 @@ export function AggregatorApp() {
               : "Una rete di prospettive"}
           </span>
           <span>
-            {directory.filter((s) => !s.discovered).length} fonti in catalogo{" "}
+            {directory.filter((s) => !s.discovered).length} testate e canali{" "}
             <i>/</i> {countries} paesi <i>/</i> {languages.length} lingue
           </span>
           <button onClick={() => navigate("metodo")}>
@@ -731,7 +853,9 @@ export function AggregatorApp() {
                     ) : (
                       <RefreshCcw size={15} />
                     )}
-                    <span>{loading ? "Aggiornamento" : "Aggiorna mondo"}</span>
+                    <span>
+                      {loading ? "Aggiornamento" : "Aggiorna notizie"}
+                    </span>
                   </button>
                 ) : (
                   <span className="local-note">
@@ -739,6 +863,65 @@ export function AggregatorApp() {
                   </span>
                 )}
               </div>
+              <div className="language-priority">
+                <label>
+                  <Languages size={16} />
+                  <span>Prima i titoli in</span>
+                  <select
+                    aria-label="Lingua da mettere in evidenza"
+                    value={preferredLanguage}
+                    onChange={(event) => choosePriority(event.target.value)}
+                  >
+                    <option value={ALL}>Tutte le lingue</option>
+                    {languages.map((code) => (
+                      <option key={code} value={code}>
+                        {LANGUAGES[code] ?? code.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <span>
+                  Preferenza del browser, modificabile. Le altre lingue restano
+                  disponibili.
+                </span>
+              </div>
+              {view === "notizie" ? (
+                <div
+                  className="source-shortcuts"
+                  aria-label="Fonti in evidenza"
+                >
+                  {["ottolina", "dazibao", "ottolina-dazibao"].map((id) => {
+                    const source = SOURCE_CATALOG.find(
+                      (item) => item.id === id,
+                    )!;
+                    return (
+                      <div key={id}>
+                        <button onClick={() => openSource(id)}>
+                          <Newspaper size={15} />
+                          {source.name}
+                          <ArrowRight size={14} />
+                        </button>
+                        <a
+                          href={source.homepage}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Apri direttamente ${source.name}`}
+                        >
+                          <ExternalLink size={14} />
+                        </a>
+                      </div>
+                    );
+                  })}
+                  <button
+                    className="text-link"
+                    onClick={() => navigate("fonti")}
+                  >
+                    Tutte le{" "}
+                    {directory.filter((source) => !source.discovered).length}{" "}
+                    fonti <ArrowUpRight size={14} />
+                  </button>
+                </div>
+              ) : null}
               <div className="filter-toolbar">
                 <label className="search-box">
                   <Search size={18} />
@@ -887,6 +1070,11 @@ export function AggregatorApp() {
                   restare dopo la chiusura.
                 </p>
               ) : null}
+              {refreshNotice ? (
+                <p className="notice" role="status">
+                  {refreshNotice}
+                </p>
+              ) : null}
               {loading && view !== "salvati" ? (
                 <div className="sync-progress" role="status">
                   <div>
@@ -909,12 +1097,7 @@ export function AggregatorApp() {
               {view === "fonti" ? (
                 <SourcesDirectory
                   sources={visibleSources}
-                  onSelect={(id) => {
-                    reset();
-                    setView("notizie");
-                    setSourceId(id);
-                    requestAnimationFrame(() => document.getElementById("letture")?.scrollIntoView({ behavior: "smooth", block: "start" }));
-                  }}
+                  onSelect={openSource}
                 />
               ) : (
                 <div className="news-layout">
@@ -975,6 +1158,43 @@ export function AggregatorApp() {
                         </span>
                       </button>
                     ) : null}
+                    {view === "notizie" ? (
+                      <div className="collection-more">
+                        <p>
+                          {attemptedIds.size} canali già consultati o presenti
+                          in memoria. Il catalogo completo è già disponibile
+                          nell’atlante.
+                        </p>
+                        <button
+                          className="button button-dark"
+                          disabled={
+                            loading ||
+                            !eligibleSources.some(
+                              (source) => !attemptedIds.has(source.id),
+                            )
+                          }
+                          onClick={() => void refresh("more")}
+                        >
+                          Carica altre fonti <ArrowDown size={16} />
+                        </button>
+                        <button
+                          className="text-link"
+                          onClick={() => navigate("fonti")}
+                        >
+                          Esplora tutte le testate <ArrowUpRight size={15} />
+                        </button>
+                        {newsUpdatedAt ? (
+                          <small>
+                            Ultime notizie recuperate:{" "}
+                            {relativeTime(
+                              new Date(newsUpdatedAt).toISOString(),
+                            )}
+                            . Le schede in memoria possono precedere l’ultimo
+                            tentativo.
+                          </small>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {!loading && failedCount > 0 && view === "notizie" ? (
                       <p className="feed-note">
                         <CircleHelp size={15} /> {failedCount} canali non hanno
@@ -1033,9 +1253,9 @@ export function AggregatorApp() {
                       <div>
                         <strong>{okCount}</strong>
                         <span>
-                          canali che hanno risposto
+                          fonti rappresentate
                           <br />
-                          in questa sessione
+                          nelle notizie recuperate
                         </span>
                       </div>
                       <p>
@@ -1222,6 +1442,8 @@ function ArticleCard({
             <img
               src={image}
               alt=""
+              width={640}
+              height={360}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
@@ -1366,7 +1588,7 @@ function SourcesDirectory({
           emerse dai radar sono indicate separatamente.
         </p>
         <span>
-          <span className="status-dot status-ok" /> Feed disponibile{" "}
+          <span className="status-dot status-ok" /> Contenuti disponibili{" "}
           <span className="status-dot status-wait" /> Non verificato o non
           disponibile
         </span>
@@ -1392,7 +1614,7 @@ function SourcesDirectory({
                   : s.count
                     ? `${s.count} articoli`
                     : s.status?.ok
-                      ? "Feed disponibile"
+                      ? "Contenuti disponibili"
                       : "Non ancora verificato"}
               </span>
             </div>
@@ -1608,7 +1830,7 @@ function MethodView({ onSources }: { onSources: () => void }) {
           {
             n: "01",
             title: "Da dove arrivano le notizie",
-            text: "Un catalogo di fonti e canali radar alimenta la raccolta tramite feed RSS e Atom. I radar sono ricerche tematiche: possono far emergere editori non inclusi nel catalogo. Una corrispondenza con una parola chiave non prova un orientamento politico.",
+            text: "Un catalogo di fonti e canali radar alimenta la raccolta tramite feed RSS e Atom. Per i canali YouTube configurati, leggiamo anche i titoli pubblici nella pagina dei video quando il feed non è utilizzabile. I radar sono ricerche tematiche: possono far emergere editori non inclusi nel catalogo. Una corrispondenza con una parola chiave non prova un orientamento politico.",
           },
           {
             n: "02",
@@ -1628,7 +1850,7 @@ function MethodView({ onSources }: { onSources: () => void }) {
           {
             n: "05",
             title: "Il tuo taccuino resta tuo",
-            text: "I salvati sono memorizzati in localStorage, solo in questo browser. Non sono sincronizzati e non richiedono un account. Cancellare i dati del browser elimina anche le schede salvate. Non conserviamo una cronologia personale di lettura sul server.",
+            text: "I salvati sono memorizzati in localStorage, solo in questo browser. Una cache temporanea delle schede dei feed velocizza le visite successive; la priorità linguistica segue le preferenze del browser ed è modificabile. Non sono sincronizzati e non richiedono un account. Cancellare i dati del browser elimina anche le schede salvate. Non conserviamo una cronologia personale di lettura sul server.",
           },
           {
             n: "06",

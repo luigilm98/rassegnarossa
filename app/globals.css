@@ -2688,3 +2688,237 @@ em {
   padding: 0;
   min-height: 24px;
 }
+
+/* Intrinsic image sizing must not depend on the full height of a text card. */
+.article-open,
+.article-copy,
+.article-image,
+.book-info {
+  min-width: 0;
+  max-width: 100%;
+}
+.article-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  isolation: isolate;
+}
+.article-image img {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+}
+.featured .article-image {
+  height: auto;
+  max-height: none;
+  align-self: start;
+  aspect-ratio: 4/3;
+}
+.article-copy h3,
+.book-info h3,
+.source-card h3 {
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.book-cover {
+  min-height: max-content;
+  height: auto;
+}
+.language-priority {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.language-priority > label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink);
+  min-width: 0;
+}
+.language-priority select {
+  font: inherit;
+  color: var(--red);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 7px 9px;
+  max-width: 170px;
+}
+.language-priority > span {
+  font-size: 9px;
+  line-height: 1.6;
+}
+.source-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  margin: 0 0 17px;
+}
+.source-shortcuts > div {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  min-width: 0;
+  max-width: 100%;
+}
+.source-shortcuts > div > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  font-size: 10px;
+  text-align: left;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.source-shortcuts > div > a {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  padding: 8px;
+  border-left: 1px solid var(--line);
+  color: var(--red);
+}
+.source-shortcuts > .text-link {
+  padding: 8px;
+  font-size: 10px;
+}
+.collection-more {
+  border-top: 1px solid var(--line);
+  margin-top: 28px;
+  padding-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+.collection-more > p,
+.collection-more > small {
+  flex-basis: 100%;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.collection-more > small {
+  font-size: 9px;
+}
+@media (max-width: 700px) {
+  .news-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .article-card.featured {
+    grid-column: auto;
+  }
+  .article-open,
+  .featured .article-open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .article-image,
+  .featured .article-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    max-height: none;
+    flex: none;
+    margin: 0 0 16px;
+  }
+  .article-copy {
+    position: static;
+    display: block;
+    width: 100%;
+    margin: 0;
+    clear: both;
+  }
+  .article-copy h3,
+  .featured .article-copy h3 {
+    font-size: 27px;
+    line-height: 1.25;
+    margin: 0;
+  }
+  .article-copy > p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .article-meta {
+    font-size: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 11px;
+  }
+  .article-meta > span:last-child {
+    flex-shrink: 1;
+  }
+  .article-bottom {
+    font-size: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .save-button,
+  .read-button {
+    width: 42px;
+    height: 42px;
+  }
+  .book-cover {
+    min-height: 190px;
+    aspect-ratio: auto;
+    height: auto;
+  }
+  .book-card {
+    align-items: start;
+  }
+  .language-priority {
+    align-items: start;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .language-priority > label {
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+  .language-priority > span {
+    font-size: 10px;
+  }
+  .source-shortcuts > div {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .source-shortcuts > div > button {
+    font-size: 12px;
+    min-height: 44px;
+    flex: 1;
+    justify-content: flex-start;
+  }
+  .source-shortcuts > div > a {
+    min-width: 44px;
+  }
+  .wordmark {
+    white-space: normal;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .wordmark > span:last-child {
+    overflow-wrap: anywhere;
+  }
+  .masthead {
+    min-width: 0;
+  }
+  .book-info > h3 {
+    font-size: 23px;
+    line-height: 1.25;
+  }
+}

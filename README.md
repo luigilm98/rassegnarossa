@@ -6,7 +6,9 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 
 - Notizie filtrabili per regione, lingua, fonte, orientamento, tipo e argomento.
 - Ricerca, ordinamento, finestra temporale e aggiornamento dei feed.
-- Catalogo delle fonti e radar internazionale.
+- Catalogo di 86 testate e canali, distinto dai 136 radar di ricerca.
+- Priorità alle testate e ai titoli nella lingua del browser, modificabile senza geolocalizzazione.
+- Prima raccolta di 16 canali con risposte indipendenti, cache locale e caricamento esplicito di altre fonti.
 - Traduzione di titoli e descrizioni tramite MyMemory; collegamento alla traduzione della pagina originale.
 - Schede salvate nel browser tramite `localStorage`: titolo, estratto e link ritrovabili anche dopo una nuova visita.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
@@ -42,6 +44,8 @@ npm test
 | `app/data/library.ts` | Biblioteca di teoria |
 | `app/data/editorial.ts` | Percorsi tematici, itinerari e glossario |
 | `app/lib/reading.ts` | Filtri, fusione degli articoli, URL e ripristino dei salvati |
+| `app/lib/source-selection.ts` | Scelta della lingua e raccolta limitata dei canali |
+| `app/lib/youtube.ts` | Lettura dei titoli pubblici dalla scheda video dei canali configurati |
 | `app/api/sources/route.ts` | Catalogo e filtri disponibili |
 | `app/api/articles/route.ts` | Raccolta concorrente, deduplicazione e ordinamento |
 | `app/lib/feed.ts` | Scoperta e parsing RSS/Atom, cache e punteggi |
@@ -64,6 +68,6 @@ Stack: React, TypeScript, vinext, Vite e Cloudflare Workers. Il progetto conserv
 
 GitHub contiene i sorgenti e avvia i controlli automatici su `main` e nelle pull request. Il servizio pubblicato è ospitato su Sites: un push su GitHub **non aggiorna automaticamente** quel sito. GitHub Pages non esegue le API server necessarie a feed e traduzioni. Vedere [la procedura di deploy](docs/ARCHITECTURE.md#pubblicazione).
 
-Le cache sono temporanee e separate per istanza; non esiste sincronizzazione dei preferiti tra dispositivi. Feed, ricerca radar e traduzioni dipendono da servizi esterni, dai loro limiti e dai loro cambiamenti. La suite attuale non copre in modo esaustivo parser, accessibilità, rete o browser. Non sono inclusi credenziali, dati di produzione o dipendenze installate. Questo repository non aggiunge una licenza: verificare i diritti prima di redistribuire codice o contenuti di terzi.
+Le cache dei feed sul server sono temporanee, con cache edge quando disponibile e una copia locale delle schede per le visite successive; non esiste sincronizzazione dei preferiti tra dispositivi. Feed, ricerca radar e traduzioni dipendono da servizi esterni, dai loro limiti e dai loro cambiamenti. La suite attuale non copre in modo esaustivo parser, accessibilità, rete o browser. Non sono inclusi credenziali, dati di produzione o dipendenze installate. Questo repository non aggiunge una licenza: verificare i diritti prima di redistribuire codice o contenuti di terzi.
 
 I sorgenti pubblici non includono identificativi di hosting specifici del proprietario.

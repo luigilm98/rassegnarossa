@@ -1,5 +1,9 @@
 import { SOURCE_CATALOG } from "@/app/data/catalog";
-import { fetchSource, getSources, type SourceFetchResult } from "@/app/lib/feed";
+import {
+  fetchSource,
+  getSources,
+  type SourceFetchResult,
+} from "@/app/lib/feed";
 
 export const dynamic = "force-dynamic";
 
@@ -11,12 +15,34 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const ids = splitParam(url.searchParams.get("sourceIds"));
   const limitPerSource = clampNumber(
-    Number(url.searchParams.get("limitPerSource")),
+    Number(url.searchParams.get("limitPerSource") ?? DEFAULT_LIMIT_PER_SOURCE),
     1,
     250,
     DEFAULT_LIMIT_PER_SOURCE,
   );
   const sources = getSources(ids).slice(0, MAX_SOURCES_PER_REQUEST);
+  const cacheUrl = new URL(request.url);
+  cacheUrl.search = "";
+  cacheUrl.searchParams.set("v", "2");
+  cacheUrl.searchParams.set(
+    "sourceIds",
+    sources
+      .map((source) => source.id)
+      .sort()
+      .join(","),
+  );
+  cacheUrl.searchParams.set("limitPerSource", String(limitPerSource));
+  const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
+  const edgeCache =
+    typeof caches === "undefined"
+      ? undefined
+      : (caches as CacheStorage & { default?: Cache }).default;
+  try {
+    const cached = await edgeCache?.match(cacheKey);
+    if (cached) return cached;
+  } catch {
+    /* Caching is optional; publisher errors must remain readable. */
+  }
   const fetched = await promisePool(sources, 6, (source) =>
     fetchSource(source, limitPerSource),
   );
@@ -31,13 +57,30 @@ export async function GET(request: Request) {
     })
     .slice(0, MAX_ARTICLES_PER_RESPONSE);
 
-  return Response.json({
-    generatedAt: new Date().toISOString(),
-    sourceCount: sources.length,
-    totalCatalogSources: SOURCE_CATALOG.length,
-    articles,
-    statuses: results.map((result) => result.status),
-  });
+  const response = Response.json(
+    {
+      generatedAt: new Date().toISOString(),
+      sourceCount: sources.length,
+      totalCatalogSources: SOURCE_CATALOG.length,
+      articles,
+      statuses: results.map((result) => result.status),
+    },
+    {
+      headers: {
+        "cache-control": results.some((result) => result.status.ok)
+          ? "public, max-age=120"
+          : "no-store",
+      },
+    },
+  );
+  if (results.some((result) => result.status.ok)) {
+    try {
+      await edgeCache?.put(cacheKey, response.clone());
+    } catch {
+      /* A cache miss must not fail the request. */
+    }
+  }
+  return response;
 }
 
 function splitParam(value: string | null) {
@@ -83,7 +126,9 @@ async function promisePool<T, R>(
   return results;
 }
 
-function dedupeByLink<T extends { link: string; title: string }>(articles: T[]) {
+function dedupeByLink<T extends { link: string; title: string }>(
+  articles: T[],
+) {
   const seen = new Set<string>();
   return articles.filter((article) => {
     const key = article.link || article.title.toLowerCase();

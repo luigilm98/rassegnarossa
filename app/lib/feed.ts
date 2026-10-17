@@ -1,3 +1,4 @@
+import { parseYouTubeListing } from "./youtube";
 import {
   SOURCE_CATALOG,
   TOPIC_TAXONOMY,
@@ -52,7 +53,8 @@ const discoveryCache = new Map<string, { expiresAt: number; urls: string[] }>();
 
 const FEED_TTL_MS = 10 * 60 * 1000;
 const DISCOVERY_TTL_MS = 60 * 60 * 1000;
-const REQUEST_TIMEOUT_MS = 9000;
+const REQUEST_TIMEOUT_MS = 6500;
+const SOURCE_BUDGET_MS = 8000;
 const MAX_FEED_CHARS = 1_800_000;
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) RassegnaRossa/1.0";
@@ -80,24 +82,56 @@ export async function fetchSource(
     };
   }
 
+  const deadline = Date.now() + SOURCE_BUDGET_MS;
   const candidates = await getFeedCandidates(source);
   let lastError = "No feed candidates";
   let feedShapeError: string | null = null;
 
-  for (const candidate of candidates) {
+  for (const candidate of candidates.slice(0, 2)) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
     try {
-      const xml = await fetchText(candidate);
-      if (!looksLikeFeed(xml)) {
+      const xml = await fetchText(
+        candidate,
+        MAX_FEED_CHARS,
+        Math.min(REQUEST_TIMEOUT_MS, remaining),
+      );
+      const fromListing = candidate === source.listingUrl;
+      if (!fromListing && !looksLikeFeed(xml)) {
         lastError = "Response was not RSS or Atom";
         continue;
       }
 
-      const articles = parseFeed(xml, source, candidate)
-        .slice(0, Math.max(1, limit))
-        .map((article) => ({
-          ...article,
-          score: computeArticleScore(article, source),
-        }));
+      const parsed = fromListing
+        ? parseYouTubeListing(xml).map((video) => {
+            const link = `https://www.youtube.com/watch?v=${video.videoId}`;
+            return {
+              id: stableHash(`${source.id}:${video.videoId}:${link}`),
+              sourceId: source.id,
+              sourceName: source.name,
+              sourceHomepage: source.homepage,
+              region: source.region,
+              country: source.country,
+              language: source.language,
+              kind: source.kind,
+              ideologies: source.ideologies,
+              title: cleanText(video.title),
+              link,
+              publishedAt: null,
+              author: source.name,
+              excerpt:
+                "Video disponibile sul canale originale. La pagina del canale non fornisce una data esatta: consulta YouTube per i dettagli.",
+              categories: source.tags,
+              topics: classifyTopics(`${video.title} ${source.tags.join(" ")}`),
+              image: video.image,
+              score: 0,
+            } satisfies ArticleRecord;
+          })
+        : parseFeed(xml, source, candidate);
+      const articles = parsed.slice(0, Math.max(1, limit)).map((article) => ({
+        ...article,
+        score: computeArticleScore(article, source),
+      }));
 
       if (!articles.length) {
         feedShapeError = "Feed contained no readable items";
@@ -140,15 +174,25 @@ export async function fetchSource(
       cached: false,
     },
   };
-  feedCache.set(cacheKey, { expiresAt: now + FEED_TTL_MS / 2, result });
+  feedCache.set(cacheKey, { expiresAt: Date.now() + 60_000, result });
   return result;
 }
 
 async function getFeedCandidates(source: SourceDefinition) {
+  // Known feeds must never wait for a homepage or a sweep of guessed URLs.
   const declared = source.feedUrls ?? [];
+  if (source.listingUrl) return [source.listingUrl, ...declared].slice(0, 2);
+  if (declared.length)
+    return Array.from(
+      new Set(
+        declared
+          .map((url) => normalizeUrl(url, source.homepage))
+          .filter((url): url is string => Boolean(url)),
+      ),
+    );
   const discovered = await discoverFeedUrls(source.homepage);
   const guessed = guessCommonFeedUrls(source.homepage);
-  const unique = [...declared, ...discovered, ...guessed]
+  const unique = [...discovered, ...guessed]
     .map((url) => normalizeUrl(url, source.homepage))
     .filter((url): url is string => Boolean(url));
 
@@ -162,7 +206,7 @@ async function discoverFeedUrls(homepage: string) {
   }
 
   try {
-    const html = await fetchText(homepage, 600_000);
+    const html = await fetchText(homepage, 250_000, 2000);
     const links = Array.from(html.matchAll(/<link\b[^>]*>/gi))
       .map((match) => match[0])
       .filter((tag) => /alternate/i.test(tag) && /(rss|atom)\+xml/i.test(tag))
@@ -221,7 +265,11 @@ function normalizeUrl(url: string, base?: string) {
   }
 }
 
-async function fetchText(url: string, maxChars = MAX_FEED_CHARS) {
+async function fetchText(
+  url: string,
+  maxChars = MAX_FEED_CHARS,
+  timeoutMs = REQUEST_TIMEOUT_MS,
+) {
   const response = await fetch(url, {
     headers: {
       accept:
@@ -229,7 +277,7 @@ async function fetchText(url: string, maxChars = MAX_FEED_CHARS) {
       "user-agent": USER_AGENT,
     },
     redirect: "follow",
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(Math.max(1, timeoutMs)),
   });
 
   if (!response.ok) {
@@ -237,7 +285,29 @@ async function fetchText(url: string, maxChars = MAX_FEED_CHARS) {
   }
 
   const contentType = response.headers.get("content-type") ?? "";
-  const buffer = await response.arrayBuffer();
+  const reader = response.body?.getReader();
+  if (!reader) return "";
+  const chunks: Uint8Array[] = [];
+  let length = 0;
+  const maxBytes = maxChars * 2;
+  try {
+    while (length < maxBytes) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const slice = value.subarray(0, maxBytes - length);
+      chunks.push(slice);
+      length += slice.length;
+    }
+  } finally {
+    await reader.cancel().catch(() => {});
+  }
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const part of chunks) {
+    bytes.set(part, offset);
+    offset += part.length;
+  }
+  const buffer = bytes.buffer;
   const text = decodeResponseText(buffer, contentType);
   return text.length > maxChars ? text.slice(0, maxChars) : text;
 }
@@ -245,7 +315,10 @@ async function fetchText(url: string, maxChars = MAX_FEED_CHARS) {
 function decodeResponseText(buffer: ArrayBuffer, contentType: string) {
   const bytes = new Uint8Array(buffer);
   const charset =
-    contentType.match(/charset=([^;]+)/i)?.[1]?.trim().toLowerCase() ?? "";
+    contentType
+      .match(/charset=([^;]+)/i)?.[1]
+      ?.trim()
+      .toLowerCase() ?? "";
   const shouldDecodeUtf16 =
     charset.includes("utf-16") ||
     (bytes[0] === 0xff && bytes[1] === 0xfe) ||
@@ -267,16 +340,15 @@ function decodeResponseText(buffer: ArrayBuffer, contentType: string) {
     return output;
   }
 
-  const label =
-    charset.includes("utf-16")
-      ? charset.includes("be")
+  const label = charset.includes("utf-16")
+    ? charset.includes("be")
+      ? "utf-16be"
+      : "utf-16le"
+    : bytes[0] === 0xff && bytes[1] === 0xfe
+      ? "utf-16le"
+      : bytes[0] === 0xfe && bytes[1] === 0xff
         ? "utf-16be"
-        : "utf-16le"
-      : bytes[0] === 0xff && bytes[1] === 0xfe
-        ? "utf-16le"
-        : bytes[0] === 0xfe && bytes[1] === 0xff
-          ? "utf-16be"
-          : "utf-8";
+        : "utf-8";
 
   try {
     return new TextDecoder(label).decode(bytes);
@@ -296,7 +368,9 @@ function parseFeed(
 ): ArticleRecord[] {
   const blockType = /<entry\b/i.test(xml) ? "entry" : "item";
   const blocks = Array.from(
-    xml.matchAll(new RegExp(`<${blockType}\\b[\\s\\S]*?<\\/${blockType}>`, "gi")),
+    xml.matchAll(
+      new RegExp(`<${blockType}\\b[\\s\\S]*?<\\/${blockType}>`, "gi"),
+    ),
   ).map((match) => match[0]);
 
   return blocks
@@ -313,8 +387,8 @@ function parseItemBlock(
   const rawTitle = cleanText(extractTag(block, ["title"]) ?? "");
   const rawLink =
     blockType === "entry"
-      ? extractAtomLink(block) ?? extractTag(block, ["link"])
-      : extractTag(block, ["link"]) ?? extractAtomLink(block);
+      ? (extractAtomLink(block) ?? extractTag(block, ["link"]))
+      : (extractTag(block, ["link"]) ?? extractAtomLink(block));
   const link = normalizeUrl(rawLink ?? "", feedUrl);
   const detectedSource =
     source.kind === "radar" ? extractItemSource(block, feedUrl) : null;
@@ -332,8 +406,12 @@ function parseItemBlock(
   }
 
   const rawContent =
-    extractTag(block, ["content:encoded", "content", "summary", "description"]) ??
-    "";
+    extractTag(block, [
+      "content:encoded",
+      "content",
+      "summary",
+      "description",
+    ]) ?? "";
   const excerpt = clampText(cleanText(rawContent), 520);
   const published =
     parseDate(
@@ -351,9 +429,7 @@ function parseItemBlock(
   const articleText = `${title} ${excerpt} ${categories.join(" ")} ${source.tags.join(
     " ",
   )}`;
-  const topics = classifyTopics(
-    articleText,
-  );
+  const topics = classifyTopics(articleText);
   const ideologies = inferIdeologies(articleText, source.ideologies);
   const idSeed =
     extractTag(block, ["guid", "id"]) ?? `${source.id}:${link}:${title}`;
@@ -387,8 +463,9 @@ function extractItemSource(block: string, feedUrl: string) {
   }
 
   const label =
-    cleanText(tag.replace(/^<source\b[^>]*>/i, "").replace(/<\/source>$/i, "")) ||
-    "Fonte radar";
+    cleanText(
+      tag.replace(/^<source\b[^>]*>/i, "").replace(/<\/source>$/i, ""),
+    ) || "Fonte radar";
   const rawUrl = getAttribute(tag, "url");
   const url = rawUrl ? normalizeUrl(rawUrl, feedUrl) : null;
   const key = sourceIdentity(url, label);
@@ -408,12 +485,14 @@ function sourceIdentity(url: string | null, label: string) {
       // Fall through to the readable label.
     }
   }
-  return label
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") || stableHash(label).slice(1);
+  return (
+    label
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || stableHash(label).slice(1)
+  );
 }
 
 function stripSourceSuffix(title: string, sourceName: string) {
@@ -469,7 +548,9 @@ function extractImage(block: string, feedUrl: string) {
 }
 
 function getAttribute(tag: string, name: string) {
-  const match = tag.match(new RegExp(`${escapeRegExp(name)}=["']([^"']+)["']`, "i"));
+  const match = tag.match(
+    new RegExp(`${escapeRegExp(name)}=["']([^"']+)["']`, "i"),
+  );
   return match?.[1] ? decodeXml(match[1]) : null;
 }
 
@@ -631,7 +712,9 @@ function stripCdata(value: string) {
 
 function decodeXml(value: string) {
   return value
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/&#(\d+);/g, (_, code: string) =>
+      String.fromCodePoint(Number(code)),
+    )
     .replace(/&#x([0-9a-f]+);/gi, (_, code: string) =>
       String.fromCodePoint(parseInt(code, 16)),
     )

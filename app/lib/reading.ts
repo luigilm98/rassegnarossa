@@ -77,6 +77,7 @@ export function filterArticles(
     source: string;
     days: number;
     sort: string;
+    preferredLanguage?: string;
   },
   now = Date.now(),
 ): ReadingArticle[] {
@@ -100,12 +101,46 @@ export function filterArticles(
             .includes(query))
       );
     })
-    .sort((a, b) =>
-      filters.sort === "score"
-        ? b.score - a.score
-        : filters.sort === "source"
-          ? a.sourceName.localeCompare(b.sourceName, "it")
-          : (Date.parse(b.publishedAt ?? "") || 0) -
-              (Date.parse(a.publishedAt ?? "") || 0) || b.score - a.score,
+    .sort(
+      (a, b) =>
+        (filters.preferredLanguage && filters.preferredLanguage !== "all"
+          ? Number(b.language === filters.preferredLanguage) -
+            Number(a.language === filters.preferredLanguage)
+          : 0) ||
+        (filters.sort === "score"
+          ? b.score - a.score
+          : filters.sort === "source"
+            ? a.sourceName.localeCompare(b.sourceName, "it")
+            : (Date.parse(b.publishedAt ?? "") || 0) -
+                (Date.parse(a.publishedAt ?? "") || 0) || b.score - a.score),
     );
+}
+
+export function restoreNewsSnapshot(
+  raw: string | null,
+  now = Date.now(),
+): { articles: ReadingArticle[]; updatedAt: number; fresh: boolean } | null {
+  try {
+    const value = JSON.parse(raw ?? "null");
+    if (
+      !value ||
+      typeof value.updatedAt !== "number" ||
+      !Array.isArray(value.articles) ||
+      now - value.updatedAt > 864e5 ||
+      value.updatedAt > now + 60_000
+    )
+      return null;
+    const articles = restoreSavedArticles(JSON.stringify(value.articles)).slice(
+      0,
+      300,
+    );
+    if (!articles.length) return null;
+    return {
+      articles,
+      updatedAt: value.updatedAt,
+      fresh: now - value.updatedAt < 600_000,
+    };
+  } catch {
+    return null;
+  }
 }

@@ -24,6 +24,7 @@ export type SourceDefinition = {
   name: string;
   homepage: string;
   feedUrls?: string[];
+  listingUrl?: string;
   region: Region;
   country: string;
   language: string;
@@ -280,6 +281,65 @@ export const TOPIC_TAXONOMY: TopicDefinition[] = [
 
 const BASE_SOURCE_CATALOG: SourceDefinition[] = [
   {
+    id: "dazibao",
+    listingUrl: "https://www.youtube.com/@dazibao/videos",
+    name: "Dazibao",
+    homepage: "https://www.youtube.com/@dazibao",
+    feedUrls: [
+      "https://www.youtube.com/feeds/videos.xml?channel_id=UCbamUSZwEixZ-_7PiXF-YHw",
+    ],
+    region: "Italia",
+    country: "Italia",
+    language: "it",
+    kind: "video",
+    ideologies: [],
+    tags: ["cina", "geopolitica", "video", "dazibao"],
+    priority: 10,
+  },
+  {
+    id: "pagine-esteri",
+    name: "Pagine Esteri",
+    homepage: "https://pagineesteri.it/",
+    feedUrls: ["https://pagineesteri.it/feed/"],
+    region: "Italia",
+    country: "Italia",
+    language: "it",
+    kind: "rivista",
+    ideologies: [],
+    tags: ["geopolitica", "palestina", "mondo"],
+    priority: 8,
+  },
+  {
+    id: "radio-onda-urto",
+    name: "Radio Onda d’Urto",
+    homepage: "https://www.radiondadurto.org/",
+    feedUrls: ["https://www.radiondadurto.org/feed/"],
+    region: "Italia",
+    country: "Italia",
+    language: "it",
+    kind: "movimento",
+    ideologies: ["antagonista"],
+    tags: ["lavoro", "movimenti", "radio"],
+    priority: 8,
+  },
+  {
+    id: "radio-onda-rossa",
+    name: "Radio Onda Rossa",
+    homepage: "https://www.ondarossa.info/",
+    feedUrls: [
+      "https://www.ondarossa.info/feed/tipo/ror_news+redazionali+news_trasmissioni+eventi",
+      "https://www.ondarossa.info/podcast/all.xml",
+    ],
+    region: "Italia",
+    country: "Italia",
+    language: "it",
+    kind: "movimento",
+    ideologies: [],
+    tags: ["lavoro", "movimenti", "radio"],
+    priority: 8,
+  },
+
+  {
     id: "ottolina",
     name: "OttolinaTV",
     homepage: "https://ottolinatv.it/",
@@ -294,7 +354,7 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
   },
   {
     id: "ottolina-dazibao",
-    name: "OttolinaTV - Dazibao",
+    name: "Dazibao · rubrica OttolinaTV",
     homepage: "https://ottolinatv.it/category/la-tv/dazibao/",
     feedUrls: ["https://ottolinatv.it/category/la-tv/dazibao/feed/"],
     region: "Italia",
@@ -309,9 +369,8 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "ottolina-youtube",
     name: "OttolinaTV YouTube",
     homepage: "https://www.youtube.com/@OttolinaTV",
-    feedUrls: [
-      "https://www.youtube.com/feeds/videos.xml?channel_id=UCoxLVRisaG8rdel1D1eseng",
-    ],
+    listingUrl: "https://www.youtube.com/@OttolinaTV/videos",
+    feedUrls: [],
     region: "Italia",
     country: "Italia",
     language: "it",
@@ -431,7 +490,9 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "sinistra-in-rete",
     name: "Sinistra in Rete",
     homepage: "https://www.sinistrainrete.info/",
-    feedUrls: ["https://www.sinistrainrete.info/index.php?format=feed&type=rss"],
+    feedUrls: [
+      "https://www.sinistrainrete.info/index.php?format=feed&type=rss",
+    ],
     region: "Italia",
     country: "Italia",
     language: "it",
@@ -1513,7 +1574,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "lavoratori OR sindacato OR sciopero OR salario",
-      antiimperialism: "imperialismo OR antimperialismo OR NATO OR Palestina OR Gaza",
+      antiimperialism:
+        "imperialismo OR antimperialismo OR NATO OR Palestina OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR rivoluzione OR movimento operaio",
       socialistStates: "Cina OR Russia OR BRICS OR multipolare OR socialismo",
     },
@@ -1530,7 +1592,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialism OR communism OR marxism",
       labor: "workers OR union OR strike OR wages",
-      antiimperialism: "imperialism OR anti-imperialism OR NATO OR Palestine OR Gaza",
+      antiimperialism:
+        "imperialism OR anti-imperialism OR NATO OR Palestine OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR revolution OR labor history",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialism",
     },
@@ -1547,7 +1610,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialism OR communism OR marxism",
       labor: "workers OR trade union OR strike OR wages",
-      antiimperialism: "imperialism OR anti-imperialism OR NATO OR Palestine OR Gaza",
+      antiimperialism:
+        "imperialism OR anti-imperialism OR NATO OR Palestine OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR revolution OR labour history",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialism",
     },
@@ -1598,7 +1662,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialisme OR communisme OR marxisme",
       labor: "travailleurs OR syndicat OR greve OR salaire",
-      antiimperialism: "imperialisme OR anti-imperialisme OR OTAN OR Palestine OR Gaza",
+      antiimperialism:
+        "imperialisme OR anti-imperialisme OR OTAN OR Palestine OR Gaza",
       theory: "Marx OR Lenine OR Gramsci OR revolution OR mouvement ouvrier",
       socialistStates: "Chine OR Russie OR BRICS OR multipolaire OR socialisme",
     },
@@ -1615,9 +1680,11 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "Sozialismus OR Kommunismus OR Marxismus",
       labor: "Arbeiter OR Gewerkschaft OR Streik OR Lohn",
-      antiimperialism: "Imperialismus OR NATO OR Palastina OR Gaza OR Sanktionen",
+      antiimperialism:
+        "Imperialismus OR NATO OR Palastina OR Gaza OR Sanktionen",
       theory: "Marx OR Lenin OR Gramsci OR Revolution OR Arbeiterbewegung",
-      socialistStates: "China OR Russland OR BRICS OR multipolar OR Sozialismus",
+      socialistStates:
+        "China OR Russland OR BRICS OR multipolar OR Sozialismus",
     },
   },
   {
@@ -1632,7 +1699,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "trabajadores OR sindicato OR huelga OR salario",
-      antiimperialism: "imperialismo OR antiimperialismo OR OTAN OR Palestina OR Gaza",
+      antiimperialism:
+        "imperialismo OR antiimperialismo OR OTAN OR Palestina OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR revolucion OR movimiento obrero",
       socialistStates: "China OR Rusia OR BRICS OR multipolar OR socialismo",
     },
@@ -1649,7 +1717,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "trabajadores OR sindicato OR huelga OR salario",
-      antiimperialism: "imperialismo OR antiimperialismo OR OTAN OR Palestina OR Gaza",
+      antiimperialism:
+        "imperialismo OR antiimperialismo OR OTAN OR Palestina OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR revolucion OR movimiento obrero",
       socialistStates: "China OR Rusia OR BRICS OR multipolar OR socialismo",
     },
@@ -1666,7 +1735,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "trabajadores OR sindicato OR huelga OR salario",
-      antiimperialism: "imperialismo OR antiimperialismo OR OTAN OR Palestina OR Gaza",
+      antiimperialism:
+        "imperialismo OR antiimperialismo OR OTAN OR Palestina OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR revolucion OR movimiento obrero",
       socialistStates: "China OR Rusia OR BRICS OR multipolar OR socialismo",
     },
@@ -1683,7 +1753,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "trabalhadores OR sindicato OR greve OR salario",
-      antiimperialism: "imperialismo OR anti-imperialismo OR OTAN OR Palestina OR Gaza",
+      antiimperialism:
+        "imperialismo OR anti-imperialismo OR OTAN OR Palestina OR Gaza",
       theory: "Marx OR Lenin OR Gramsci OR revolucao OR movimento operario",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialismo",
     },
@@ -1700,7 +1771,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "trabalhadores OR sindicato OR greve OR salario",
-      antiimperialism: "imperialismo OR anti-imperialismo OR NATO OR Palestina OR Gaza",
+      antiimperialism:
+        "imperialismo OR anti-imperialismo OR NATO OR Palestina OR Gaza",
       theory: "Marx OR Lenine OR Gramsci OR revolucao OR movimento operario",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialismo",
     },
@@ -1717,7 +1789,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialismo OR comunismo OR marxismo",
       labor: "trabajadores OR sindicato OR huelga OR salario",
-      antiimperialism: "bloqueo OR imperialismo OR antiimperialismo OR Palestina OR Gaza",
+      antiimperialism:
+        "bloqueo OR imperialismo OR antiimperialismo OR Palestina OR Gaza",
       theory: "Marx OR Lenin OR Fidel OR revolucion OR movimiento obrero",
       socialistStates: "Cuba OR China OR Rusia OR BRICS OR socialismo",
     },
@@ -1751,8 +1824,10 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialism OR communism OR marxism",
       labor: "workers OR trade union OR strike OR wages",
-      antiimperialism: "imperialism OR anti-imperialism OR NATO OR Palestine OR Gaza",
-      theory: "Marx OR Lenin OR revolution OR peasant movement OR labour history",
+      antiimperialism:
+        "imperialism OR anti-imperialism OR NATO OR Palestine OR Gaza",
+      theory:
+        "Marx OR Lenin OR revolution OR peasant movement OR labour history",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialism",
     },
   },
@@ -1821,7 +1896,8 @@ const RADAR_LOCALES: RadarLocale[] = [
       labor: "cong nhan OR cong doan OR dinh cong OR tien luong",
       antiimperialism: "chu nghia de quoc OR NATO OR Palestine OR Gaza",
       theory: "Marx OR Lenin OR cach mang OR phong trao cong nhan",
-      socialistStates: "Trung Quoc OR Nga OR BRICS OR da cuc OR xa hoi chu nghia",
+      socialistStates:
+        "Trung Quoc OR Nga OR BRICS OR da cuc OR xa hoi chu nghia",
     },
   },
   {
@@ -1887,8 +1963,10 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialism OR communism OR marxism",
       labor: "workers OR union OR strike OR wages",
-      antiimperialism: "imperialism OR anti-imperialism OR Palestine OR Gaza OR sanctions",
-      theory: "Marx OR Lenin OR revolution OR liberation movement OR labour history",
+      antiimperialism:
+        "imperialism OR anti-imperialism OR Palestine OR Gaza OR sanctions",
+      theory:
+        "Marx OR Lenin OR revolution OR liberation movement OR labour history",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialism",
     },
   },
@@ -1904,7 +1982,8 @@ const RADAR_LOCALES: RadarLocale[] = [
     terms: {
       core: "socialism OR communism OR marxism",
       labor: "workers OR union OR strike OR wages",
-      antiimperialism: "imperialism OR anti-imperialism OR Palestine OR Gaza OR sanctions",
+      antiimperialism:
+        "imperialism OR anti-imperialism OR Palestine OR Gaza OR sanctions",
       theory: "Marx OR Lenin OR revolution OR labour movement",
       socialistStates: "China OR Russia OR BRICS OR multipolar OR socialism",
     },
@@ -1945,20 +2024,26 @@ const RADAR_LOCALES: RadarLocale[] = [
   },
 ];
 
-const GLOBAL_RADAR_SOURCES: SourceDefinition[] = RADAR_LOCALES.flatMap((locale) =>
-  RADAR_QUERIES.map((query) => ({
-    id: `radar-${locale.id}-${query.id}`,
-    name: `Radar ${locale.name}: ${query.label}`,
-    homepage: "https://news.google.com/",
-    feedUrls: [buildGoogleNewsFeed(locale, query)],
-    region: locale.region,
-    country: locale.country,
-    language: locale.language,
-    kind: "radar",
-    ideologies: ["radar", "trasversale"],
-    tags: ["scoperta", "notizie", locale.country.toLowerCase(), ...query.tags],
-    priority: 5,
-  })),
+const GLOBAL_RADAR_SOURCES: SourceDefinition[] = RADAR_LOCALES.flatMap(
+  (locale) =>
+    RADAR_QUERIES.map((query) => ({
+      id: `radar-${locale.id}-${query.id}`,
+      name: `Radar ${locale.name}: ${query.label}`,
+      homepage: "https://news.google.com/",
+      feedUrls: [buildGoogleNewsFeed(locale, query)],
+      region: locale.region,
+      country: locale.country,
+      language: locale.language,
+      kind: "radar",
+      ideologies: ["radar", "trasversale"],
+      tags: [
+        "scoperta",
+        "notizie",
+        locale.country.toLowerCase(),
+        ...query.tags,
+      ],
+      priority: 5,
+    })),
 );
 
 export const SOURCE_CATALOG: SourceDefinition[] = [

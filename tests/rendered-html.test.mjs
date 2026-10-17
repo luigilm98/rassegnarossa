@@ -124,3 +124,146 @@ test("translation validates empty text and preserves same-language content", asy
   assert.equal(same.status, 200);
   assert.equal((await same.json()).translatedText, "Una lettura");
 });
+
+test("known feeds bypass homepage discovery and retain source identity", async () => {
+  const { default: worker } = await import("../dist/server/index.js");
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    return new Response(
+      '<rss version="2.0"><channel><title>Fixture</title><item><title>Notizia di prova</title><link>https://example.org/prova</link><guid>fixture-one</guid><pubDate>Fri, 16 Oct 2026 15:00:00 GMT</pubDate><description>Un estratto sintetico per il test.</description></item></channel></rss>',
+      { headers: { "content-type": "application/rss+xml" } },
+    );
+  };
+  try {
+    const env = {
+      ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
+    };
+    const ctx = { waitUntil() {}, passThroughOnException() {} };
+    for (const [id, feed] of [
+      ["ottolina", "https://ottolinatv.it/feed/"],
+      [
+        "ottolina-dazibao",
+        "https://ottolinatv.it/category/la-tv/dazibao/feed/",
+      ],
+    ]) {
+      const response = await worker.fetch(
+        new Request(
+          `http://localhost/api/articles?sourceIds=${id}&limitPerSource=23`,
+        ),
+        env,
+        ctx,
+      );
+      assert.equal(response.status, 200);
+      const body = await response.json();
+      assert.equal(body.statuses[0].ok, true);
+      assert.equal(body.articles[0].sourceId, id);
+      assert.equal(body.statuses[0].feedUrl, feed);
+    }
+    assert.deepEqual(calls, [
+      "https://ottolinatv.it/feed/",
+      "https://ottolinatv.it/category/la-tv/dazibao/feed/",
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("unreachable declared feeds stop after known candidates instead of sweeping homepages", async () => {
+  const { default: worker } = await import("../dist/server/index.js");
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    return new Response("Unavailable", { status: 503 });
+  };
+  try {
+    const response = await worker.fetch(
+      new Request(
+        "http://localhost/api/articles?sourceIds=dazibao&limitPerSource=22",
+      ),
+      {
+        ASSETS: {
+          fetch: async () => new Response("Not found", { status: 404 }),
+        },
+      },
+      { waitUntil() {}, passThroughOnException() {} },
+    );
+    const result = await response.json();
+    assert.equal(result.statuses[0].ok, false);
+    assert.deepEqual(result.articles, []);
+    assert.equal(calls.length, 2);
+    assert.match(calls[0], /youtube.com\/@dazibao\/videos/);
+    assert.match(calls[1], /youtube.com\/feeds\/videos.xml/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("configured YouTube listings provide titles without inventing publication dates", async () => {
+  const { default: worker } = await import("../dist/server/index.js");
+  const originalFetch = globalThis.fetch;
+  const listing = {
+    contents: {
+      twoColumnBrowseResultsRenderer: {
+        tabs: [
+          {
+            tabRenderer: {
+              selected: true,
+              content: {
+                richGridRenderer: {
+                  contents: [
+                    {
+                      lockupViewModel: {
+                        contentId: "Sample00001",
+                        metadata: {
+                          lockupMetadataViewModel: {
+                            title: { content: "Un video di prova sulla Cina" },
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    return new Response(
+      `<script>var ytInitialData = ${JSON.stringify(listing)};</script>`,
+      { headers: { "content-type": "text/html" } },
+    );
+  };
+  try {
+    const response = await worker.fetch(
+      new Request(
+        "http://localhost/api/articles?sourceIds=dazibao&limitPerSource=21",
+      ),
+      {
+        ASSETS: {
+          fetch: async () => new Response("Not found", { status: 404 }),
+        },
+      },
+      { waitUntil() {}, passThroughOnException() {} },
+    );
+    const result = await response.json();
+    assert.equal(result.statuses[0].ok, true);
+    assert.equal(result.articles[0].sourceId, "dazibao");
+    assert.equal(result.articles[0].publishedAt, null);
+    assert.equal(result.articles[0].title, "Un video di prova sulla Cina");
+    assert.equal(
+      result.articles[0].link,
+      "https://www.youtube.com/watch?v=Sample00001",
+    );
+    assert.deepEqual(calls, ["https://www.youtube.com/@dazibao/videos"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
