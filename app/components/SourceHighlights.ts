@@ -16,6 +16,7 @@ export function useSourceHighlights(articles: { sourceId: string; sourceHomepage
     const controller = new AbortController();
     const attempted = new Map<string, number>();
     const inFlight = new Set<string>();
+    const failures = new Map<string, number>();
     const results = new Map<string, { ok: boolean; highlights: SourceHighlight[]; images: SourceImage[] }>();
     let active = true;
     const report = () => {
@@ -33,13 +34,14 @@ export function useSourceHighlights(articles: { sourceId: string; sourceHomepage
       if (!active || document.visibilityState !== "visible") return;
       for (const source of sourcesRef.current) {
         if (inFlight.size >= 3) break;
-        if (inFlight.has(source.homepage) || Date.now() - (attempted.get(source.homepage) ?? 0) < 600_000) continue;
+        const retryAfter = failures.get(source.homepage) === 1 ? 30_000 : 600_000;
+        if (inFlight.has(source.homepage) || Date.now() - (attempted.get(source.homepage) ?? 0) < retryAfter) continue;
         attempted.set(source.homepage, Date.now()); inFlight.add(source.homepage);
         void (async () => {
           let result = { ok: false, highlights: [] as SourceHighlight[], images: [] as SourceImage[] };
           try {
             const response = await fetch(`/api/highlights?sourceId=${encodeURIComponent(source.id)}`, {
-              signal: AbortSignal.any([controller.signal, AbortSignal.timeout(6000)]),
+              signal: AbortSignal.any([controller.signal, AbortSignal.timeout(10000)]),
             });
             const data = await response.json();
             if (response.ok && data.ok && Array.isArray(data.highlights))
@@ -48,6 +50,7 @@ export function useSourceHighlights(articles: { sourceId: string; sourceHomepage
                 images: Array.isArray(data.images) ? data.images.filter((item: SourceImage) => typeof item.link === "string" && typeof item.image === "string") : [] };
           } catch { /* One publisher cannot block articles or other publishers. */ }
           if (active) {
+            failures.set(source.homepage, result.ok ? 0 : (failures.get(source.homepage) ?? 0) + 1);
             results.set(source.homepage, result);
             setHighlights([...results.values()].flatMap(value => value.highlights));
             setImages([...results.values()].flatMap(value => value.images));

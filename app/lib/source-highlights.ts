@@ -1,6 +1,6 @@
 import type { ArticleRecord } from "./feed";
 export type Placement = "featured" | "opening" | "popular";
-export type SourceImage = { link: string; image: string };
+export type SourceImage = { link: string; image: string; fallbacks?: string[] };
 export type SourceHighlight = { link: string; placement: Placement; rank: number };
 type Node = { tag: string; attrs: Record<string, string>; parent?: Node; children: Node[]; text: string; blocked: boolean };
 const VOID = new Set("area base br col embed hr img input link meta param source track wbr".split(" "));
@@ -104,8 +104,10 @@ export function parseSourcePage(html: string, homepage: string): { highlights: S
       const image = match && safeImage(match[1]);
       return image && Number(match![2]) >= 480 ? [{ image, width: Number(match![2]) }] : [];
     }).sort((a, b) => a.width - b.width);
-    const image = (sizes.find(size => size.width >= 640) ?? sizes.at(-1))?.image ??
-      [node.attrs["data-src"], node.attrs["data-lazy-src"], node.attrs["data-original"], node.attrs.src].flatMap(value => value && safeImage(value) ? [safeImage(value)!] : [])[0];
+    const rawImages = [node.attrs["data-src"], node.attrs["data-lazy-src"], node.attrs["data-original"], node.attrs.src]
+      .flatMap(value => value && safeImage(value) ? [safeImage(value)!] : []);
+    const image = (sizes.find(size => size.width >= 640) ?? sizes.at(-1))?.image ?? rawImages[0];
+    const fallbacks = [...new Set([...rawImages, ...sizes.map(size => size.image)])].filter(value => value !== image).slice(0, 4);
     if (!image) continue;
     let parent = node.parent, href: string | null = null;
     for (let depth = 0; parent && depth < 6; depth++, parent = parent.parent) {
@@ -118,7 +120,7 @@ export function parseSourcePage(html: string, homepage: string): { highlights: S
       if (parent.tag === "article") break;
     }
     const key = href && highlightLinkKey(href);
-    if (href && key && !pictured.has(key)) { images.push({ link: href, image }); pictured.add(key); }
+    if (href && key && !pictured.has(key)) { images.push({ link: href, image, ...(fallbacks.length ? { fallbacks } : {}) }); pictured.add(key); }
     if (images.length >= 120) break;
   }
   return { highlights: results, images };
@@ -128,11 +130,15 @@ export function parseSourceHighlights(html: string, homepage: string): SourceHig
 }
 /** Match photos to exact collected article links; never assign publisher logos or unrelated pictures. */
 export function applySourceImages<T extends { link: string; image: string | null; imageFallbacks?: string[] }>(articles: T[], photos: SourceImage[]): T[] {
-  const byLink = new Map(photos.map(photo => [highlightLinkKey(photo.link), photo.image]));
+  const byLink = new Map(photos.map(photo => [highlightLinkKey(photo.link), photo]));
   return articles.map(article => {
-    const image = byLink.get(highlightLinkKey(article.link));
-    if (!image || image === article.image) return article;
-    return article.image ? { ...article, imageFallbacks: [...new Set([...(article.imageFallbacks ?? []), image])].slice(0, 4) } : { ...article, image };
+    const photo = byLink.get(highlightLinkKey(article.link));
+    if (!photo) return article;
+    const alternates = Array.isArray(photo.fallbacks) ? photo.fallbacks : [];
+    const image = article.image || photo.image;
+    const fallbacks = [...new Set([...(Array.isArray(article.imageFallbacks) ? article.imageFallbacks : []), photo.image, ...alternates])].filter(value => value !== image).slice(0, 4);
+    if (image === article.image && JSON.stringify(fallbacks) === JSON.stringify(article.imageFallbacks ?? [])) return article;
+    return { ...article, image, ...(fallbacks.length ? { imageFallbacks: fallbacks } : {}) };
   });
 }
 export function rankSourceHighlights(articles: ArticleRecord[], highlights: SourceHighlight[], mode: "featured" | "popular"): ArticleRecord[] {

@@ -69,7 +69,7 @@ test("publisher photos match exact article links, support responsive lazy images
  <div><img src="/unrelated.jpg"><a href="/a">One</a><a href="/b">Two</a></div>
  <a href="https://other.example/news"><img src="/external.jpg"></a>
  <nav><a href="/navigation"><img src="/nav.jpg"></a></nav>`,"https://publisher.example/");
- assert.deepEqual(page.images,[{link:"https://publisher.example/story-one?utm_source=front",image:"https://publisher.example/card.jpg"},{link:"https://publisher.example/story-two",image:"https://publisher.example/second.jpg"}]);
+ assert.deepEqual(page.images,[{link:"https://publisher.example/story-one?utm_source=front",image:"https://publisher.example/card.jpg",fallbacks:["https://publisher.example/full.jpg","https://publisher.example/large.jpg"]},{link:"https://publisher.example/story-two",image:"https://publisher.example/second.jpg"}]);
  const unchanged={link:"https://publisher.example/no-photo",image:null};
  const old={link:"https://publisher.example/story-two",image:"https://publisher.example/original.jpg"};
  const result=applySourceImages([{link:"https://publisher.example/story-one",image:null},old,unchanged],page.images);
