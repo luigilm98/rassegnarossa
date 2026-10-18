@@ -58,5 +58,5 @@ export function useSourceHighlights(articles: { sourceId: string; sourceHomepage
     const timer = setInterval(pump, 1000);
     return () => { active = false; controller.abort(); clearTimeout(delay); clearInterval(timer); };
   }, [enabled]);
-  return { highlights, coverage };
+  return { highlights, coverage: { ...coverage, busy: enabled && (coverage.busy || coverage.total < sources.length) } };
 }

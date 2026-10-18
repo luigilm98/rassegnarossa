@@ -10,6 +10,7 @@ import {
   type InputHTMLAttributes,
 } from "react";
 
+import { usePagePreparation } from "./InitialLoadBoundary";
 import { translateAvailableText, normalizeLanguage } from "@/app/lib/translation";
 import { createTranslationQueue } from "@/app/lib/translation-queue";
 
@@ -161,6 +162,7 @@ function translate(text: string, from: string, to: string, priority = 0) {
   hydrateCache();
   const key = keyFor(text, from, to);
   if (memory.has(key)) return Promise.resolve(memory.get(key)!);
+  if (failedKeys.has(key)) return Promise.resolve(null);
   return translationQueue.enqueue({ key, text, from, to, priority });
 }
 export function LocalizationProvider({
@@ -195,6 +197,7 @@ export function LocalizedText({
   priority?: number;
   defer?: boolean;
 }) {
+  const { preparing, begin } = usePagePreparation();
   const to = normalizeLanguage(useLocale());
   const from = normalizeLanguage(originalLanguage);
   const anchor = useRef<HTMLSpanElement>(null);
@@ -239,21 +242,23 @@ export function LocalizedText({
   useEffect(() => {
     let live = true;
     if (
-      visible &&
+      (preparing || visible) &&
       text.trim() &&
       /\p{L}/u.test(text) &&
       from !== to &&
       !builtin &&
       text.length <= 2200
     ) {
+      const finish = preparing ? begin() : () => {};
       void translate(text, from, to, priority).then((value) => {
         if (live && value !== null) setResult({ key, value });
-      });
+      }).finally(finish);
+      return () => { live = false; finish(); };
     }
     return () => {
       live = false;
     };
-  }, [text, from, to, key, builtin, visible, priority, retry]);
+  }, [text, from, to, key, builtin, visible, priority, retry, preparing, begin]);
   const translated = builtin ?? (result?.key === key ? result.value : null);
   const output =
     !text || from === to || translated === null

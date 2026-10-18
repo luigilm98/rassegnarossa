@@ -125,6 +125,7 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
   return (
     <aside
       className="world-watch"
+      data-initial-pending={busy || !updatedAt ? "true" : undefined}
       aria-label="Osservatorio mondiale delle ultime sei ore"
     >
       <div className="watch-heading">

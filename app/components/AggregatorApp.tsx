@@ -50,6 +50,7 @@ import {
 
 import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
+import { InitialLoadBoundary, usePagePreparation } from "./InitialLoadBoundary";
 import { WorldWatch } from "./WorldWatch";
 import { useStableNews } from "./StableNews";
 import { useCloudBookmarks, type RestoredCollection } from "./CloudBookmarks";
@@ -763,7 +764,8 @@ export function AggregatorApp() {
 
   return (
     <LocalizationProvider language={readingLanguage}>
-      <div className="app-shell">
+      <InitialLoadBoundary collecting={loading || collecting || progress.done < progress.total} progress={progress} language={readingLanguage}>
+      <div className="app-shell" data-initial-pending={sourceHighlights.coverage.busy ? "true" : undefined}>
         <a className="skip-link" href="#letture">
           <LocalizedText>{"Vai ai contenuti"}</LocalizedText>
         </a>
@@ -1317,6 +1319,7 @@ export function AggregatorApp() {
           ) : null}
         </dialog>
       </div>
+      </InitialLoadBoundary>
     </LocalizationProvider>
   );
 }
@@ -1355,6 +1358,7 @@ function ArticleCard({
   onSelect: () => void;
   onSave: () => void;
 }) {
+  const { preparing } = usePagePreparation();
   const [imageFailed, setImageFailed] = useState(false);
   const [image] = useState(() => safeWebUrl(article.image));
   return (
@@ -1367,7 +1371,7 @@ function ArticleCard({
               alt=""
               width={640}
               height={360}
-              loading="lazy"
+              loading={preparing ? "eager" : "lazy"}
               decoding="async"
               referrerPolicy="no-referrer"
               style={{ opacity: imageFailed ? 0 : undefined }}

@@ -34,6 +34,9 @@ test("server-renders the aggregator shell", async () => {
   const html = await response.text();
   assert.match(html, /<html lang="it">/i);
   assert.match(html, /<title>Rassegna Rossa<\/title>/i);
+  assert.match(html, /class="initial-loading"[^>]*role="status"[^>]*aria-busy="true"/);
+  assert.match(html, /class="edition-preparing"[^>]*inert=""[^>]*aria-hidden="true"/);
+  assert.match(html, /Prepariamo la rassegna/);
   assert.match(html, /Aggregatore socialista globale/);
   assert.match(html, /Tesi su Feuerbach/);
   assert.match(html, /community-emblem/);
