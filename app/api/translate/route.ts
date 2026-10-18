@@ -1,3 +1,4 @@
+import { chunkTranslationText } from "@/app/lib/translation";
 export const dynamic = "force-dynamic";
 
 type TranslationPayload = {
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
         { error: "Translation temporarily unavailable" },
         { status: 503 },
       );
-    const chunks = chunkText(text, CHUNK_CHARS);
+    const chunks = chunkTranslationText(text, CHUNK_CHARS);
     const translatedChunks = [];
     for (const chunk of chunks) {
       translatedChunks.push(await translateChunk(chunk, from, to));
@@ -164,31 +165,6 @@ function normalizeLanguage(language: string) {
     auto: "auto",
   };
   return map[lower] ?? lower.split("-")[0] ?? "en";
-}
-
-function chunkText(text: string, maxBytes: number) {
-  const chunks: string[] = [];
-  const encoder = new TextEncoder();
-  let current = "";
-  for (const word of text.match(/\S+\s*/gu) ?? []) {
-    if (encoder.encode(current + word).length <= maxBytes) {
-      current += word;
-      continue;
-    }
-    if (current) {
-      chunks.push(current.trim());
-      current = "";
-    }
-    for (const char of word) {
-      if (encoder.encode(current + char).length > maxBytes) {
-        chunks.push(current.trim());
-        current = "";
-      }
-      current += char;
-    }
-  }
-  if (current.trim()) chunks.push(current.trim());
-  return chunks;
 }
 
 function decodeEntities(value: string) {

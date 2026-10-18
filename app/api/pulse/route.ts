@@ -13,6 +13,15 @@ const AREAS: Record<string, string> = {
   east: "radar-cn-labor",
   mena: "radar-eg-labor",
 };
+const PUBLISHERS: Record<string, string> = {
+  europe: "morning-star",
+  north: "truthout",
+  latin: "prensa-latina",
+  africa: "roape",
+  asia: "vietnam-news",
+  east: "china-daily",
+  mena: "peoples-dispatch",
+};
 export async function GET(request: Request) {
   const area = new URL(request.url).searchParams.get("area") ?? "europe";
   const original = SOURCE_CATALOG.find((source) => source.id === AREAS[area]);
@@ -45,9 +54,23 @@ export async function GET(request: Request) {
         : original.name,
     feedUrls: [feed.href],
   };
-  const result = await fetchSource(source, 60);
+  const publisher = SOURCE_CATALOG.find((item) => item.id === PUBLISHERS[area]);
+  const results = await Promise.all([
+    fetchSource(source, 60),
+    ...(publisher
+      ? [fetchSource({ ...publisher, id: `pulse-direct-${publisher.id}` }, 60)]
+      : []),
+  ]);
+  const seen = new Set<string>();
+  const collected = results
+    .flatMap((result) => result.articles)
+    .filter((article) => {
+      if (seen.has(article.link)) return false;
+      seen.add(article.link);
+      return true;
+    });
   const now = Date.now();
-  const articles = result.articles.filter((article) => {
+  const articles = collected.filter((article) => {
     const time = article.publishedAt ? Date.parse(article.publishedAt) : NaN;
     return time >= now - SIX_HOURS_MS && time <= now;
   });
@@ -58,12 +81,20 @@ export async function GET(request: Request) {
       generatedAt: new Date(now).toISOString(),
       windowStart: new Date(now - SIX_HOURS_MS).toISOString(),
       articles,
-      ok: result.status.ok,
-      error: result.status.ok ? null : "Area momentaneamente non disponibile",
+      ok: results.some((result) => result.status.ok),
+      feeds: results.map((result) => ({
+        name: result.source.name,
+        ok: result.status.ok,
+      })),
+      error: results.some((result) => result.status.ok)
+        ? null
+        : "Area momentaneamente non disponibile",
     },
     {
       headers: {
-        "cache-control": result.status.ok ? "public, max-age=120" : "no-store",
+        "cache-control": results.some((result) => result.status.ok)
+          ? "public, max-age=120"
+          : "no-store",
       },
     },
   );

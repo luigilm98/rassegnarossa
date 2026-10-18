@@ -10,6 +10,9 @@ import {
   type InputHTMLAttributes,
 } from "react";
 
+import { translatePublicText } from "@/app/lib/translation";
+
+let useDirectTranslation = false;
 const Locale = createContext("it");
 export function useLocale() {
   return useContext(Locale);
@@ -139,23 +142,33 @@ function drain() {
     active++;
     void (async () => {
       try {
-        const response = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            text: task.text,
-            from: task.from,
-            to: task.to,
-          }),
-          signal: AbortSignal.timeout(14000),
-        });
-        const data = await response.json();
-        if (!response.ok || typeof data.translatedText !== "string")
-          throw new Error("Translation unavailable");
+        let value: string;
+        try {
+          if (useDirectTranslation) throw new Error("Use public CORS endpoint");
+          const response = await fetch("/api/translate", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              text: task.text,
+              from: task.from,
+              to: task.to,
+            }),
+            signal: AbortSignal.timeout(14000),
+          });
+          const data = await response.json();
+          if (!response.ok || typeof data.translatedText !== "string")
+            throw new Error("Server translation unavailable");
+          value = data.translatedText;
+        } catch {
+          // The provider can reject a shared hosting IP or exhaust its quota.
+          // Its public CORS API works without keys or browser credentials.
+          useDirectTranslation = true;
+          value = await translatePublicText(task.text, task.from, task.to);
+        }
         if (memory.size >= 800) memory.delete(memory.keys().next().value!);
-        memory.set(task.key, data.translatedText);
+        memory.set(task.key, value);
         persist();
-        task.done(data.translatedText);
+        task.done(value);
       } catch {
         failed = true;
         emit();

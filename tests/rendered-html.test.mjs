@@ -313,7 +313,7 @@ test("world observatory limits dates and remote destinations and reports partial
         area === "pacific" ? "Green Left" : "Fixture Publisher",
       );
     }
-    assert.equal(calls.length, 8);
+    assert.equal(calls.length, 15);
     assert.ok(
       calls
         .filter((url) => url.includes("news.google.com"))
@@ -325,7 +325,7 @@ test("world observatory limits dates and remote destinations and reports partial
       ctx,
     );
     assert.equal(denied.status, 400);
-    assert.equal(calls.length, 8);
+    assert.equal(calls.length, 15);
     const realNow = Date.now;
     globalThis.fetch = async () => new Response("Unavailable", { status: 503 });
     Date.now = () => realNow() + 180_000;
@@ -339,6 +339,25 @@ test("world observatory limits dates and remote destinations and reports partial
       assert.equal(data.ok, false);
       assert.deepEqual(data.articles, []);
       assert.ok(data.error);
+      Date.now = () => realNow() + 360_000;
+      globalThis.fetch = async (url) =>
+        String(url).includes("news.google.com")
+          ? new Response("Unavailable", { status: 503 })
+          : new Response(
+              `<rss><channel><item><title>Direct publisher fallback</title><link>https://example.org/direct</link><pubDate>${new Date(realNow()).toUTCString()}</pubDate></item></channel></rss>`,
+            );
+      const fallback = await worker.fetch(
+        new Request("http://localhost/api/pulse?area=europe"),
+        env,
+        ctx,
+      );
+      const recovered = await fallback.json();
+      assert.equal(recovered.ok, true);
+      assert.equal(recovered.articles[0].sourceName, "Morning Star");
+      assert.deepEqual(
+        recovered.feeds.map((feed) => feed.ok),
+        [false, true],
+      );
     } finally {
       Date.now = realNow;
     }

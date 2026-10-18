@@ -257,7 +257,7 @@ export function WorldWatch() {
             </>
           ) : (
             <>
-              <T>Canali disponibili</T> {coverage.ok}/{AREAS.length}
+              <T>Raccolte disponibili</T> {coverage.ok}/{AREAS.length}
             </>
           )}
         </span>
@@ -344,11 +344,11 @@ export function WorldWatch() {
         </p>
         <p>
           <T>
-            Otto canali: sette radar regionali di Google News e Green Left per
-            l’Oceania. Le aree indicano l’edizione consultata, non
-            necessariamente il luogo dell’evento. Le date mancanti, future o
-            oltre sei ore sono escluse. Copertura parziale; nessun articolo
-            inventato.
+            Otto raccolte regionali: sette radar di Google News affiancati da
+            testate dirette e Green Left per l’Oceania. Le aree indicano
+            l’edizione consultata, non necessariamente il luogo dell’evento. Le
+            date mancanti, future o oltre sei ore sono escluse. Copertura
+            parziale; nessun articolo inventato.
           </T>
         </p>
       </details>
