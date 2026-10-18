@@ -1,4 +1,4 @@
-import { chunkTranslationText } from "@/app/lib/translation";
+import { chunkTranslationText, translateGoogleText } from "@/app/lib/translation";
 export const dynamic = "force-dynamic";
 
 type TranslationPayload = {
@@ -15,6 +15,7 @@ const TRANSLATION_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_TEXT_CHARS = 2200;
 const CHUNK_CHARS = 460;
 let unavailableUntil = 0;
+let googleUnavailableUntil = 0;
 
 export async function POST(request: Request) {
   try {
@@ -66,20 +67,22 @@ export async function POST(request: Request) {
       });
     }
 
-    if (Date.now() < unavailableUntil)
-      return Response.json(
-        { error: "Translation temporarily unavailable" },
-        { status: 503 },
-      );
-    const chunks = chunkTranslationText(text, CHUNK_CHARS);
-    const translatedChunks = [];
-    for (const chunk of chunks) {
-      translatedChunks.push(await translateChunk(chunk, from, to));
+    let translatedText: string;
+    let provider = "google-web";
+    try {
+      if (Date.now() < googleUnavailableUntil) throw new Error("Google rate limited");
+      translatedText = await translateGoogleText(text, from, to);
+    } catch (error) {
+      if ((error as { status?: number })?.status === 429) googleUnavailableUntil = Date.now() + 60_000;
+      // MyMemory's quota must never prevent another provider from succeeding.
+      if (Date.now() < unavailableUntil)
+        return Response.json({ error: "Translation temporarily unavailable" }, { status: 503 });
+      const chunks = chunkTranslationText(text, CHUNK_CHARS);
+      const translatedChunks = [];
+      for (const chunk of chunks) translatedChunks.push(await translateChunk(chunk, from, to));
+      translatedText = translatedChunks.join(["zh", "ja"].includes(to.split("-")[0]) ? "" : " ").replace(/\s+/g, " ").trim();
+      provider = "mymemory";
     }
-    const translatedText = translatedChunks
-      .join(["zh", "ja"].includes(to.split("-")[0]) ? "" : " ")
-      .replace(/\s+/g, " ")
-      .trim();
 
     if (translationCache.size >= 2048)
       translationCache.delete(translationCache.keys().next().value!);
@@ -88,7 +91,7 @@ export async function POST(request: Request) {
       value: translatedText,
     });
 
-    return Response.json({ translatedText, provider: "mymemory" });
+    return Response.json({ translatedText, provider });
   } catch (error) {
     return Response.json(
       {

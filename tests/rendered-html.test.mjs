@@ -44,7 +44,9 @@ test("server-renders the aggregator shell", async () => {
   assert.match(html, /aria-label="Lingua di lettura"/);
   assert.match(html, /aria-label="Lingua delle fonti in analisi"/);
   assert.match(html, /reading-language-control/);
-  assert.match(html, /source-language-control/);
+  assert.match(html, /source-language-control source-language-inline/);
+  const toolbar = html.slice(html.indexOf('class="filter-toolbar"'), html.indexOf('id="advanced-filters"'));
+  assert.match(toolbar, /aria-label="Lingua delle fonti in analisi"/);
   assert.match(html, /aria-label="Ordina le notizie"/);
   assert.match(html, /In evidenza dalle fonti/);
   assert.match(html, /Ultimi articoli/);
@@ -425,7 +427,9 @@ test("automatic translation rejects malformed input, preserves Unicode and never
   );
   const originalFetch = globalThis.fetch;
   const queries = [];
+  const queryLimits = [];
   globalThis.fetch = async (url) => {
+    queryLimits.push(String(url).includes("translate.googleapis.com") ? 1600 : 460);
     const q = new URL(url).searchParams.get("q");
     queries.push(q);
     return Response.json({
@@ -443,7 +447,7 @@ test("automatic translation rejects malformed input, preserves Unicode and never
     assert.ok(queries.length > 1);
     assert.ok(
       queries.every(
-        (q) => new TextEncoder().encode(q).length <= 460 && !q.includes("�"),
+        (q, index) => new TextEncoder().encode(q).length <= queryLimits[index] && !q.includes("�"),
       ),
     );
     const before = queries.length;
@@ -531,4 +535,47 @@ test("publisher homepage collection uses configured destinations, returns real p
       assert.equal(fresh.highlights[0].placement, "opening");
     } finally { Date.now = realNow; }
   } finally { globalThis.fetch = original; }
+});
+
+
+test("Google translation remains available when the alternate provider is in quota cooldown", async () => {
+ const { default: worker } = await import("../dist/server/index.js");
+ const original = globalThis.fetch;
+ const calls = [];
+ globalThis.fetch = async url => {
+  calls.push(String(url));
+  return Response.json([[["Le lavoratrici organizzano uno sciopero.", "Workers organize a strike."]], null, "en"]);
+ };
+ try {
+  const response = await worker.fetch(new Request("http://localhost/api/translate", {
+   method: "POST", headers: { "content-type": "application/json" },
+   body: JSON.stringify({ text: "Workers organize a strike.", from: "en", to: "it" }),
+  }), { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } }, { waitUntil() {}, passThroughOnException() {} });
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.translatedText, "Le lavoratrici organizzano uno sciopero.");
+  assert.equal(data.provider, "google-web");
+  assert.equal(calls.length, 1);
+  assert.ok(calls[0].startsWith("https://translate.googleapis.com/"));
+ } finally { globalThis.fetch = original; }
+});
+
+
+test("rate-limited Google requests back off while other article translations continue through MyMemory", async () => {
+ const { default: worker } = await import("../dist/server/index.js");
+ const originalFetch = globalThis.fetch, realNow = Date.now;
+ Date.now = () => realNow() + 120_000;
+ let googleCalls = 0, alternateCalls = 0;
+ globalThis.fetch = async url => {
+  if (String(url).includes("translate.googleapis.com")) { googleCalls++; return new Response("Rate limit", { status: 429 }); }
+  alternateCalls++; return Response.json({ responseStatus: 200, responseData: { translatedText: "Articolo tradotto" } });
+ };
+ try {
+  for (const text of ["First independent article", "Second independent article"]) {
+   const response = await worker.fetch(new Request("http://localhost/api/translate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, from: "en", to: "it" }) }), { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } }, { waitUntil() {}, passThroughOnException() {} });
+   assert.equal(response.status, 200);
+   assert.equal((await response.json()).translatedText, "Articolo tradotto");
+  }
+  assert.equal(googleCalls, 1); assert.equal(alternateCalls, 2);
+ } finally { globalThis.fetch = originalFetch; Date.now = realNow; }
 });

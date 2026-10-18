@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   translatePublicText,
+  translateGoogleText,
+  translateAvailableText,
   chunkTranslationText,
 } from "../app/lib/translation.ts";
 
@@ -74,4 +76,38 @@ test("translation fallback fails visibly for quotas, empty results, invalid lang
         new TextEncoder().encode(chunk).length <= 460 && !chunk.includes("�"),
     ),
   );
+});
+
+
+test("Google translates complete sentence segments with explicit languages, bounded UTF-8 and no browser credentials", async () => {
+ const calls = [];
+ const text = "知识共享与集体行动。".repeat(100);
+ const result = await translateGoogleText(text, "zh", "it", async (url, options) => {
+  const params = new URL(url).searchParams;
+  calls.push({ params, options });
+  return Response.json([[["Condividere il sapere. ", params.get("q")], ["Agire insieme.", ""]], null, "zh"]);
+ });
+ assert.ok(calls.length > 1);
+ assert.ok(result.includes("Condividere il sapere. Agire insieme."));
+ for (const {params, options} of calls) {
+  assert.equal(params.get("sl"), "zh"); assert.equal(params.get("tl"), "it");
+  assert.ok(new TextEncoder().encode(params.get("q")).length <= 1600);
+  assert.equal(options.credentials, "omit"); assert.equal(options.referrerPolicy, "no-referrer");
+ }
+});
+
+test("a rate-limited translation provider falls back to the other provider without returning error pages as translated text", async () => {
+ const calls = [];
+ const result = await translateAvailableText("Workers defend rights", "en", "it", async url => {
+  calls.push(String(url));
+  return String(url).includes("translate.googleapis.com")
+   ? new Response("Too many requests", { status: 429 })
+   : Response.json({ responseStatus: 200, responseData: { translatedText: "I lavoratori difendono i diritti" } });
+ });
+ assert.equal(result, "I lavoratori difendono i diritti");
+ assert.equal(calls.length, 2);
+ assert.ok(calls[1].startsWith("https://api.mymemory.translated.net/"));
+ for (const value of [[], [null], [[[null]]], {error: "Quota exceeded"}])
+  await assert.rejects(translateGoogleText("News", "en", "it", async () => Response.json(value)));
+ assert.equal(await translateGoogleText("Notizie", "it", "it", async () => { throw new Error("Must not fetch"); }), "Notizie");
 });

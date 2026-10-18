@@ -905,6 +905,37 @@ export function AggregatorApp() {
                       </kbd>
                     )}
                   </label>
+                  <label className="source-language-control source-language-inline">
+                    <Newspaper size={16} />
+                    <span>
+                      <strong>
+                        <LocalizedText>
+                          Lingua delle fonti
+                        </LocalizedText>
+                      </strong>
+                      <small>
+                        <LocalizedText>
+                          Seleziona la lingua originale delle fonti
+                        </LocalizedText>
+                      </small>
+                    </span>
+                    <select
+                      aria-label="Lingua delle fonti in analisi"
+                      value={language}
+                      onChange={(event) =>
+                        chooseSourceLanguage(event.target.value)
+                      }
+                    >
+                      <option value={ALL}>
+                        <LocalizedText>Tutte le lingue</LocalizedText>
+                      </option>
+                      {languages.map((code) => (
+                        <option key={code} value={code}>
+                          <LanguageName code={code} />
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   {view !== "fonti" ? (
                     <label className="inline-select news-order">
                       <span><LocalizedText>Ordina</LocalizedText></span>
@@ -934,37 +965,7 @@ export function AggregatorApp() {
                   </button>
                 </div>
                 <div id="advanced-filters" className="advanced-filters unified-filters" hidden={!filtersOpen}>
-                  <label className="source-language-control">
-                    <Newspaper size={19} />
-                    <span>
-                      <strong>
-                        <LocalizedText>
-                          Lingua delle fonti in analisi
-                        </LocalizedText>
-                      </strong>
-                      <small>
-                        <LocalizedText>
-                          Seleziona la lingua originale delle fonti
-                        </LocalizedText>
-                      </small>
-                    </span>
-                    <select
-                      aria-label="Lingua delle fonti in analisi"
-                      value={language}
-                      onChange={(event) =>
-                        chooseSourceLanguage(event.target.value)
-                      }
-                    >
-                      <option value={ALL}>
-                        <LocalizedText>Tutte le lingue</LocalizedText>
-                      </option>
-                      {languages.map((code) => (
-                        <option key={code} value={code}>
-                          <LanguageName code={code} />
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+
                     <Select label="Area geografica" value={region} change={setRegion}>
                       <option value={ALL}><LocalizedText>Tutto il mondo</LocalizedText></option>
                       {REGION_ORDER.map(value => <option key={value} value={value}><LocalizedText>{value}</LocalizedText></option>)}

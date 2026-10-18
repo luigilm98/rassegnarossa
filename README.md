@@ -9,9 +9,9 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Priorità politica e formativa: organizzarsi, studiare, acquisire competenze e capire i rapporti di potere. Ordinamento dedicato, senza clic o trend come segnali.
 - Atlante completo per aree, con testate, radar e fonti scoperte distinti e sezioni espandibili.
 - Catalogo di 129 testate, canali e risorse, distinto dai 136 radar di ricerca.
-- Lingua di lettura e lingua delle fonti in analisi hanno controlli e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
+- Lingua di lettura e lingua delle fonti in analisi hanno controlli sempre visibili e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
 - Tutte le 265 fonti e ricerche partecipano automaticamente: dieci richieste parallele, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
-- Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e avviso se MyMemory non è disponibile.
+- Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e Google Translate e MyMemory come servizi alternativi, senza fermare la coda al primo errore.
 - Apertura immediata sulla rassegna: testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
 - Ordine selezionabile: in evidenza dalle fonti, ultimi articoli, più letti sulle fonti, priorità politica e formativa.
 - Le selezioni delle testate provengono dal loro HTML pubblico, separatamente dai feed. Nessun contatore di letture interno. “Più letti” usa soltanto classifiche pubblicate dalle fonti; se mancano, l’interfaccia lo segnala.
@@ -65,7 +65,8 @@ npm test
 | `app/api/sources/route.ts` | Catalogo e filtri disponibili |
 | `app/api/articles/route.ts` | Raccolta concorrente, deduplicazione e ordinamento |
 | `app/lib/feed.ts` | Scoperta e parsing RSS/Atom, cache e punteggi |
-| `app/api/translate/route.ts` | Proxy MyMemory e cache in memoria |
+| `app/api/translate/route.ts` | Traduzione con servizi alternativi e cache in memoria |
+| `app/lib/translation-queue.ts` | Coda indipendente per testo, priorità e cambio della lingua di lettura |
 | `worker/index.ts` | Entrata Cloudflare Worker |
 | `.openai/hosting.json` | Identità del sito Sites e binding |
 | `tests/` | Verifiche automatiche del rendering |

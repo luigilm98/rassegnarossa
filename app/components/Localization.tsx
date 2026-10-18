@@ -10,9 +10,11 @@ import {
   type InputHTMLAttributes,
 } from "react";
 
-import { translatePublicText } from "@/app/lib/translation";
+import { translateAvailableText } from "@/app/lib/translation";
+import { createTranslationQueue } from "@/app/lib/translation-queue";
 
-let useDirectTranslation = false;
+let useDirectUntil = 0;
+const failedKeys = new Set<string>();
 const Locale = createContext("it");
 export function useLocale() {
   return useContext(Locale);
@@ -22,16 +24,7 @@ const listeners = new Set<() => void>();
 let failed = false;
 let retryVersion = 0;
 let hydrated = false;
-let active = 0;
-const pending: {
-  key: string;
-  text: string;
-  from: string;
-  to: string;
-  priority: number;
-  done: (value: string | null) => void;
-}[] = [];
-const requests = new Map<string, Promise<string | null>>();
+let currentReadingLanguage = "it";
 const EN: Record<string, string> = {
   "La rassegna": "News",
   "Atlante delle fonti": "Source atlas",
@@ -131,70 +124,42 @@ function persist() {
     }
   }, 600);
 }
-function drain() {
-  while (active < 3 && pending.length) {
-    const task = pending.shift()!;
-    if (failed) {
-      requests.delete(task.key);
-      task.done(null);
-      continue;
+const translationQueue = createTranslationQueue(async (task) => {
+  try {
+    let value: string;
+    try {
+      if (Date.now() < useDirectUntil) throw new Error("Use public CORS endpoint");
+      const response = await fetch("/api/translate", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: task.text, from: task.from, to: task.to }),
+        signal: AbortSignal.timeout(14000),
+      });
+      const data = await response.json();
+      if (!response.ok || typeof data.translatedText !== "string" || !data.translatedText.trim()) throw new Error("Server translation unavailable");
+      value = data.translatedText;
+    } catch {
+      useDirectUntil = Date.now() + 60_000;
+      value = await translateAvailableText(task.text, task.from, task.to);
     }
-    active++;
-    void (async () => {
-      try {
-        let value: string;
-        try {
-          if (useDirectTranslation) throw new Error("Use public CORS endpoint");
-          const response = await fetch("/api/translate", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              text: task.text,
-              from: task.from,
-              to: task.to,
-            }),
-            signal: AbortSignal.timeout(14000),
-          });
-          const data = await response.json();
-          if (!response.ok || typeof data.translatedText !== "string")
-            throw new Error("Server translation unavailable");
-          value = data.translatedText;
-        } catch {
-          // The provider can reject a shared hosting IP or exhaust its quota.
-          // Its public CORS API works without keys or browser credentials.
-          useDirectTranslation = true;
-          value = await translatePublicText(task.text, task.from, task.to);
-        }
-        if (memory.size >= 800) memory.delete(memory.keys().next().value!);
-        memory.set(task.key, value);
-        persist();
-        task.done(value);
-      } catch {
-        failed = true;
-        emit();
-        requests.delete(task.key);
-        task.done(null);
-      } finally {
-        requests.delete(task.key);
-        active--;
-        drain();
-      }
-    })();
+    if (memory.size >= 800) memory.delete(memory.keys().next().value!);
+    memory.set(task.key, value);
+    failedKeys.delete(task.key);
+    failed = failedKeys.size > 0;
+    emit(); persist();
+    return value;
+  } catch (error) {
+    if (task.to === currentReadingLanguage) {
+      failedKeys.add(task.key); failed = true; emit();
+    }
+    throw error;
   }
-}
+});
 function translate(text: string, from: string, to: string, priority = 0) {
   if (from === to) return Promise.resolve(text);
   hydrateCache();
   const key = keyFor(text, from, to);
   if (memory.has(key)) return Promise.resolve(memory.get(key)!);
-  if (requests.has(key)) return requests.get(key)!;
-  const promise = new Promise<string | null>((done) => {
-    pending.push({ key, text, from, to, priority, done });
-    pending.sort((a, b) => b.priority - a.priority);
-  });
-  requests.set(key, promise);
-  drain();
-  return promise;
+  return translationQueue.enqueue({ key, text, from, to, priority });
 }
 export function LocalizationProvider({
   language,
@@ -204,6 +169,11 @@ export function LocalizationProvider({
   children: ReactNode;
 }) {
   useEffect(() => {
+    currentReadingLanguage = language;
+    translationQueue.keepTarget(language);
+    failedKeys.clear();
+    failed = false;
+    emit();
     document.documentElement.lang = language;
     document.documentElement.dir = ["ar", "fa"].includes(language)
       ? "rtl"
@@ -323,7 +293,7 @@ export function TranslationNotice() {
       ) : (
         <LocalizedText>
           Interfaccia, titoli ed estratti vengono tradotti automaticamente con
-          MyMemory. Le traduzioni possono contenere errori. Apri e sostieni la
+          Google Translate, con MyMemory come alternativa. Le traduzioni possono contenere errori. Apri e sostieni la
           fonte per il testo completo.
         </LocalizedText>
       )}
@@ -331,8 +301,9 @@ export function TranslationNotice() {
         <button
           className="text-link"
           onClick={() => {
+            failedKeys.clear();
             failed = false;
-            requests.clear();
+            useDirectUntil = 0;
             retryVersion++;
             emit();
           }}
