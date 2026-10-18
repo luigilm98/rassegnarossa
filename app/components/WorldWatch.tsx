@@ -121,15 +121,6 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
       (a, b) =>
         Date.parse(b.article.publishedAt!) - Date.parse(a.article.publishedAt!),
     );
-  const histogram = Array.from(
-    { length: 6 },
-    (_, index) =>
-      allStories.filter((story) => {
-        const age = (now - Date.parse(story.article.publishedAt!)) / 3_600_000;
-        return age >= 5 - index && age < 6 - index;
-      }).length,
-  );
-  const max = Math.max(1, ...histogram);
   const time = (value: number) =>
     new Intl.DateTimeFormat(locale, {
       hour: "2-digit",
@@ -175,20 +166,8 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
           <T>testate rappresentate</T>
         </div>
       </div>
-      <div
-        className="watch-histogram"
-        aria-label="Distribuzione delle notizie nelle ultime sei ore"
-      >
-        {histogram.map((count, index) => (
-          <div key={index}>
-            <span
-              style={{ height: `${Math.max(4, (count / max) * 42)}px` }}
-              title={String(count)}
-            />
-            <small>{index === 5 ? <T>Ora</T> : `−${5 - index}h`}</small>
-          </div>
-        ))}
-      </div>
+      <details className="watch-filters">
+        <summary><T>Filtra l’osservatorio</T></summary>
       <div className="watch-controls">
         <label>
           <T>Area</T>
@@ -250,6 +229,7 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
           </select>
         </label>
       </div>
+      </details>
       <div className="watch-status" role="status">
         <span>
           {busy ? (

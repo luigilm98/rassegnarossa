@@ -6,13 +6,15 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 
 - Notizie filtrabili per regione, lingua, fonte, orientamento, tipo e argomento.
 - Ricerca, ordinamento, finestra temporale e aggiornamento dei feed.
-- Priorità politica e formativa: organizzarsi, studiare, acquisire competenze e capire i rapporti di potere. Criterio automatico spiegabile su ogni scheda, senza clic o trend come segnali.
+- Priorità politica e formativa: organizzarsi, studiare, acquisire competenze e capire i rapporti di potere. Ordinamento dedicato, senza clic o trend come segnali.
 - Atlante completo per aree, con testate, radar e fonti scoperte distinti e sezioni espandibili.
 - Catalogo di 129 testate, canali e risorse, distinto dai 136 radar di ricerca.
 - Lingua di lettura e lingua delle fonti in analisi hanno controlli e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
 - Tutte le 265 fonti e ricerche partecipano automaticamente: dieci richieste parallele, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
 - Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e avviso se MyMemory non è disponibile.
-- Fonti consigliate coerenti con la lingua scelta, comprese le lingue con soli radar.
+- Apertura immediata sulla rassegna: testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
+- Ordine selezionabile: in evidenza dalle fonti, ultimi articoli, più letti sulle fonti, priorità politica e formativa.
+- Le selezioni delle testate provengono dal loro HTML pubblico, separatamente dai feed. Nessun contatore di letture interno. “Più letti” usa soltanto classifiche pubblicate dalle fonti; se mancano, l’interfaccia lo segnala.
 - Osservatorio delle ultime sei ore: notizie da tutta la rete raccolta e da otto canali regionali aggiuntivi, filtri, attività oraria e collegamenti diretti alle testate, senza punteggi nelle schede.
 - Marchio essenziale con libro aperto e stella, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Schede salvate nel browser tramite `localStorage`: titolo, estratto e link ritrovabili anche dopo una nuova visita.
@@ -54,6 +56,8 @@ npm test
 | `app/lib/source-selection.ts` | Preferenze linguistiche indipendenti e fonti consigliate |
 | `app/components/Localization.tsx` | Traduzioni React, coda, cache e scelta della lingua |
 | `app/components/WorldWatch.tsx` | Osservatorio mondiale indipendente e relativi controlli |
+| `app/lib/source-highlights.ts` | Selezioni e classifiche pubbliche delle testate, riconciliazione con i feed |
+| `app/api/highlights/route.ts` | Lettura limitata delle pagine di fonti configurate, cache e fallimenti indipendenti |
 | `app/lib/pulse.ts` | Finestra mobile di sei ore, raggruppamento e ranking |
 | `app/api/pulse/route.ts` | Raccolta da destinazioni regionali fisse |
 | `app/data/quotes.ts` | Citazioni, provenienza e rotazione |

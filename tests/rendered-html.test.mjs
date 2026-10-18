@@ -45,7 +45,14 @@ test("server-renders the aggregator shell", async () => {
   assert.match(html, /aria-label="Lingua delle fonti in analisi"/);
   assert.match(html, /reading-language-control/);
   assert.match(html, /source-language-control/);
-  assert.match(html, /LEGGERE PER CAPIRE E AGIRE/);
+  assert.match(html, /aria-label="Ordina le notizie"/);
+  assert.match(html, /In evidenza dalle fonti/);
+  assert.match(html, /Ultimi articoli/);
+  assert.match(html, /Più letti sulle fonti/);
+  assert.match(html, /id="advanced-filters"[^>]*hidden/);
+  assert.doesNotMatch(html, /dossier-strip|editorial-compass|source-shortcuts|topic-tabs|editorial-hero|hero-art|Entra nella rassegna/);
+  assert.ok(html.indexOf('id="letture"') < html.indexOf('class="daily-quotation"'));
+  assert.match(html, /<h1 id="page-title">/);
   assert.doesNotMatch(html, /Carica altre fonti|Mostra altre fonti/);
   assert.doesNotMatch(html, /Il mondo, da un’altra/);
   assert.match(html, /Atlante delle fonti/);
@@ -482,4 +489,46 @@ test("automatic translation rejects malformed input, preserves Unicode and never
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test("publisher homepage collection uses configured destinations, returns real placements, caches successes and reports failures without inventing charts", async () => {
+  const { default: worker } = await import("../dist/server/index.js");
+  const env = { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } };
+  const ctx = { waitUntil() {}, passThroughOnException() {} };
+  const original = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async url => {
+    calls.push(String(url));
+    return new Response('<main><article class="featured-stories-tier-1"><h2><a href="/lead">Lead article</a></h2></article><aside><h2>Più letti</h2><a href="/read">Readers choice</a></aside></main>', { headers: { "content-type": "text/html; charset=utf-8" } });
+  };
+  try {
+    for (const id of ["https://unconfigured.example", "does-not-exist", "radar-uk-labor", "ottolina-youtube"]) {
+      const response = await worker.fetch(new Request(`http://localhost/api/highlights?sourceId=${encodeURIComponent(id)}`), env, ctx);
+      assert.equal(response.status, 400);
+    }
+    assert.equal(calls.length, 0);
+    const request = () => new Request("http://localhost/api/highlights?sourceId=ottolina");
+    const response = await worker.fetch(request(), env, ctx);
+    const data = await response.json();
+    assert.equal(data.ok, true);
+    assert.equal(data.highlights.filter(item => item.placement === "popular").length, 1);
+    assert.equal(data.highlights[0].link, "https://ottolinatv.it/lead");
+    assert.deepEqual(calls, ["https://ottolinatv.it/"]);
+    await worker.fetch(request(), env, ctx);
+    assert.equal(calls.length, 1);
+    globalThis.fetch = async () => new Response("Unavailable", { status: 503 });
+    const failed = await worker.fetch(new Request("http://localhost/api/highlights?sourceId=contropiano"), env, ctx);
+    const unavailable = await failed.json();
+    assert.equal(unavailable.ok, false);
+    assert.deepEqual(unavailable.highlights, []);
+    const realNow = Date.now;
+    Date.now = () => realNow() + 660_000;
+    globalThis.fetch = async () => new Response('<main><h2><a href="/latest">Ordinary latest article</a></h2></main>', { headers: { "content-type": "text/html" } });
+    try {
+      const fresh = await (await worker.fetch(request(), env, ctx)).json();
+      assert.equal(fresh.ok, true);
+      assert.equal(fresh.highlights.filter(item => item.placement === "popular").length, 0);
+      assert.equal(fresh.highlights[0].placement, "opening");
+    } finally { Date.now = realNow; }
+  } finally { globalThis.fetch = original; }
 });

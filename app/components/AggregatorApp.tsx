@@ -31,7 +31,6 @@ import {
   SOURCE_CATALOG,
   TOPIC_TAXONOMY,
   REGION_ORDER,
-  RADAR_CHANNEL_COUNT,
   type SourceDefinition,
 } from "@/app/data/catalog";
 import { THEORY_LIBRARY } from "@/app/data/library";
@@ -47,13 +46,13 @@ import {
 import {
   preferredLanguageFor,
   resolveLanguageChoices,
-  rankSources,
-  recommendedSources,
 } from "@/app/lib/source-selection";
 
 import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
 import { WorldWatch } from "./WorldWatch";
+import { useSourceHighlights } from "./SourceHighlights";
+import { highlightLinkKey, rankSourceHighlights } from "@/app/lib/source-highlights";
 import {
   LocalizationProvider,
   LocalizedText,
@@ -92,7 +91,6 @@ const NAV: { id: View; label: string }[] = [
   { id: "fonti", label: "Atlante delle fonti" },
   { id: "teoria", label: "Biblioteca" },
   { id: "salvati", label: "Salvati" },
-  { id: "metodo", label: "Il progetto" },
 ];
 const HEADINGS = {
   notizie: {
@@ -177,7 +175,8 @@ export function AggregatorApp() {
   const [topic, setTopic] = useState(ALL);
   const [sourceId, setSourceId] = useState(ALL);
   const [days, setDays] = useState("30");
-  const [sort, setSort] = useState("editorial");
+  const [sort, setSort] = useState("featured");
+  const sourceHighlights = useSourceHighlights(articles, view === "notizie" && (sort === "featured" || sort === "popular"));
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
@@ -279,7 +278,7 @@ export function AggregatorApp() {
     setTopic(ALL);
     setSourceId(ALL);
     setDays("30");
-    setSort("editorial");
+    setSort("featured");
     setVisibleCount(PAGE_SIZE);
   }, []);
   const navigate = (next: View) => {
@@ -298,14 +297,6 @@ export function AggregatorApp() {
       "Raccolta interrotta. Le notizie già recuperate restano disponibili.",
     );
     setLastRefresh(new Date().toISOString());
-  };
-  const pickTopic = (id: string) => {
-    reset();
-    setView("notizie");
-    setTopic(id);
-    document
-      .getElementById("letture")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const refresh = useCallback(
@@ -591,10 +582,17 @@ export function AggregatorApp() {
         : matched.filter((article) =>
             editorialAssessment(article).axes.includes(editorialAxis),
           );
+    if (view !== "salvati" && sort === "featured")
+      return rankSourceHighlights(rankEditorial(selected, preferredLanguage), sourceHighlights.highlights, "featured");
+    if (sort === "popular") {
+      const links = new Set(sourceHighlights.highlights.filter(item => item.placement === "popular").map(item => highlightLinkKey(item.link)));
+      const ranked = selected.filter(article => links.has(highlightLinkKey(article.link)));
+      return ranked.length ? rankSourceHighlights(ranked, sourceHighlights.highlights, "popular") : selected;
+    }
     return sort === "editorial" && view !== "salvati"
       ? rankEditorial(selected, preferredLanguage)
       : selected;
-  }, [matched, editorialAxis, view, sort, preferredLanguage]);
+  }, [matched, editorialAxis, view, sort, preferredLanguage, sourceHighlights.highlights]);
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [
@@ -608,6 +606,7 @@ export function AggregatorApp() {
     sourceId,
     days,
     sort,
+    editorialAxis,
   ]);
   const selectedArticle = allArticles.find((a) => a.id === selectedId) ?? null;
   useEffect(() => {
@@ -695,14 +694,16 @@ export function AggregatorApp() {
         .sort(),
     [],
   );
-  const countries = new Set(
-    SOURCE_CATALOG.filter((s) => s.kind !== "radar").map((s) => s.country),
-  ).size;
   const failedCount = Object.values(statuses).filter((s) => !s.ok).length;
   const filterCount =
-    [region, kind, ideology, topic, sourceId].filter((f) => f !== ALL).length +
+    [region, language, kind, ideology, topic, sourceId, editorialAxis].filter((f) => f !== ALL).length +
+    (days !== "30" ? 1 : 0) +
     (query ? 1 : 0);
   const heading = HEADINGS[view];
+  const ContentHeading = view === "notizie" ? "h1" : "h2";
+  const matchedLinks = useMemo(() => new Set(matched.map(article => highlightLinkKey(article.link))), [matched]);
+  const hasSourceSelection = sourceHighlights.highlights.some(item =>
+    (sort === "popular" ? item.placement === "popular" : item.placement !== "popular") && matchedLinks.has(highlightLinkKey(item.link)));
   const readingLanguage =
     readingChoice === "auto" ? browserLanguage : readingChoice;
   const quote = QUOTATIONS[quoteIndex];
@@ -749,13 +750,7 @@ export function AggregatorApp() {
                 </span>
               </span>
             </button>
-            <p className="brand-note">
-              <LocalizedText>{"Le notizie passano."}</LocalizedText>
-              <br />
-              <strong>
-                <LocalizedText>{"Le connessioni restano."}</LocalizedText>
-              </strong>
-            </p>
+
           </div>
           <nav className="main-nav" aria-label="Navigazione principale">
             <div className="nav-links">
@@ -782,145 +777,13 @@ export function AggregatorApp() {
         </header>
 
         <main>
-          <section
-            className={`editorial-hero ${view !== "notizie" ? "hero-compact" : ""}`}
-            aria-labelledby="page-title"
-          >
-            <div className="hero-copy">
-              <p className="eyebrow">
-                <span className="small-square" />{" "}
-                <LocalizedText>{heading.overline}</LocalizedText>
-              </p>
-              <h1
-                id="page-title"
-                className={view === "notizie" ? "quotation-title" : undefined}
-              >
-                {view === "notizie" ? (
-                  <>
-                    <LocalizedText>{"“"}</LocalizedText>
-                    <LocalizedText priority={2}>{quote.text}</LocalizedText>
-                    <LocalizedText>{"”"}</LocalizedText>
-                  </>
-                ) : (
-                  heading.title
-                )}
-              </h1>
-              {view === "notizie" ? (
-                <p className="quote-attribution">
-                  <strong>{quote.author}</strong>
-                  <span>
-                    <LocalizedText>{quote.work}</LocalizedText>
-                    <LocalizedText>{", "}</LocalizedText>
-                    <LocalizedText>{quote.year}</LocalizedText>
-                  </span>
-                  <a href={quote.url} target="_blank" rel="noopener noreferrer">
-                    <LocalizedText>{"Consulta il testo "}</LocalizedText>
-                    <ArrowUpRight size={13} />
-                  </a>
-                  <small>
-                    <LocalizedText>{quote.note}</LocalizedText>
-                    <LocalizedText>
-                      {" · Marxists Internet Archive"}
-                    </LocalizedText>
-                  </small>
-                </p>
-              ) : null}
-              <p className="hero-description">
-                <LocalizedText>{heading.description}</LocalizedText>
-              </p>
-              {view === "notizie" ? (
-                <div className="hero-links">
-                  <a href="#letture" className="button button-dark">
-                    <LocalizedText>{"Entra nella rassegna "}</LocalizedText>
-                    <ArrowDown size={16} />
-                  </a>
-                  <button
-                    className="text-link"
-                    onClick={() => navigate("teoria")}
-                  >
-                    <LocalizedText>{"Esplora la biblioteca "}</LocalizedText>
-                    <ArrowUpRight size={16} />
-                  </button>
-                </div>
-              ) : null}
-            </div>
-            {view === "notizie" ? (
-              <div className="hero-art" aria-hidden="true">
-                <CommunityEmblem />
-                <span className="emblem-caption">
-                  <LocalizedText>CONOSCENZA COMUNE</LocalizedText>
-                </span>
+          {view !== "notizie" ? (
+            <section className="editorial-hero hero-compact" aria-labelledby="page-title">
+              <div className="hero-copy">
+                <p className="eyebrow"><LocalizedText>{heading.overline}</LocalizedText></p>
+                <h1 id="page-title">{heading.title}</h1>
+                <p className="hero-description"><LocalizedText>{heading.description}</LocalizedText></p>
               </div>
-            ) : (
-              <div className="hero-index" aria-hidden="true">
-                <LocalizedText>
-                  {view === "fonti"
-                    ? "02"
-                    : view === "teoria"
-                      ? "03"
-                      : view === "salvati"
-                        ? "04"
-                        : "05"}
-                </LocalizedText>
-                <span>RASSEGNA ROSSA</span>
-              </div>
-            )}
-          </section>
-
-          <div className="edition-line">
-            <span>
-              <span className="live-dot" />
-              <LocalizedText> </LocalizedText>
-              <LocalizedText>
-                {loading
-                  ? "Tutte le fonti partecipano"
-                  : "Una rete di prospettive"}
-              </LocalizedText>
-            </span>
-            <span>
-              <LocalizedText>
-                {
-                  directory.filter((s) => !s.discovered && s.kind !== "radar")
-                    .length
-                }
-              </LocalizedText>
-              <LocalizedText>{" testate e canali"}</LocalizedText>
-              <LocalizedText> </LocalizedText>
-              <i>
-                <LocalizedText>{"/"}</LocalizedText>
-              </i>{" "}
-              <LocalizedText>{countries}</LocalizedText>
-              <LocalizedText>{" paesi "}</LocalizedText>
-              <i>
-                <LocalizedText>{"/"}</LocalizedText>
-              </i>{" "}
-              <LocalizedText>{languages.length}</LocalizedText>
-              <LocalizedText>{" lingue"}</LocalizedText>
-            </span>
-            <button onClick={() => navigate("metodo")}>
-              <LocalizedText>{"Come leggiamo le fonti "}</LocalizedText>
-              <ArrowUpRight size={14} />
-            </button>
-          </div>
-
-          {view === "notizie" ? (
-            <section className="dossier-strip" aria-label="Percorsi tematici">
-              {DOSSIERS.slice(0, 4).map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => pickTopic(d.id)}
-                  className={topic === d.id ? "active" : ""}
-                >
-                  <span>
-                    <LocalizedText>{d.number}</LocalizedText>
-                    <LocalizedText>{" / ESPLORA"}</LocalizedText>
-                  </span>
-                  <strong>
-                    <LocalizedText>{d.short}</LocalizedText>
-                  </strong>
-                  <ArrowUpRight size={18} />
-                </button>
-              ))}
             </section>
           ) : null}
 
@@ -932,7 +795,7 @@ export function AggregatorApp() {
             {view === "notizie" || view === "salvati" || view === "fonti" ? (
               <>
                 <div className="section-heading">
-                  <div>
+                  <div className="reading-heading-copy">
                     <p className="eyebrow">
                       <LocalizedText>
                         {view === "fonti"
@@ -942,7 +805,7 @@ export function AggregatorApp() {
                             : "DALLA RETE AL CONTESTO"}
                       </LocalizedText>
                     </p>
-                    <h2>
+                    <ContentHeading id={view === "notizie" ? "page-title" : undefined}>
                       <LocalizedText>
                         {view === "notizie"
                           ? "La rassegna"
@@ -957,28 +820,8 @@ export function AggregatorApp() {
                             : filtered.length}
                         </LocalizedText>
                       </span>
-                    </h2>
+                    </ContentHeading>
                   </div>
-                  {view !== "salvati" ? (
-                    <button
-                      className="button button-outline"
-                      disabled={collecting}
-                      onClick={() => void refresh("all")}
-                    >
-                      <RefreshCcw size={15} />
-                      <span>
-                        <LocalizedText>
-                          {collecting ? "Raccolta attiva" : "Aggiorna notizie"}
-                        </LocalizedText>
-                      </span>
-                    </button>
-                  ) : (
-                    <span className="local-note">
-                      <Bookmark size={15} />
-                      <LocalizedText>{" Solo in questo browser"}</LocalizedText>
-                    </span>
-                  )}
-                </div>
                 <div className="language-controls">
                   <label className="reading-language-control">
                     <Languages size={19} />
@@ -1009,6 +852,88 @@ export function AggregatorApp() {
                       ))}
                     </select>
                   </label>
+
+                </div>
+                  {view !== "salvati" ? (
+                    <button
+                      className="button button-outline"
+                      disabled={collecting}
+                      aria-label="Aggiorna notizie"
+                      onClick={() => void refresh("all")}
+                    >
+                      <RefreshCcw size={15} />
+                      <span>
+                        <LocalizedText>
+                          {collecting ? "Raccolta attiva" : "Aggiorna notizie"}
+                        </LocalizedText>
+                      </span>
+                    </button>
+                  ) : (
+                    <span className="local-note">
+                      <Bookmark size={15} />
+                      <LocalizedText>{" Solo in questo browser"}</LocalizedText>
+                    </span>
+                  )}
+                </div>
+                <TranslationNotice />
+                <div className="filter-toolbar">
+                  <label className="search-box">
+                    <Search size={18} />
+                    <LocalizedInput
+                      id="rassegna-search"
+                      aria-label={
+                        view === "fonti" ? "Cerca fonti" : "Cerca articoli"
+                      }
+                      placeholder={
+                        view === "fonti"
+                          ? "Cerca una fonte, un paese…"
+                          : "Cerca notizie, fonti, parole chiave…"
+                      }
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                    {query ? (
+                      <button
+                        onClick={() => setQuery("")}
+                        aria-label="Cancella ricerca"
+                      >
+                        <X size={16} />
+                      </button>
+                    ) : (
+                      <kbd>
+                        <LocalizedText>{"/"}</LocalizedText>
+                      </kbd>
+                    )}
+                  </label>
+                  {view !== "fonti" ? (
+                    <label className="inline-select news-order">
+                      <span><LocalizedText>Ordina</LocalizedText></span>
+                      <select aria-label="Ordina le notizie" value={sort} onChange={event => setSort(event.target.value)}>
+                        <option value="featured"><LocalizedText>In evidenza dalle fonti</LocalizedText></option>
+                        <option value="editorial"><LocalizedText>Priorità politica e formativa</LocalizedText></option>
+                        <option value="fresh"><LocalizedText>Ultimi articoli</LocalizedText></option>
+                        <option value="popular"><LocalizedText>Più letti sulle fonti</LocalizedText></option>
+                      </select>
+                      <ChevronDown size={14} />
+                    </label>
+                  ) : null}
+                  <button
+                    className={`filter-toggle ${filtersOpen ? "active" : ""}`}
+                    onClick={() => setFiltersOpen(!filtersOpen)}
+                    aria-expanded={filtersOpen}
+                    aria-controls="advanced-filters"
+                  >
+                    <SlidersHorizontal size={16} />
+                    <LocalizedText>{" Filtri"}</LocalizedText>
+                    <LocalizedText> </LocalizedText>
+                    {filterCount > 0 ? (
+                      <span>
+                        <LocalizedText>{filterCount}</LocalizedText>
+                      </span>
+                    ) : null}
+                  </button>
+                </div>
+                <div id="advanced-filters" className="advanced-filters unified-filters" hidden={!filtersOpen}>
                   <label className="source-language-control">
                     <Newspaper size={19} />
                     <span>
@@ -1040,145 +965,27 @@ export function AggregatorApp() {
                       ))}
                     </select>
                   </label>
-                </div>
-                <TranslationNotice />
-                {view === "notizie" ? (
-                  <div
-                    className="source-shortcuts"
-                    aria-label="Fonti in evidenza"
-                  >
-                    {recommendedSources(SOURCE_CATALOG, language).map(
-                      (source) => {
-                        const id = source.id;
-                        return (
-                          <div key={id}>
-                            <button onClick={() => openSource(id)}>
-                              <Newspaper size={15} />
-                              {source.name}
-                              <ArrowRight size={14} />
-                            </button>
-                            <a
-                              href={source.homepage}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              aria-label={`Apri direttamente ${source.name}`}
-                            >
-                              <ExternalLink size={14} />
-                            </a>
-                          </div>
-                        );
-                      },
-                    )}
-                    <button
-                      className="text-link"
-                      onClick={() => navigate("fonti")}
-                    >
-                      <LocalizedText>{"Tutte le"}</LocalizedText>
-                      <LocalizedText> </LocalizedText>
-                      <LocalizedText>
-                        {
-                          directory.filter((source) => !source.discovered)
-                            .length
-                        }
-                      </LocalizedText>
-                      <LocalizedText> </LocalizedText>
-                      <LocalizedText>{"fonti "}</LocalizedText>
-                      <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                ) : null}
-                <div className="filter-toolbar">
-                  <label className="search-box">
-                    <Search size={18} />
-                    <LocalizedInput
-                      id="rassegna-search"
-                      aria-label={
-                        view === "fonti" ? "Cerca fonti" : "Cerca articoli"
-                      }
-                      placeholder={
-                        view === "fonti"
-                          ? "Cerca una fonte, un paese…"
-                          : "Cerca notizie, fonti, parole chiave…"
-                      }
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                    {query ? (
-                      <button
-                        onClick={() => setQuery("")}
-                        aria-label="Cancella ricerca"
-                      >
-                        <X size={16} />
-                      </button>
-                    ) : (
-                      <kbd>
-                        <LocalizedText>{"/"}</LocalizedText>
-                      </kbd>
-                    )}
-                  </label>
-                  <label className="inline-select">
-                    <Globe2 size={16} />
-                    <span className="sr-only">
-                      <LocalizedText>{"Area geografica"}</LocalizedText>
-                    </span>
-                    <select
-                      value={region}
-                      onChange={(e) => setRegion(e.target.value)}
-                    >
-                      <option value={ALL}>
-                        <LocalizedText>{"Tutto il mondo"}</LocalizedText>
-                      </option>
-                      {REGION_ORDER.map((r) => (
-                        <option key={r} value={r}>
-                          <LocalizedText>{r}</LocalizedText>
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown size={14} />
-                  </label>
-                  {view === "notizie" ? (
-                    <label className="inline-select">
-                      <span className="sr-only">
-                        <LocalizedText>{"Periodo"}</LocalizedText>
-                      </span>
-                      <select
-                        value={days}
-                        onChange={(e) => setDays(e.target.value)}
-                      >
-                        <option value="1">
-                          <LocalizedText>{"Ultime 24 ore"}</LocalizedText>
-                        </option>
-                        <option value="7">
-                          <LocalizedText>{"Ultimi 7 giorni"}</LocalizedText>
-                        </option>
-                        <option value="30">
-                          <LocalizedText>{"Ultimi 30 giorni"}</LocalizedText>
-                        </option>
-                        <option value="Infinity">
-                          <LocalizedText>{"Tutte le date"}</LocalizedText>
-                        </option>
-                      </select>
-                      <ChevronDown size={14} />
-                    </label>
-                  ) : null}
-                  <button
-                    className={`filter-toggle ${filtersOpen ? "active" : ""}`}
-                    onClick={() => setFiltersOpen(!filtersOpen)}
-                    aria-expanded={filtersOpen}
-                    aria-controls="advanced-filters"
-                  >
-                    <SlidersHorizontal size={16} />
-                    <LocalizedText>{" Filtri"}</LocalizedText>
-                    <LocalizedText> </LocalizedText>
-                    {filterCount > 0 ? (
-                      <span>
-                        <LocalizedText>{filterCount}</LocalizedText>
-                      </span>
-                    ) : null}
-                  </button>
-                </div>
-                {filtersOpen ? (
-                  <div id="advanced-filters" className="advanced-filters">
+                    <Select label="Area geografica" value={region} change={setRegion}>
+                      <option value={ALL}><LocalizedText>Tutto il mondo</LocalizedText></option>
+                      {REGION_ORDER.map(value => <option key={value} value={value}><LocalizedText>{value}</LocalizedText></option>)}
+                    </Select>
+                    <Select label="Periodo" value={days} change={setDays}>
+                      {[["0.25", "Ultime 6 ore"], ["0.5", "Ultime 12 ore"], ["1", "Ultime 24 ore"], ["3", "Ultimi 3 giorni"], ["7", "Ultimi 7 giorni"], ["30", "Ultimi 30 giorni"], ["Infinity", "Tutte le date"]].map(([value, label]) => <option key={value} value={value}><LocalizedText>{label}</LocalizedText></option>)}
+                    </Select>
+                    <Select label="Fonte" value={sourceId} change={setSourceId}>
+                      <option value={ALL}><LocalizedText>Tutte le fonti</LocalizedText></option>
+                      {directory.map(source => <option key={source.id} value={source.id}>{source.name}</option>)}
+                    </Select>
+                    {view !== "fonti" ? <>
+                      <Select label="Argomento" value={topic} change={setTopic}>
+                        <option value={ALL}><LocalizedText>Tutti gli argomenti</LocalizedText></option>
+                        {TOPIC_TAXONOMY.map(item => <option key={item.id} value={item.id}><LocalizedText>{item.label}</LocalizedText></option>)}
+                      </Select>
+                      <Select label="Approfondimento" value={editorialAxis} change={value => setEditorialAxis(value as EditorialAxis | "all")}>
+                        <option value={ALL}><LocalizedText>Tutti gli approfondimenti</LocalizedText></option>
+                        {EDITORIAL_AXES.map(axis => <option key={axis.id} value={axis.id}><LocalizedText>{axis.label}</LocalizedText></option>)}
+                      </Select>
+                    </> : null}
                     <Select label="Tipo di fonte" value={kind} change={setKind}>
                       <option value={ALL}>
                         <LocalizedText>{"Tutti i tipi"}</LocalizedText>
@@ -1205,48 +1012,17 @@ export function AggregatorApp() {
                         </option>
                       ))}
                     </Select>
-                    {view !== "fonti" ? (
-                      <Select label="Ordina per" value={sort} change={setSort}>
-                        <option value="editorial">
-                          <LocalizedText>
-                            Priorità politica e formativa
-                          </LocalizedText>
-                        </option>
-                        <option value="fresh">
-                          <LocalizedText>{"Più recenti"}</LocalizedText>
-                        </option>
-                        <option value="score">
-                          <LocalizedText>{"Punteggio tematico"}</LocalizedText>
-                        </option>
-                        <option value="source">
-                          <LocalizedText>{"Nome della fonte"}</LocalizedText>
-                        </option>
-                      </Select>
-                    ) : null}
-                    <button className="text-link" onClick={reset}>
+                    <button className="text-link" onClick={() => { reset(); chooseSourceLanguage(ALL); }}>
                       <X size={14} />
                       <LocalizedText>{" Azzera filtri"}</LocalizedText>
                     </button>
-                  </div>
-                ) : null}
-                {view !== "fonti" ? (
-                  <div className="topic-tabs" aria-label="Argomenti">
-                    <button
-                      onClick={() => setTopic(ALL)}
-                      aria-pressed={topic === ALL}
-                    >
-                      <LocalizedText>{"Tutti i temi"}</LocalizedText>
-                    </button>
-                    {TOPIC_TAXONOMY.map((t) => (
-                      <button
-                        key={t.id}
-                        onClick={() => setTopic(t.id)}
-                        aria-pressed={topic === t.id}
-                      >
-                        <LocalizedText>{t.label}</LocalizedText>
-                      </button>
-                    ))}
-                  </div>
+                </div>
+                {view === "notizie" && (sort === "popular" || sort === "featured") && !hasSourceSelection ? (
+                  <p className="sort-note" role="status"><LocalizedText>{sourceHighlights.coverage.busy
+                    ? "Le notizie sono già leggibili. Si aggiornano le selezioni delle fonti."
+                    : sort === "popular"
+                      ? "Nessuna classifica dei più letti disponibile per questi articoli. Mostriamo gli ultimi pubblicati."
+                      : "Selezioni delle prime pagine non disponibili per questi articoli. È attiva la priorità politica e formativa."}</LocalizedText></p>
                 ) : null}
                 {sourceId !== ALL ? (
                   <div className="active-source">
@@ -1346,68 +1122,6 @@ export function AggregatorApp() {
                           </p>
                         </div>
                       ) : null}
-                      {view === "notizie" ? (
-                        <section
-                          className="editorial-compass"
-                          aria-label="Criterio politico della rassegna"
-                        >
-                          <p className="eyebrow">
-                            <LocalizedText>
-                              LEGGERE PER CAPIRE E AGIRE
-                            </LocalizedText>
-                          </p>
-                          <h3>
-                            <LocalizedText>
-                              Idee, strumenti, organizzazione.
-                            </LocalizedText>
-                          </h3>
-                          <p>
-                            <LocalizedText>
-                              La priorità va a formazione politica, competenze
-                              critiche, esperienze collettive e analisi dei
-                              rapporti di potere. La cronaca resta disponibile;
-                              la popolarità non determina l’ordine.
-                            </LocalizedText>
-                          </p>
-                          <div className="editorial-lenses">
-                            <button
-                              aria-pressed={editorialAxis === "all"}
-                              onClick={() => setEditorialAxis("all")}
-                            >
-                              <LocalizedText>Visione d’insieme</LocalizedText>
-                            </button>
-                            {EDITORIAL_AXES.map((axis) => (
-                              <button
-                                key={axis.id}
-                                aria-pressed={editorialAxis === axis.id}
-                                onClick={() => setEditorialAxis(axis.id)}
-                              >
-                                <LocalizedText>{axis.label}</LocalizedText>
-                              </button>
-                            ))}
-                          </div>
-                          <details>
-                            <summary>
-                              <LocalizedText>
-                                Come scegliamo cosa mettere in evidenza
-                              </LocalizedText>
-                            </summary>
-                            <p>
-                              <LocalizedText>
-                                Un criterio pubblico e uguale per tutti: segnali
-                                nel titolo e nell’estratto, non un profilo
-                                politico del lettore. La formazione e gli
-                                strumenti pesano più della freschezza; nessun
-                                conteggio di clic o trend. I segnali sono
-                                automatici, non una verifica di qualità. Per
-                                evitare monopolî, l’apertura ospita al massimo
-                                due articoli per testata; gli altri restano
-                                nella rassegna.
-                              </LocalizedText>
-                            </p>
-                          </details>
-                        </section>
-                      ) : null}
                       <div className="news-grid" aria-label="Articoli">
                         {filtered
                           .slice(0, visibleCount)
@@ -1458,22 +1172,6 @@ export function AggregatorApp() {
                           </span>
                         </button>
                       ) : null}
-                      {view === "notizie" ? (
-                        <p className="collection-summary">
-                          <LocalizedText>
-                            Tutte le fonti del catalogo partecipano
-                            automaticamente. Le risposte arrivano separatamente
-                            e le fonti non disponibili restano nell’atlante.
-                          </LocalizedText>{" "}
-                          <button
-                            className="text-link"
-                            onClick={() => navigate("fonti")}
-                          >
-                            <LocalizedText>Esplora la rete</LocalizedText>
-                            <ArrowUpRight size={14} />
-                          </button>
-                        </p>
-                      ) : null}
                       {!loading && failedCount > 0 && view === "notizie" ? (
                         <p className="feed-note">
                           <CircleHelp size={15} />{" "}
@@ -1502,6 +1200,13 @@ export function AggregatorApp() {
               <MethodView onSources={() => navigate("fonti")} />
             ) : null}
           </section>
+          {view === "notizie" ? (
+            <section className="daily-quotation" aria-label="Una citazione per approfondire">
+              <blockquote><LocalizedText>{quote.text}</LocalizedText></blockquote>
+              <p><strong>{quote.author}</strong> · <a href={quote.url} target="_blank" rel="noopener noreferrer"><LocalizedText>{quote.work}</LocalizedText>, {quote.year}</a></p>
+              <small><LocalizedText>{quote.note}</LocalizedText> · Marxists Internet Archive</small>
+            </section>
+          ) : null}
         </main>
         <footer className="site-footer">
           <div className="footer-top">
@@ -1622,13 +1327,6 @@ function ArticleCard({
               <LocalizedText>{article.region}</LocalizedText>
             </span>
           </div>
-        ) : featured ? (
-          <div className="article-typographic" aria-hidden="true">
-            <CommunityEmblem />
-            <span>
-              <LocalizedText>{"VOCI DAL MONDO"}</LocalizedText>
-            </span>
-          </div>
         ) : null}
         <div className="article-copy">
           <div className="article-meta">
@@ -1658,39 +1356,6 @@ function ArticleCard({
           </p>
         </div>
       </button>
-      <details className="article-relevance">
-        <summary>
-          <LocalizedText>Perché leggerlo</LocalizedText>
-        </summary>
-        <p>
-          <LocalizedText>
-            Segnali editoriali rilevati nel titolo e nell’estratto:
-          </LocalizedText>
-        </p>
-        <ul>
-          {editorialAssessment(article).axes.length ? (
-            editorialAssessment(article).axes.map((id) => (
-              <li key={id}>
-                <LocalizedText>
-                  {EDITORIAL_AXES.find((axis) => axis.id === id)!.label}
-                </LocalizedText>
-              </li>
-            ))
-          ) : (
-            <li>
-              <LocalizedText>
-                Cronaca e contesto: nessun segnale formativo specifico
-                riconosciuto.
-              </LocalizedText>
-            </li>
-          )}
-        </ul>
-        <small>
-          <LocalizedText>
-            Classificazione automatica, da valutare sul testo originale.
-          </LocalizedText>
-        </small>
-      </details>
       <a
         className="publisher-link"
         href={safeWebUrl(article.link) ?? undefined}
@@ -1722,13 +1387,7 @@ function ArticleCard({
           >
             {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
           </button>
-          <button
-            className="read-button"
-            onClick={onSelect}
-            aria-label={`Leggi la scheda: ${article.title}`}
-          >
-            <ArrowUpRight size={19} />
-          </button>
+
         </div>
       </div>
     </article>
@@ -2216,7 +1875,7 @@ function MethodView({ onSources }: { onSources: () => void }) {
           {
             n: "02",
             title: "Come sono organizzate",
-            text: "L’apertura dà priorità a organizzazione collettiva, formazione, competenze e analisi del potere, usando segnali espliciti nel titolo e nell’estratto. Le notizie più recenti restano selezionabili. Titoli ed estratti vengono filtrati per provenienza e classificati con parole chiave. Il punteggio tematico è un’euristica, non una misura di verità, qualità o rilevanza assoluta. Una data mancante o errata può influire sull’ordine.",
+            text: "Puoi scegliere le aperture delle testate, gli ultimi articoli, le classifiche dei più letti pubblicate dalle fonti o la priorità politica e formativa. Le classifiche non sono disponibili per ogni testata e non sono indici SEO. La modalità politica usa segnali di organizzazione collettiva, formazione, competenze e analisi del potere nel titolo e nell’estratto. Titoli ed estratti vengono filtrati per provenienza e classificati con parole chiave. Il punteggio tematico è un’euristica, non una misura di verità, qualità o rilevanza assoluta. Una data mancante o errata può influire sull’ordine.",
           },
           {
             n: "03",
@@ -2344,7 +2003,7 @@ function ArticleReader({
             target="_blank"
             rel="noopener noreferrer"
             className="button button-dark"
-          >
+              >
             <LocalizedText>{"Leggi sulla fonte "}</LocalizedText>
             <ArrowUpRight size={16} />
           </a>
@@ -2373,7 +2032,7 @@ function ArticleReader({
             target="_blank"
             rel="noopener noreferrer"
             className="text-link"
-          >
+              >
             <LocalizedText>
               {"Apri la pagina con Google Translate "}
             </LocalizedText>
