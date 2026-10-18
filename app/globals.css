@@ -3039,8 +3039,7 @@ em {
   margin: 12px 0;
 }
 .watch-deck,
-.watch-footnote,
-.watch-method p {
+.watch-footnote {
   font-size: 11px;
   line-height: 1.7;
   color: var(--muted);
@@ -3146,6 +3145,7 @@ em {
 }
 .watch-title {
   display: block;
+  overflow-wrap: anywhere;
   font: 18px/1.25 var(--serif);
   color: var(--ink);
   text-decoration: none;
@@ -3163,27 +3163,6 @@ em {
   font-size: 10px;
   color: var(--muted);
   margin: 9px 0;
-}
-.world-watch details {
-  font-size: 10px;
-  line-height: 1.6;
-}
-.world-watch summary {
-  cursor: pointer;
-  color: var(--red);
-}
-.world-watch details p {
-  margin: 8px 0;
-}
-.watch-stories details a {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding-block: 4px;
-  text-decoration: underline;
-}
-.watch-method {
-  margin: 18px 0 8px;
 }
 .watch-empty {
   font-size: 12px;

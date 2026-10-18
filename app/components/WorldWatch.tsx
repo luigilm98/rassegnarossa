@@ -20,7 +20,7 @@ const AREAS = [
   "mena",
   "pacific",
 ];
-export function WorldWatch() {
+export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticle[] }) {
   const locale = useLocale();
   const [articles, setArticles] = useState<ReadingArticle[]>([]);
   const [region, setRegion] = useState("all");
@@ -42,7 +42,6 @@ export function WorldWatch() {
     setCoverage({ done: 0, ok: 0 });
     setNow(Date.now());
     let cursor = 0;
-    const timer = setTimeout(() => controller.abort(), 28000);
     const worker = async () => {
       while (cursor < AREAS.length && !controller.signal.aborted) {
         const area = AREAS[cursor++];
@@ -51,7 +50,7 @@ export function WorldWatch() {
           const response = await fetch(`/api/pulse?area=${area}`, {
             signal: AbortSignal.any([
               controller.signal,
-              AbortSignal.timeout(10000),
+              AbortSignal.timeout(12000),
             ]),
           });
           const data = await response.json();
@@ -77,7 +76,6 @@ export function WorldWatch() {
       }
     };
     await Promise.all([worker(), worker(), worker()]);
-    clearTimeout(timer);
     if (current === run.current) {
       setBusy(false);
       setUpdatedAt(Date.now());
@@ -99,7 +97,10 @@ export function WorldWatch() {
     // Collection is independent of the language and the main news filters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const allStories = useMemo(() => rankPulse(articles, now), [articles, now]);
+  const allStories = useMemo(
+    () => rankPulse([...networkArticles, ...articles], now),
+    [networkArticles, articles, now],
+  );
   const regions = [
     ...new Set(
       allStories.flatMap((story) =>
@@ -152,8 +153,8 @@ export function WorldWatch() {
       </h3>
       <p className="watch-deck">
         <T>
-          Le notizie più in evidenza nel campione delle ultime sei ore. Tutte le
-          lingue, più aree del mondo.
+          Le ultime sei ore dalla rete di fonti e dalle raccolte internazionali.
+          Apri i titoli per leggere direttamente dalle testate.
         </T>
       </p>
       <div className="watch-stats">
@@ -253,11 +254,11 @@ export function WorldWatch() {
         <span>
           {busy ? (
             <>
-              <T>Raccolta</T> {coverage.done}/{AREAS.length}
+              <T>Aree aggiornate</T> {coverage.done}/{AREAS.length}
             </>
           ) : (
             <>
-              <T>Raccolte disponibili</T> {coverage.ok}/{AREAS.length}
+              <T>Aree disponibili</T> {coverage.ok}/{AREAS.length}
             </>
           )}
         </span>
@@ -270,7 +271,7 @@ export function WorldWatch() {
         </button>
       </div>
       <ol className="watch-stories">
-        {stories.slice(0, 8).map((story, index) => (
+        {stories.slice(0, 12).map((story, index) => (
           <li key={story.article.id}>
             <div className="watch-story-meta">
               <span>
@@ -292,32 +293,7 @@ export function WorldWatch() {
               </T>
               <ArrowUpRight size={14} />
             </a>
-            <p className="watch-publisher">
-              {story.article.sourceName} · <T>Segnale</T> {story.score}/100
-            </p>
-            <details>
-              <summary>
-                <T>Perché è in evidenza</T>
-              </summary>
-              <p>
-                <T>Freschezza</T>: {story.freshness}/50 ·{" "}
-                <T>Presenza su più testate</T>: {story.breadth}/50.{" "}
-                <T>
-                  Somiglianza dei titoli calcolata automaticamente, da
-                  verificare sulle fonti.
-                </T>
-              </p>
-              {story.coverage.map((article) => (
-                <a
-                  key={article.id}
-                  href={safeWebUrl(article.link) ?? undefined}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {article.sourceName} <ArrowUpRight size={12} />
-                </a>
-              ))}
-            </details>
+            <p className="watch-publisher">{story.article.sourceName}</p>
           </li>
         ))}
       </ol>
@@ -330,28 +306,6 @@ export function WorldWatch() {
           </T>
         </p>
       ) : null}
-      <details className="watch-method">
-        <summary>
-          <T>Come viene calcolato?</T>
-        </summary>
-        <p>
-          <T>
-            Il segnale somma freschezza (0–50) e presenza su più testate (15
-            punti per ogni testata aggiuntiva, fino a 50). Titoli molto simili
-            nella stessa lingua vengono raggruppati. Non misura la verità o
-            l’importanza assoluta.
-          </T>
-        </p>
-        <p>
-          <T>
-            Otto raccolte regionali: sette radar di Google News affiancati da
-            testate dirette e Green Left per l’Oceania. Le aree indicano
-            l’edizione consultata, non necessariamente il luogo dell’evento. Le
-            date mancanti, future o oltre sei ore sono escluse. Copertura
-            parziale; nessun articolo inventato.
-          </T>
-        </p>
-      </details>
       <p className="watch-footnote">
         <T>Finestra mobile</T> {time(now - 21_600_000)}–{time(now)}.{" "}
         {updatedAt ? (

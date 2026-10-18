@@ -13,7 +13,7 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Tutte le 265 fonti e ricerche partecipano automaticamente: dieci richieste parallele, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
 - Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e avviso se MyMemory non è disponibile.
 - Fonti consigliate coerenti con la lingua scelta, comprese le lingue con soli radar.
-- Osservatorio indipendente delle ultime sei ore: otto canali regionali, filtri, attività oraria e punteggio spiegabile di freschezza e presenza su più testate.
+- Osservatorio delle ultime sei ore: notizie da tutta la rete raccolta e da otto canali regionali aggiuntivi, filtri, attività oraria e collegamenti diretti alle testate, senza punteggi nelle schede.
 - Marchio essenziale con libro aperto e stella, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Schede salvate nel browser tramite `localStorage`: titolo, estratto e link ritrovabili anche dopo una nuova visita.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.

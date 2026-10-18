@@ -38,6 +38,9 @@ test("server-renders the aggregator shell", async () => {
   assert.match(html, /Tesi su Feuerbach/);
   assert.match(html, /community-emblem/);
   assert.match(html, /OSSERVATORIO MONDIALE/);
+  const observatory = html.match(/<aside class="world-watch"[\s\S]*?<\/aside>/)?.[0];
+  assert.ok(observatory);
+  assert.doesNotMatch(observatory, /Perché è in evidenza|Come viene calcolato|Freschezza|Segnale|\/100/);
   assert.match(html, /aria-label="Lingua di lettura"/);
   assert.match(html, /aria-label="Lingua delle fonti in analisi"/);
   assert.match(html, /reading-language-control/);

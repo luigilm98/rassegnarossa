@@ -103,3 +103,20 @@ test("a reload selects a different sourced quotation and handles invalid saved i
     }
   assert.ok(QUOTATIONS[nextQuotation(-999)]);
 });
+
+
+test("the complete network supplements a sparse regional collection without duplicates or stale stories", () => {
+  const regional = [card("regional", 60000, "International negotiations reopen after emergency summit")];
+  const network = Array.from({ length: 15 }, (_, index) => ({
+    ...card(`network-${index}`, (index + 1) * 120000, `報道${index}`),
+    language: index % 2 ? "it" : "zh",
+  }));
+  const stories = rankPulse([...network, ...regional, ...regional,
+    card("stale", SIX_HOURS_MS + 1), card("undated", null)], now);
+  assert.equal(stories.length, 16);
+  assert.equal(stories.filter(story => story.article.id === "regional").length, 1);
+  assert.ok(stories.some(story => story.article.language === "zh"));
+  assert.equal(rankPulse(network, now).length, 15, "regional outages preserve network stories");
+  assert.equal(rankPulse([...network, ...regional], now + SIX_HOURS_MS).length, 0,
+    "stories expire as the six-hour window advances");
+});

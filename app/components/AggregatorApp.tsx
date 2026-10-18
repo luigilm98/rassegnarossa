@@ -1490,7 +1490,7 @@ export function AggregatorApp() {
                         </p>
                       ) : null}
                     </div>
-                    {view === "notizie" ? <WorldWatch /> : null}
+                    {view === "notizie" ? <WorldWatch networkArticles={articles} /> : null}
                   </div>
                 )}
               </>
