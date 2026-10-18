@@ -3282,3 +3282,317 @@ em {
   margin-inline-start: 8px;
   text-decoration: underline;
 }
+/* One clear mark, two independent language controls, and an editorial reading order. */
+.hero-art {
+  flex-direction: column;
+  gap: 8px;
+}
+.hero-art .community-emblem {
+  max-width: 235px;
+}
+.emblem-caption {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  text-align: center;
+}
+.language-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0 10px;
+}
+.language-controls label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border: 1px solid var(--line);
+  padding: 16px;
+  min-width: 0;
+}
+.language-controls label > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 140px;
+}
+.language-controls strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+.language-controls small {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.language-controls select {
+  min-width: 100px;
+  max-width: 100%;
+  padding: 9px 26px 9px 10px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  background: var(--paper);
+}
+.reading-language-control {
+  background: #f1e7df;
+  border-top: 3px solid var(--red) !important;
+}
+.reading-language-control > svg {
+  color: var(--red);
+}
+.source-language-control {
+  background: #e9ece5;
+  border-top: 3px solid #56604e !important;
+}
+.source-language-control > svg {
+  color: #56604e;
+}
+.collection-status {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+  border-block: 1px solid var(--line);
+  padding: 10px 0;
+  margin: 12px 0 22px;
+}
+.collection-status summary {
+  cursor: pointer;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.collection-status summary > span:last-child {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+}
+.collection-status p {
+  max-width: 720px;
+  margin: 10px 0;
+}
+.collection-status progress {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--red);
+  margin: 10px 0;
+}
+.collection-summary {
+  margin: 28px 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+}
+.editorial-compass {
+  border-top: 3px solid var(--red);
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+  margin-bottom: 26px;
+}
+.editorial-compass h3 {
+  font: 30px/1.15 var(--serif);
+  margin: 9px 0 12px;
+}
+.editorial-compass > p:not(.eyebrow) {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 690px;
+}
+.editorial-lenses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 17px 0;
+}
+.editorial-lenses button {
+  border: 1px solid var(--line);
+  padding: 9px 12px;
+  font-size: 11px;
+  border-radius: 3px;
+  text-align: start;
+}
+.editorial-lenses button[aria-pressed="true"] {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+.editorial-compass details,
+.article-relevance {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.editorial-compass details summary,
+.article-relevance summary {
+  cursor: pointer;
+  color: var(--red);
+  width: fit-content;
+}
+.editorial-compass details p {
+  max-width: 680px;
+  margin-top: 10px;
+}
+.article-relevance {
+  margin: 12px 0 0;
+}
+.article-relevance p {
+  margin-top: 8px;
+}
+.article-relevance ul {
+  margin: 5px 0;
+  padding-inline-start: 18px;
+}
+.article-relevance small {
+  font-size: 9px;
+}
+.featured .article-relevance {
+  padding-inline: 18px;
+}
+.atlas-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 22px 0;
+}
+.atlas-overview a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--line);
+  padding: 10px 13px;
+  font-size: 11px;
+  text-decoration: none;
+}
+.atlas-overview strong {
+  color: var(--red);
+  font: 21px/1 var(--serif);
+}
+.atlas-group {
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 25px;
+}
+.atlas-group > summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  font-family: var(--serif);
+  font-size: 26px;
+  padding: 20px 4px;
+  cursor: pointer;
+}
+.atlas-group > summary > span:last-child {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--muted);
+  align-self: center;
+}
+.atlas-group > summary::before {
+  content: "+";
+  font: 20px/1 var(--sans);
+  color: var(--red);
+  align-self: center;
+}
+.atlas-group[open] > summary::before {
+  content: "−";
+}
+.atlas-group > summary > span:first-child {
+  flex: 1;
+}
+.atlas-rows {
+  border-top: 1px solid var(--line);
+}
+.atlas-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px 120px;
+  gap: 15px;
+  align-items: center;
+  padding: 15px 5px;
+  border-bottom: 1px solid var(--line);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 76px;
+}
+.atlas-row h3 {
+  font: 20px/1.2 var(--serif);
+  overflow-wrap: anywhere;
+}
+.atlas-row p {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+  margin-top: 5px;
+}
+.atlas-status {
+  font-size: 10px;
+  color: var(--muted);
+}
+.atlas-status.available {
+  color: #4d694b;
+}
+.atlas-actions {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 14px;
+}
+.atlas-actions button {
+  font-size: 11px;
+}
+.atlas-actions > a {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 38px;
+  color: var(--red);
+}
+@media (max-width: 760px) {
+  .language-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .language-controls label {
+    padding: 12px;
+  }
+  .hero-art .community-emblem {
+    max-width: 170px;
+  }
+  .emblem-caption {
+    font-size: 8px;
+  }
+  .collection-status summary > span:last-child {
+    margin-inline-start: 0;
+  }
+  .editorial-compass h3 {
+    font-size: 27px;
+  }
+  .atlas-row {
+    grid-template-columns: minmax(0, 1fr) 100px;
+    gap: 10px;
+  }
+  .atlas-status {
+    grid-row: 2;
+  }
+  .atlas-actions {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+}
+.article-typographic .community-emblem {
+  width: 144px;
+  height: 144px;
+  transform: none;
+}
+.brand-symbol {
+  width: 40px;
+  height: 40px;
+}
+@media (max-width: 480px) {
+  .brand-symbol {
+    width: 32px;
+    height: 32px;
+  }
+}

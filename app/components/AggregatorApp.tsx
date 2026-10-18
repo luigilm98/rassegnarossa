@@ -46,8 +46,8 @@ import {
 } from "@/app/lib/reading";
 import {
   preferredLanguageFor,
+  resolveLanguageChoices,
   rankSources,
-  nextSourcePage,
   recommendedSources,
 } from "@/app/lib/source-selection";
 
@@ -62,6 +62,14 @@ import {
   LanguageName,
   LocalizedInput,
 } from "./Localization";
+
+import { collectionOrder, collectAll } from "@/app/lib/collection";
+import {
+  EDITORIAL_AXES,
+  editorialAssessment,
+  rankEditorial,
+  type EditorialAxis,
+} from "@/app/lib/editorial-ranking";
 
 type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo";
 type SourceStatus = {
@@ -169,22 +177,28 @@ export function AggregatorApp() {
   const [topic, setTopic] = useState(ALL);
   const [sourceId, setSourceId] = useState(ALL);
   const [days, setDays] = useState("30");
-  const [sort, setSort] = useState("fresh");
+  const [sort, setSort] = useState("editorial");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
+  const [collecting, setCollecting] = useState(false);
+  const [readingChoice, setReadingChoice] = useState("auto");
+  const [editorialAxis, setEditorialAxis] = useState<EditorialAxis | "all">(
+    "all",
+  );
+  const preferredRef = useRef("it");
+  const hasArticlesRef = useRef(false);
+  const collectingRef = useRef(false);
   const [progress, setProgress] = useState({
     done: 0,
-    total: 16,
+    total: SOURCE_CATALOG.length,
   });
   const [lastRefresh, setLastRefresh] = useState<string | null>(null);
   const [dateLabel, setDateLabel] = useState("L’informazione, oltre i confini");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [preferredLanguage, setPreferredLanguage] = useState("it");
   const [newsUpdatedAt, setNewsUpdatedAt] = useState(0);
-  const [attemptedIds, setAttemptedIds] = useState<Set<string>>(new Set());
   const [refreshNotice, setRefreshNotice] = useState("");
-  const attemptedRef = useRef<Set<string>>(new Set());
   const refreshNumber = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const readerDialog = useRef<HTMLDialogElement>(null);
@@ -258,14 +272,14 @@ export function AggregatorApp() {
 
   const reset = useCallback(() => {
     setQuery("");
+    setEditorialAxis("all");
     setRegion(ALL);
-    setLanguage(ALL);
     setKind(ALL);
     setIdeology(ALL);
     setTopic(ALL);
     setSourceId(ALL);
     setDays("30");
-    setSort("fresh");
+    setSort("editorial");
     setVisibleCount(PAGE_SIZE);
   }, []);
   const navigate = (next: View) => {
@@ -278,6 +292,11 @@ export function AggregatorApp() {
     ++refreshNumber.current;
     abortRef.current?.abort();
     setLoading(false);
+    setCollecting(false);
+    collectingRef.current = false;
+    setRefreshNotice(
+      "Raccolta interrotta. Le notizie già recuperate restano disponibili.",
+    );
     setLastRefresh(new Date().toISOString());
   };
   const pickTopic = (id: string) => {
@@ -289,189 +308,172 @@ export function AggregatorApp() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const eligibleSources = useMemo(
-    () =>
-      SOURCE_CATALOG.filter(
-        (s) =>
-          (region === ALL || s.region === region) &&
-          (language === ALL || s.language === language) &&
-          (kind === ALL || s.kind === kind) &&
-          (ideology === ALL ||
-            s.ideologies.includes(ideology) ||
-            s.kind === "radar") &&
-          (sourceId === ALL || s.id === sourceId),
-      ),
-    [region, language, kind, ideology, sourceId],
-  );
-
   const refresh = useCallback(
     async (
-      scope: "initial" | "all" | "selection" | "more" = "all",
-      preferred = preferredLanguage,
+      _scope: "initial" | "all" | "selection" = "all",
+      preferred = preferredRef.current,
       explicitIds?: string[],
     ) => {
+      const applyResult = (
+        _source: SourceDefinition,
+        payload: { articles: Article[]; statuses: SourceStatus[] },
+      ) => {
+        if (
+          !Array.isArray(payload.articles) ||
+          !Array.isArray(payload.statuses)
+        )
+          return;
+        const cards = restoreSavedArticles(JSON.stringify(payload.articles));
+        if (cards.length) {
+          hasArticlesRef.current = true;
+          setLoading(false);
+          setNewsUpdatedAt(Date.now());
+          setArticles((current) => mergeArticles(current, cards));
+        }
+        setStatuses((current) => ({
+          ...current,
+          ...Object.fromEntries(
+            payload.statuses.map((status) => [status.sourceId, status]),
+          ),
+        }));
+      };
+      const worker = async (source: SourceDefinition, signal: AbortSignal) => {
+        const response = await fetch(
+          `/api/articles?sourceIds=${encodeURIComponent(source.id)}&limitPerSource=24`,
+          { signal },
+        );
+        if (!response.ok) throw new Error("Source unavailable");
+        return (await response.json()) as {
+          articles: Article[];
+          statuses: SourceStatus[];
+        };
+      };
+      // Opening one source never interrupts the full catalogue collection.
+      if (explicitIds) {
+        await Promise.all(
+          SOURCE_CATALOG.filter((source) =>
+            explicitIds.includes(source.id),
+          ).map(async (source) => {
+            try {
+              applyResult(
+                source,
+                await worker(source, AbortSignal.timeout(10000)),
+              );
+            } catch {
+              /* Full collection remains active. */
+            }
+          }),
+        );
+        return;
+      }
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
       const run = ++refreshNumber.current;
-      const ordered = rankSources(SOURCE_CATALOG, preferred);
-      const targets = explicitIds
-        ? ordered.filter((source) => explicitIds.includes(source.id))
-        : scope === "more"
-          ? nextSourcePage(eligibleSources, preferred, attemptedRef.current)
-          : scope === "selection"
-            ? rankSources(eligibleSources, preferred).slice(0, 16)
-            : scope === "all" && attemptedRef.current.size
-              ? ordered
-                  .filter((source) => attemptedRef.current.has(source.id))
-                  .slice(0, 32)
-              : ordered.slice(0, 16);
-      setLoading(true);
+      const targets = collectionOrder(SOURCE_CATALOG, preferred);
+      collectingRef.current = true;
+      setCollecting(true);
+      setLoading(!hasArticlesRef.current);
       setRefreshNotice("");
       setProgress({ done: 0, total: targets.length });
-      const runTimeout = setTimeout(() => {
-        if (run !== refreshNumber.current) return;
-        setRefreshNotice(
-          "Aggiornamento parziale: alcune fonti richiedono più tempo. Le altre notizie restano disponibili.",
-        );
-        controller.abort();
-      }, 25000);
-      let cursor = 0;
+      const firstScreenDeadline = setTimeout(() => {
+        if (run === refreshNumber.current) setLoading(false);
+      }, 8000);
       try {
-        await Promise.all(
-          Array.from({ length: Math.min(6, targets.length) }, async () => {
-            while (cursor < targets.length && !controller.signal.aborted) {
-              const source = targets[cursor++];
-              const requestController = new AbortController();
-              const abort = () => requestController.abort();
-              controller.signal.addEventListener("abort", abort, {
-                once: true,
-              });
-              const timeout = setTimeout(abort, 10000);
-              try {
-                const response = await fetch(
-                  `/api/articles?sourceIds=${encodeURIComponent(source.id)}&limitPerSource=24`,
-                  { signal: requestController.signal },
-                );
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const payload = (await response.json()) as {
-                  articles: Article[];
-                  statuses: SourceStatus[];
-                };
-                if (
-                  !Array.isArray(payload.articles) ||
-                  !Array.isArray(payload.statuses)
-                )
-                  throw new Error("Risposta non valida");
-                if (run !== refreshNumber.current || controller.signal.aborted)
-                  return;
-                setArticles((current) =>
-                  mergeArticles(current, payload.articles),
-                );
-                if (payload.articles.length) setNewsUpdatedAt(Date.now());
-                setStatuses((current) => ({
-                  ...current,
-                  ...Object.fromEntries(
-                    payload.statuses.map((status) => [status.sourceId, status]),
-                  ),
-                }));
-              } catch {
-                if (run !== refreshNumber.current || controller.signal.aborted)
-                  return;
-                setStatuses((current) => ({
-                  ...current,
-                  [source.id]: {
-                    sourceId: source.id,
-                    name: source.name,
-                    ok: false,
-                    count: 0,
-                    error:
-                      "La fonte non ha risposto in tempo. Puoi aprire direttamente il suo sito.",
-                    cached: false,
-                  },
-                }));
-              } finally {
-                clearTimeout(timeout);
-                controller.signal.removeEventListener("abort", abort);
-                if (
-                  run === refreshNumber.current &&
-                  !controller.signal.aborted
-                ) {
-                  attemptedRef.current.add(source.id);
-                  setAttemptedIds(new Set(attemptedRef.current));
-                  setProgress((current) => ({
-                    ...current,
-                    done: Math.min(current.total, current.done + 1),
-                  }));
-                }
-              }
-            }
-          }),
-        );
+        await collectAll({
+          items: targets,
+          signal: controller.signal,
+          worker,
+          onResult: (source, payload) => {
+            if (run === refreshNumber.current) applyResult(source, payload);
+          },
+          onError: (source) => {
+            if (run !== refreshNumber.current) return;
+            setStatuses((current) => ({
+              ...current,
+              [source.id]: {
+                sourceId: source.id,
+                name: source.name,
+                ok: false,
+                count: 0,
+                error:
+                  "La fonte non ha risposto. Il suo sito resta accessibile.",
+                cached: false,
+              },
+            }));
+          },
+          onProgress: (done, total) => {
+            if (run === refreshNumber.current) setProgress({ done, total });
+          },
+        });
       } finally {
-        clearTimeout(runTimeout);
+        clearTimeout(firstScreenDeadline);
         if (run === refreshNumber.current) {
+          collectingRef.current = false;
+          setCollecting(false);
           setLoading(false);
           setLastRefresh(new Date().toISOString());
         }
       }
     },
-    [eligibleSources, preferredLanguage],
+    [],
   );
 
   useEffect(() => {
     const available = [
       ...new Set(SOURCE_CATALOG.map((source) => source.language)),
     ];
-    let preferred = preferredLanguageFor(
+    const detected = preferredLanguageFor(
       navigator.languages?.length ? navigator.languages : [navigator.language],
       available,
     );
-    setBrowserLanguage(preferred);
+    setBrowserLanguage(detected);
+    setPreferredLanguage(detected);
+    preferredRef.current = detected;
     try {
       const previous = Number(
         sessionStorage.getItem("rassegna-rossa.quote") ?? "-1",
       );
-      const next = nextQuotation(Number.isInteger(previous) ? previous : -1);
+      const next = nextQuotation(previous);
       setQuoteIndex(next);
       sessionStorage.setItem("rassegna-rossa.quote", String(next));
     } catch {
       setQuoteIndex(Math.floor(Math.random() * QUOTATIONS.length));
     }
-    let fresh = false;
     try {
-      const chosen = localStorage.getItem("rassegna-rossa.language");
-      if (chosen === ALL || (chosen && available.includes(chosen)))
-        preferred = chosen;
+      const choices = resolveLanguageChoices(
+        {
+          reading: localStorage.getItem("rassegna-rossa.reading-language"),
+          sources: localStorage.getItem("rassegna-rossa.source-language"),
+          legacy: localStorage.getItem("rassegna-rossa.language"),
+        },
+        available,
+      );
+      setReadingChoice(choices.reading);
+      setLanguage(choices.sources);
       const snapshot = restoreNewsSnapshot(
         localStorage.getItem("rassegna-rossa.feed-cache"),
       );
       if (snapshot) {
         setArticles(snapshot.articles);
+        hasArticlesRef.current = true;
+        setLoading(false);
         setNewsUpdatedAt(snapshot.updatedAt);
-        setLastRefresh(new Date(snapshot.updatedAt).toISOString());
-        fresh = snapshot.fresh;
-        const ids = new Set(
-          snapshot.articles
-            .map((article) => article.sourceId)
-            .filter((id) => SOURCE_CATALOG.some((source) => source.id === id)),
-        );
-        attemptedRef.current = ids;
-        setAttemptedIds(new Set(ids));
       }
     } catch {
-      /* Caching is optional, including in private browsing. */
+      /* Browser storage is optional. */
     }
-    setPreferredLanguage(preferred);
-    if (fresh) setLoading(false);
-    else void refresh("initial", preferred);
+    void refresh("initial", detected);
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible" && !collectingRef.current)
+        void refresh("all", preferredRef.current);
+    }, 600000);
     return () => {
+      clearInterval(timer);
       abortRef.current?.abort();
       ++refreshNumber.current;
     };
-    // Only the initial page loads automatically; subsequent pages are explicit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     if (!storageReady || !newsUpdatedAt || !articles.length) return;
@@ -481,7 +483,7 @@ export function AggregatorApp() {
           "rassegna-rossa.feed-cache",
           JSON.stringify({
             updatedAt: newsUpdatedAt,
-            articles: articles.slice(0, 300),
+            articles: rankEditorial(articles).slice(0, 1200),
           }),
         );
       } catch {
@@ -491,12 +493,21 @@ export function AggregatorApp() {
     return () => clearTimeout(timer);
   }, [articles, newsUpdatedAt, storageReady]);
 
-  const choosePriority = (value: string) => {
-    setPreferredLanguage(value);
+  const chooseReadingLanguage = (value: string) => {
+    setReadingChoice(value);
     try {
-      localStorage.setItem("rassegna-rossa.language", value);
-    } catch {}
-    void refresh("initial", value);
+      localStorage.setItem("rassegna-rossa.reading-language", value);
+    } catch {
+      /* Optional storage. */
+    }
+  };
+  const chooseSourceLanguage = (value: string) => {
+    setLanguage(value);
+    try {
+      localStorage.setItem("rassegna-rossa.source-language", value);
+    } catch {
+      /* Optional storage. */
+    }
   };
   const openSource = (id: string) => {
     reset();
@@ -538,7 +549,7 @@ export function AggregatorApp() {
     () => mergeArticles(savedArticles, articles),
     [savedArticles, articles],
   );
-  const filtered = useMemo(
+  const matched = useMemo(
     () =>
       filterArticles(
         view === "salvati"
@@ -554,7 +565,6 @@ export function AggregatorApp() {
           source: sourceId,
           days: view === "salvati" ? Infinity : Number(days),
           sort,
-          preferredLanguage,
         },
       ),
     [
@@ -574,6 +584,17 @@ export function AggregatorApp() {
       preferredLanguage,
     ],
   );
+  const filtered = useMemo(() => {
+    const selected =
+      editorialAxis === "all" || view === "salvati"
+        ? matched
+        : matched.filter((article) =>
+            editorialAssessment(article).axes.includes(editorialAxis),
+          );
+    return sort === "editorial" && view !== "salvati"
+      ? rankEditorial(selected, preferredLanguage)
+      : selected;
+  }, [matched, editorialAxis, view, sort, preferredLanguage]);
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [
@@ -612,7 +633,7 @@ export function AggregatorApp() {
   const directory = useMemo(() => {
     const counts = new Map<string, number>();
     const sources = new Map<string, DirectorySource>(
-      SOURCE_CATALOG.filter((s) => s.kind !== "radar").map((s) => [
+      SOURCE_CATALOG.map((s) => [
         s.id,
         { ...s, count: 0, status: statuses[s.id] },
       ]),
@@ -636,7 +657,11 @@ export function AggregatorApp() {
         });
     }
     return Array.from(sources.values())
-      .map((s) => ({ ...s, count: counts.get(s.id) ?? 0 }))
+      .map((s) => ({
+        ...s,
+        count:
+          counts.get(s.id) ?? (s.kind === "radar" ? (s.status?.count ?? 0) : 0),
+      }))
       .sort(
         (a, b) =>
           Number(b.language === preferredLanguage) -
@@ -673,14 +698,13 @@ export function AggregatorApp() {
   const countries = new Set(
     SOURCE_CATALOG.filter((s) => s.kind !== "radar").map((s) => s.country),
   ).size;
-  const okCount = new Set(articles.map((article) => article.sourceId)).size;
   const failedCount = Object.values(statuses).filter((s) => !s.ok).length;
   const filterCount =
-    [region, language, kind, ideology, topic, sourceId].filter((f) => f !== ALL)
-      .length + (query ? 1 : 0);
+    [region, kind, ideology, topic, sourceId].filter((f) => f !== ALL).length +
+    (query ? 1 : 0);
   const heading = HEADINGS[view];
   const readingLanguage =
-    preferredLanguage === ALL ? browserLanguage : preferredLanguage;
+    readingChoice === "auto" ? browserLanguage : readingChoice;
   const quote = QUOTATIONS[quoteIndex];
   useEffect(() => {
     setDateLabel(
@@ -823,15 +847,8 @@ export function AggregatorApp() {
             {view === "notizie" ? (
               <div className="hero-art" aria-hidden="true">
                 <CommunityEmblem />
-                <span className="globe-note">
-                  <LocalizedText>{"SAPERE, CREARE,"}</LocalizedText>
-                  <br />
-                  <LocalizedText>{"CONDIVIDERE."}</LocalizedText>
-                </span>
-                <span className="globe-coordinate">
-                  <LocalizedText>
-                    {"RR / INTELLIGENZA COLLETTIVA"}
-                  </LocalizedText>
+                <span className="emblem-caption">
+                  <LocalizedText>CONOSCENZA COMUNE</LocalizedText>
                 </span>
               </div>
             ) : (
@@ -856,13 +873,16 @@ export function AggregatorApp() {
               <LocalizedText> </LocalizedText>
               <LocalizedText>
                 {loading
-                  ? "Raccolta delle notizie in corso"
+                  ? "Tutte le fonti partecipano"
                   : "Una rete di prospettive"}
               </LocalizedText>
             </span>
             <span>
               <LocalizedText>
-                {directory.filter((s) => !s.discovered).length}
+                {
+                  directory.filter((s) => !s.discovered && s.kind !== "radar")
+                    .length
+                }
               </LocalizedText>
               <LocalizedText>{" testate e canali"}</LocalizedText>
               <LocalizedText> </LocalizedText>
@@ -942,23 +962,13 @@ export function AggregatorApp() {
                   {view !== "salvati" ? (
                     <button
                       className="button button-outline"
-                      disabled={loading}
-                      onClick={() =>
-                        void refresh(
-                          filterCount && eligibleSources.length
-                            ? "selection"
-                            : "all",
-                        )
-                      }
+                      disabled={collecting}
+                      onClick={() => void refresh("all")}
                     >
-                      {loading ? (
-                        <Loader2 size={15} className="spin" />
-                      ) : (
-                        <RefreshCcw size={15} />
-                      )}
+                      <RefreshCcw size={15} />
                       <span>
                         <LocalizedText>
-                          {loading ? "Aggiornamento" : "Aggiorna notizie"}
+                          {collecting ? "Raccolta attiva" : "Aggiorna notizie"}
                         </LocalizedText>
                       </span>
                     </button>
@@ -969,19 +979,28 @@ export function AggregatorApp() {
                     </span>
                   )}
                 </div>
-                <div className="language-priority">
-                  <label>
-                    <Languages size={16} />
+                <div className="language-controls">
+                  <label className="reading-language-control">
+                    <Languages size={19} />
                     <span>
-                      <LocalizedText>{"Lingua di lettura"}</LocalizedText>
+                      <strong>
+                        <LocalizedText>Lingua di lettura</LocalizedText>
+                      </strong>
+                      <small>
+                        <LocalizedText>
+                          Traduce la pagina e le schede
+                        </LocalizedText>
+                      </small>
                     </span>
                     <select
-                      aria-label="Lingua da mettere in evidenza"
-                      value={preferredLanguage}
-                      onChange={(event) => choosePriority(event.target.value)}
+                      aria-label="Lingua di lettura"
+                      value={readingChoice}
+                      onChange={(event) =>
+                        chooseReadingLanguage(event.target.value)
+                      }
                     >
-                      <option value={ALL}>
-                        <LocalizedText>{"Tutte le lingue"}</LocalizedText>
+                      <option value="auto">
+                        <LocalizedText>Automatica · browser</LocalizedText>
                       </option>
                       {languages.map((code) => (
                         <option key={code} value={code}>
@@ -990,13 +1009,37 @@ export function AggregatorApp() {
                       ))}
                     </select>
                   </label>
-                  <span>
-                    <LocalizedText>
-                      {
-                        "Interfaccia e notizie nella lingua scelta. Le fonti originali restano accessibili."
+                  <label className="source-language-control">
+                    <Newspaper size={19} />
+                    <span>
+                      <strong>
+                        <LocalizedText>
+                          Lingua delle fonti in analisi
+                        </LocalizedText>
+                      </strong>
+                      <small>
+                        <LocalizedText>
+                          Seleziona la lingua originale delle fonti
+                        </LocalizedText>
+                      </small>
+                    </span>
+                    <select
+                      aria-label="Lingua delle fonti in analisi"
+                      value={language}
+                      onChange={(event) =>
+                        chooseSourceLanguage(event.target.value)
                       }
-                    </LocalizedText>
-                  </span>
+                    >
+                      <option value={ALL}>
+                        <LocalizedText>Tutte le lingue</LocalizedText>
+                      </option>
+                      {languages.map((code) => (
+                        <option key={code} value={code}>
+                          <LanguageName code={code} />
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
                 <TranslationNotice />
                 {view === "notizie" ? (
@@ -1004,7 +1047,7 @@ export function AggregatorApp() {
                     className="source-shortcuts"
                     aria-label="Fonti in evidenza"
                   >
-                    {recommendedSources(SOURCE_CATALOG, preferredLanguage).map(
+                    {recommendedSources(SOURCE_CATALOG, language).map(
                       (source) => {
                         const id = source.id;
                         return (
@@ -1136,20 +1179,6 @@ export function AggregatorApp() {
                 </div>
                 {filtersOpen ? (
                   <div id="advanced-filters" className="advanced-filters">
-                    <Select
-                      label="Lingua"
-                      value={language}
-                      change={setLanguage}
-                    >
-                      <option value={ALL}>
-                        <LocalizedText>{"Tutte le lingue"}</LocalizedText>
-                      </option>
-                      {languages.map((l) => (
-                        <option value={l} key={l}>
-                          <LanguageName code={l} />
-                        </option>
-                      ))}
-                    </Select>
                     <Select label="Tipo di fonte" value={kind} change={setKind}>
                       <option value={ALL}>
                         <LocalizedText>{"Tutti i tipi"}</LocalizedText>
@@ -1178,6 +1207,11 @@ export function AggregatorApp() {
                     </Select>
                     {view !== "fonti" ? (
                       <Select label="Ordina per" value={sort} change={setSort}>
+                        <option value="editorial">
+                          <LocalizedText>
+                            Priorità politica e formativa
+                          </LocalizedText>
+                        </option>
                         <option value="fresh">
                           <LocalizedText>{"Più recenti"}</LocalizedText>
                         </option>
@@ -1249,32 +1283,39 @@ export function AggregatorApp() {
                     <LocalizedText>{refreshNotice}</LocalizedText>
                   </p>
                 ) : null}
-                {loading && view !== "salvati" ? (
-                  <div className="sync-progress" role="status">
-                    <div>
+                {view !== "salvati" ? (
+                  <details className="collection-status">
+                    <summary>
+                      <span className="live-dot" />
+                      <LocalizedText>
+                        {collecting
+                          ? "Rete completa in raccolta automatica"
+                          : "Ultimo ciclo di raccolta"}
+                      </LocalizedText>
                       <span>
-                        <Loader2 size={13} className="spin" />
-                        <LocalizedText>
-                          {" Le notizie arrivano progressivamente"}
-                        </LocalizedText>
+                        {progress.done}/{progress.total}{" "}
+                        <LocalizedText>canali consultati</LocalizedText>
                       </span>
-                      <span>
-                        <LocalizedText>{progress.done}</LocalizedText>
-                        <LocalizedText>{" / "}</LocalizedText>
-                        <LocalizedText>{progress.total}</LocalizedText>
-                        <LocalizedText>{" canali"}</LocalizedText>
-                        <LocalizedText> </LocalizedText>
-                        <button onClick={stopRefresh}>
-                          <LocalizedText>{"Interrompi"}</LocalizedText>
-                        </button>
-                      </span>
-                    </div>
+                    </summary>
+                    <p>
+                      <LocalizedText>
+                        Tutte le fonti partecipano, con richieste parallele
+                        limitate per mantenere il sito utilizzabile. Puoi
+                        leggere, cercare e filtrare durante la raccolta. Una
+                        fonte lenta non blocca le altre.
+                      </LocalizedText>
+                    </p>
                     <progress
                       value={progress.done}
                       max={progress.total || 1}
-                      aria-label="Raccolta dei canali"
+                      aria-label="Copertura della raccolta"
                     />
-                  </div>
+                    {collecting ? (
+                      <button className="text-link" onClick={stopRefresh}>
+                        <LocalizedText>Interrompi questo ciclo</LocalizedText>
+                      </button>
+                    ) : null}
+                  </details>
                 ) : null}
                 {view === "fonti" ? (
                   <SourcesDirectory
@@ -1305,6 +1346,68 @@ export function AggregatorApp() {
                           </p>
                         </div>
                       ) : null}
+                      {view === "notizie" ? (
+                        <section
+                          className="editorial-compass"
+                          aria-label="Criterio politico della rassegna"
+                        >
+                          <p className="eyebrow">
+                            <LocalizedText>
+                              LEGGERE PER CAPIRE E AGIRE
+                            </LocalizedText>
+                          </p>
+                          <h3>
+                            <LocalizedText>
+                              Idee, strumenti, organizzazione.
+                            </LocalizedText>
+                          </h3>
+                          <p>
+                            <LocalizedText>
+                              La priorità va a formazione politica, competenze
+                              critiche, esperienze collettive e analisi dei
+                              rapporti di potere. La cronaca resta disponibile;
+                              la popolarità non determina l’ordine.
+                            </LocalizedText>
+                          </p>
+                          <div className="editorial-lenses">
+                            <button
+                              aria-pressed={editorialAxis === "all"}
+                              onClick={() => setEditorialAxis("all")}
+                            >
+                              <LocalizedText>Visione d’insieme</LocalizedText>
+                            </button>
+                            {EDITORIAL_AXES.map((axis) => (
+                              <button
+                                key={axis.id}
+                                aria-pressed={editorialAxis === axis.id}
+                                onClick={() => setEditorialAxis(axis.id)}
+                              >
+                                <LocalizedText>{axis.label}</LocalizedText>
+                              </button>
+                            ))}
+                          </div>
+                          <details>
+                            <summary>
+                              <LocalizedText>
+                                Come scegliamo cosa mettere in evidenza
+                              </LocalizedText>
+                            </summary>
+                            <p>
+                              <LocalizedText>
+                                Un criterio pubblico e uguale per tutti: segnali
+                                nel titolo e nell’estratto, non un profilo
+                                politico del lettore. La formazione e gli
+                                strumenti pesano più della freschezza; nessun
+                                conteggio di clic o trend. I segnali sono
+                                automatici, non una verifica di qualità. Per
+                                evitare monopolî, l’apertura ospita al massimo
+                                due articoli per testata; gli altri restano
+                                nella rassegna.
+                              </LocalizedText>
+                            </p>
+                          </details>
+                        </section>
+                      ) : null}
                       <div className="news-grid" aria-label="Articoli">
                         {filtered
                           .slice(0, visibleCount)
@@ -1322,19 +1425,14 @@ export function AggregatorApp() {
                       {!filtered.length ? (
                         <EmptyState
                           loading={loading && view !== "salvati"}
+                          collecting={collecting}
                           saved={view === "salvati"}
                           filtered={filterCount > 0 || topic !== ALL}
                           onReset={reset}
                           onExplore={() =>
                             navigate(view === "salvati" ? "notizie" : "fonti")
                           }
-                          onRetry={() =>
-                            void refresh(
-                              filterCount && eligibleSources.length
-                                ? "selection"
-                                : "all",
-                            )
-                          }
+                          onRetry={() => void refresh("all")}
                         />
                       ) : null}
                       {filtered.length > visibleCount ? (
@@ -1361,58 +1459,20 @@ export function AggregatorApp() {
                         </button>
                       ) : null}
                       {view === "notizie" ? (
-                        <div className="collection-more">
-                          <p>
-                            <LocalizedText>{attemptedIds.size}</LocalizedText>
-                            <LocalizedText>
-                              {
-                                " canali già consultati o presenti in memoria. Il catalogo completo è già disponibile nell’atlante."
-                              }
-                            </LocalizedText>
-                          </p>
-                          <button
-                            className="button button-dark"
-                            disabled={
-                              loading ||
-                              !eligibleSources.some(
-                                (source) => !attemptedIds.has(source.id),
-                              )
-                            }
-                            onClick={() => void refresh("more")}
-                          >
-                            <LocalizedText>
-                              {"Carica altre fonti "}
-                            </LocalizedText>
-                            <ArrowDown size={16} />
-                          </button>
+                        <p className="collection-summary">
+                          <LocalizedText>
+                            Tutte le fonti del catalogo partecipano
+                            automaticamente. Le risposte arrivano separatamente
+                            e le fonti non disponibili restano nell’atlante.
+                          </LocalizedText>{" "}
                           <button
                             className="text-link"
                             onClick={() => navigate("fonti")}
                           >
-                            <LocalizedText>
-                              {"Esplora tutte le testate "}
-                            </LocalizedText>
-                            <ArrowUpRight size={15} />
+                            <LocalizedText>Esplora la rete</LocalizedText>
+                            <ArrowUpRight size={14} />
                           </button>
-                          {newsUpdatedAt ? (
-                            <small>
-                              <LocalizedText>
-                                {"Ultime notizie recuperate:"}
-                              </LocalizedText>
-                              <LocalizedText> </LocalizedText>
-                              <LocalizedText>
-                                {relativeTime(
-                                  new Date(newsUpdatedAt).toISOString(),
-                                )}
-                              </LocalizedText>
-                              <LocalizedText>
-                                {
-                                  ". Le schede in memoria possono precedere l’ultimo tentativo."
-                                }
-                              </LocalizedText>
-                            </small>
-                          ) : null}
-                        </div>
+                        </p>
                       ) : null}
                       {!loading && failedCount > 0 && view === "notizie" ? (
                         <p className="feed-note">
@@ -1598,6 +1658,39 @@ function ArticleCard({
           </p>
         </div>
       </button>
+      <details className="article-relevance">
+        <summary>
+          <LocalizedText>Perché leggerlo</LocalizedText>
+        </summary>
+        <p>
+          <LocalizedText>
+            Segnali editoriali rilevati nel titolo e nell’estratto:
+          </LocalizedText>
+        </p>
+        <ul>
+          {editorialAssessment(article).axes.length ? (
+            editorialAssessment(article).axes.map((id) => (
+              <li key={id}>
+                <LocalizedText>
+                  {EDITORIAL_AXES.find((axis) => axis.id === id)!.label}
+                </LocalizedText>
+              </li>
+            ))
+          ) : (
+            <li>
+              <LocalizedText>
+                Cronaca e contesto: nessun segnale formativo specifico
+                riconosciuto.
+              </LocalizedText>
+            </li>
+          )}
+        </ul>
+        <small>
+          <LocalizedText>
+            Classificazione automatica, da valutare sul testo originale.
+          </LocalizedText>
+        </small>
+      </details>
       <a
         className="publisher-link"
         href={safeWebUrl(article.link) ?? undefined}
@@ -1644,6 +1737,7 @@ function ArticleCard({
 
 function EmptyState({
   loading,
+  collecting = false,
   saved,
   filtered,
   onReset,
@@ -1651,6 +1745,7 @@ function EmptyState({
   onRetry,
 }: {
   loading: boolean;
+  collecting?: boolean;
   saved: boolean;
   filtered: boolean;
   onReset: () => void;
@@ -1708,7 +1803,7 @@ function EmptyState({
           </LocalizedText>
           <ArrowRight size={15} />
         </button>
-        {!saved && !loading ? (
+        {!saved && !loading && !collecting ? (
           <button className="text-link" onClick={onRetry}>
             <RefreshCcw size={14} />
             <LocalizedText>{" Riprova aggiornamento"}</LocalizedText>
@@ -1726,116 +1821,169 @@ function SourcesDirectory({
   sources: DirectorySource[];
   onSelect: (id: string) => void;
 }) {
-  const [limit, setLimit] = useState(36);
+  const [expanded, setExpanded] = useState<Set<string>>(
+    () => new Set(["Italia", "Europa"]),
+  );
+  const groups = useMemo(() => {
+    const buckets = new Map<string, DirectorySource[]>();
+    for (const source of sources) {
+      const key = source.discovered
+        ? "Fonti emerse dai radar"
+        : source.kind === "radar"
+          ? "Radar di ricerca"
+          : source.region;
+      const bucket = buckets.get(key) ?? [];
+      bucket.push(source);
+      buckets.set(key, bucket);
+    }
+    return [...buckets.entries()].sort(([a], [b]) => {
+      const order = [
+        ...REGION_ORDER,
+        "Fonti emerse dai radar",
+        "Radar di ricerca",
+      ] as string[];
+      return order.indexOf(a) - order.indexOf(b);
+    });
+  }, [sources]);
+  const groupNames = groups.map(([name]) => name).join("|");
+  useEffect(() => {
+    const names = groupNames.split("|").filter(Boolean);
+    if (names.length === 1)
+      setExpanded((previous) => new Set([...previous, names[0]]));
+  }, [groupNames]);
   return (
-    <>
+    <div className="source-atlas">
       <div className="directory-intro">
         <p>
           <LocalizedText>
-            {
-              "Ogni fonte ha una storia e un punto di vista. Le etichette sono classificazioni del catalogo, non certificazioni editoriali. Le fonti emerse dai radar sono indicate separatamente."
-            }
+            Tutta la rete è inclusa nella raccolta automatica. Apri un’area per
+            esplorare le testate; i radar di ricerca e le fonti da essi scoperte
+            rimangono distinti dagli editori del catalogo.
           </LocalizedText>
         </p>
         <span>
-          <span className="status-dot status-ok" />
-          <LocalizedText>{" Contenuti disponibili"}</LocalizedText>
-          <LocalizedText> </LocalizedText>
-          <span className="status-dot status-wait" />
-          <LocalizedText>{" Non verificato o non disponibile"}</LocalizedText>
+          <LocalizedText>
+            Le etichette descrivono il catalogo, non certificano
+            l’attendibilità.
+          </LocalizedText>
         </span>
       </div>
-      <div className="source-grid">
-        {sources.slice(0, limit).map((s) => (
-          <article className="source-card" key={s.id}>
-            <div className="source-card-top">
-              <span className="source-monogram" aria-hidden="true">
-                <LocalizedText>
-                  {s.name
-                    .replace(/^(the|il|la|le) /i, "")
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </LocalizedText>
-              </span>
-              <span
-                className={`source-availability ${(s.status ? s.status.ok : s.count > 0) ? "available" : ""}`}
-              >
-                <span
-                  className={`status-dot ${(s.status ? s.status.ok : s.count > 0) ? "status-ok" : "status-wait"}`}
-                />
-                <LocalizedText>
-                  {s.status && !s.status.ok
-                    ? "Ultimo tentativo fallito"
-                    : s.count
-                      ? `${s.count} articoli`
-                      : s.status?.ok
-                        ? "Contenuti disponibili"
-                        : "Non ancora verificato"}
-                </LocalizedText>
-              </span>
-            </div>
-            <span className="source-region">
-              <LocalizedText>{s.region}</LocalizedText>
-              <LocalizedText>{" / "}</LocalizedText>
-              <LocalizedText>{s.country}</LocalizedText>
-            </span>
-            <h3>
-              <LocalizedText>{s.name}</LocalizedText>
-            </h3>
-            <p>
-              <LanguageName code={s.language} />{" "}
-              <i>
-                <LocalizedText>{"·"}</LocalizedText>
-              </i>
-              <LocalizedText> </LocalizedText>
-              <LocalizedText>{s.kind}</LocalizedText>
-              <LocalizedText>
-                {s.discovered ? " · Emersa dal radar" : ""}
-              </LocalizedText>
-            </p>
-            <div className="source-tags">
-              {s.ideologies.slice(0, 3).map((tag) => (
-                <span key={tag}>
-                  <LocalizedText>{tag}</LocalizedText>
-                </span>
-              ))}
-            </div>
-            <div className="source-card-actions">
-              <button className="text-link" onClick={() => onSelect(s.id)}>
-                <LocalizedText>{"Leggi le notizie "}</LocalizedText>
-                <ArrowRight size={15} />
-              </button>
-              <a
-                href={safeWebUrl(s.homepage) ?? undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Apri il sito di ${s.name}`}
-              >
-                <ExternalLink size={17} />
-              </a>
-            </div>
-          </article>
+      <div className="atlas-overview">
+        {groups.map(([name, items]) => (
+          <a
+            href={`#atlas-${name.replace(/\s/g, "-")}`}
+            key={name}
+            onClick={() =>
+              setExpanded((previous) => new Set([...previous, name]))
+            }
+          >
+            <strong>{items.length}</strong>
+            <LocalizedText>{name}</LocalizedText>
+          </a>
         ))}
       </div>
+      {groups.map(([name, items]) => {
+        const open = expanded.has(name);
+        return (
+          <details
+            className="atlas-group"
+            key={name}
+            id={`atlas-${name.replace(/\s/g, "-")}`}
+            open={open}
+            onToggle={(event) => {
+              const nextOpen = event.currentTarget.open;
+              setExpanded((previous) => {
+                if (previous.has(name) === nextOpen) return previous;
+                const next = new Set(previous);
+                if (nextOpen) next.add(name);
+                else next.delete(name);
+                return next;
+              });
+            }}
+          >
+            <summary>
+              <span>
+                <LocalizedText>{name}</LocalizedText>
+              </span>
+              <span>
+                {items.length}{" "}
+                <LocalizedText>
+                  {name === "Radar di ricerca" ? "canali" : "fonti"}
+                </LocalizedText>
+              </span>
+            </summary>
+            {open ? (
+              <div className="atlas-rows">
+                {items.map((source) => (
+                  <article className="atlas-row" key={source.id}>
+                    <div>
+                      <h3>
+                        {source.kind === "radar" ? (
+                          <LocalizedText>{source.name}</LocalizedText>
+                        ) : (
+                          source.name
+                        )}
+                      </h3>
+                      <p>
+                        <LocalizedText>{source.country}</LocalizedText> ·{" "}
+                        <LanguageName code={source.language} /> ·{" "}
+                        <LocalizedText>
+                          {source.tags.includes("archivio")
+                            ? "Archivio"
+                            : source.kind}
+                        </LocalizedText>
+                      </p>
+                    </div>
+                    <span
+                      className={`atlas-status ${source.status?.ok || source.count ? "available" : ""}`}
+                    >
+                      {source.count ? (
+                        <>
+                          {source.count} <LocalizedText>articoli</LocalizedText>
+                        </>
+                      ) : (
+                        <LocalizedText>
+                          {source.status?.ok
+                            ? "Feed disponibile"
+                            : source.status
+                              ? "Fonte non disponibile"
+                              : "In raccolta"}
+                        </LocalizedText>
+                      )}
+                    </span>
+                    <div className="atlas-actions">
+                      <button
+                        className="text-link"
+                        onClick={() => onSelect(source.id)}
+                      >
+                        <LocalizedText>Articoli</LocalizedText>
+                        <ArrowRight size={14} />
+                      </button>
+                      <a
+                        href={safeWebUrl(source.homepage) ?? undefined}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Apri ${source.name}`}
+                      >
+                        <ExternalLink size={17} />
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : null}
+          </details>
+        );
+      })}
       {!sources.length ? (
         <p className="notice">
           <LocalizedText>
-            {
-              "Nessuna fonte corrisponde alla ricerca. Prova un altro paese, una lingua diversa o azzera i filtri."
-            }
+            Nessuna fonte corrisponde alla selezione. Cambia lingua delle fonti
+            o azzera la ricerca.
           </LocalizedText>
         </p>
       ) : null}
-      {sources.length > limit ? (
-        <button
-          className="button button-outline load-more"
-          onClick={() => setLimit((n) => n + 36)}
-        >
-          <LocalizedText>{"Mostra altre fonti "}</LocalizedText>
-          <ArrowDown size={15} />
-        </button>
-      ) : null}
-    </>
+    </div>
   );
 }
 
@@ -2068,7 +2216,7 @@ function MethodView({ onSources }: { onSources: () => void }) {
           {
             n: "02",
             title: "Come sono organizzate",
-            text: "Titoli ed estratti vengono ordinati per data, filtrati per provenienza e classificati con parole chiave. Il punteggio tematico è un’euristica, non una misura di verità, qualità o rilevanza assoluta. Una data mancante o errata può influire sull’ordine.",
+            text: "L’apertura dà priorità a organizzazione collettiva, formazione, competenze e analisi del potere, usando segnali espliciti nel titolo e nell’estratto. Le notizie più recenti restano selezionabili. Titoli ed estratti vengono filtrati per provenienza e classificati con parole chiave. Il punteggio tematico è un’euristica, non una misura di verità, qualità o rilevanza assoluta. Una data mancante o errata può influire sull’ordine.",
           },
           {
             n: "03",

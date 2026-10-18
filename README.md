@@ -6,13 +6,15 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 
 - Notizie filtrabili per regione, lingua, fonte, orientamento, tipo e argomento.
 - Ricerca, ordinamento, finestra temporale e aggiornamento dei feed.
-- Catalogo di 86 testate e canali, distinto dai 136 radar di ricerca.
-- Priorità alle testate e ai titoli nella lingua del browser, modificabile senza geolocalizzazione.
-- Prima raccolta di 16 canali con risposte indipendenti, cache locale e caricamento esplicito di altre fonti.
+- Priorità politica e formativa: organizzarsi, studiare, acquisire competenze e capire i rapporti di potere. Criterio automatico spiegabile su ogni scheda, senza clic o trend come segnali.
+- Atlante completo per aree, con testate, radar e fonti scoperte distinti e sezioni espandibili.
+- Catalogo di 129 testate, canali e risorse, distinto dai 136 radar di ricerca.
+- Lingua di lettura e lingua delle fonti in analisi hanno controlli e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
+- Tutte le 265 fonti e ricerche partecipano automaticamente: dieci richieste parallele, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
 - Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e avviso se MyMemory non è disponibile.
 - Fonti consigliate coerenti con la lingua scelta, comprese le lingue con soli radar.
 - Osservatorio indipendente delle ultime sei ore: otto canali regionali, filtri, attività oraria e punteggio spiegabile di freschezza e presenza su più testate.
-- Emblema originale dedicato a conoscenza e condivisione; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
+- Marchio essenziale con libro aperto e stella, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Schede salvate nel browser tramite `localStorage`: titolo, estratto e link ritrovabili anche dopo una nuova visita.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
 - Sei percorsi tematici e una pagina trasparente su metodo, attribuzione e limiti.
@@ -47,7 +49,9 @@ npm test
 | `app/data/library.ts` | Biblioteca di teoria |
 | `app/data/editorial.ts` | Percorsi tematici, itinerari e glossario |
 | `app/lib/reading.ts` | Filtri, fusione degli articoli, URL e ripristino dei salvati |
-| `app/lib/source-selection.ts` | Scelta della lingua e raccolta limitata dei canali |
+| `app/lib/collection.ts` | Raccolta automatica completa, ordine equilibrato, timeout e cancellazione |
+| `app/lib/editorial-ranking.ts` | Segnali politici e formativi, deduplicazione e diversità editoriale |
+| `app/lib/source-selection.ts` | Preferenze linguistiche indipendenti e fonti consigliate |
 | `app/components/Localization.tsx` | Traduzioni React, coda, cache e scelta della lingua |
 | `app/components/WorldWatch.tsx` | Osservatorio mondiale indipendente e relativi controlli |
 | `app/lib/pulse.ts` | Finestra mobile di sei ore, raggruppamento e ranking |

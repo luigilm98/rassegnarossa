@@ -1,9 +1,10 @@
+import { collectionOrder } from "../app/lib/collection.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
   preferredLanguageFor,
   rankSources,
-  nextSourcePage,
+  resolveLanguageChoices,
 } from "../app/lib/source-selection.ts";
 import { SOURCE_CATALOG } from "../app/data/catalog.ts";
 import { filterArticles, restoreNewsSnapshot } from "../app/lib/reading.ts";
@@ -77,20 +78,64 @@ test("headlines in the preferred language lead without hiding other languages", 
   );
 });
 
-test("initial collection is bounded and contains Ottolina and both Dazibao sources in Italian", () => {
-  const page = nextSourcePage(SOURCE_CATALOG, "it", new Set());
-  assert.equal(page.length, 16);
-  for (const id of ["ottolina", "dazibao", "ottolina-dazibao"])
-    assert.ok(page.some((s) => s.id === id));
-  assert.ok(page.every((s) => s.language === "it"));
-  const next = nextSourcePage(
-    SOURCE_CATALOG,
-    "it",
-    new Set(page.map((s) => s.id)),
+test("the automatic collection includes the entire unique catalogue and balances early responses", () => {
+  const order = collectionOrder(SOURCE_CATALOG, "it");
+  assert.equal(order.length, SOURCE_CATALOG.length);
+  assert.equal(
+    new Set(order.map((source) => source.id)).size,
+    SOURCE_CATALOG.length,
   );
-  assert.ok(next.every((s) => !page.some((first) => first.id === s.id)));
+  for (const id of ["ottolina", "dazibao", "ottolina-dazibao"])
+    assert.ok(order.slice(0, 6).some((source) => source.id === id));
+  assert.ok(
+    new Set(order.slice(0, 32).map((source) => source.region)).size >= 6,
+  );
+  assert.ok(
+    new Set(order.slice(0, 40).map((source) => source.language)).size >= 6,
+  );
+  assert.ok(
+    SOURCE_CATALOG.filter((source) => source.kind !== "radar").length >= 129,
+  );
   assert.equal(rankSources(SOURCE_CATALOG, "fr")[0].language, "fr");
-  assert.ok(SOURCE_CATALOG.filter((s) => s.kind !== "radar").length >= 86);
+});
+
+test("reading language never selects or resets the language of sources", () => {
+  const available = ["it", "en", "fr"];
+  assert.deepEqual(
+    resolveLanguageChoices(
+      { reading: "it", sources: "fr", legacy: null },
+      available,
+    ),
+    { reading: "it", sources: "fr" },
+  );
+  assert.deepEqual(
+    resolveLanguageChoices(
+      { reading: "en", sources: "fr", legacy: "it" },
+      available,
+    ),
+    { reading: "en", sources: "fr" },
+  );
+  assert.deepEqual(
+    resolveLanguageChoices(
+      { reading: null, sources: null, legacy: "fr" },
+      available,
+    ),
+    { reading: "fr", sources: "all" },
+  );
+  assert.deepEqual(
+    resolveLanguageChoices(
+      { reading: "auto", sources: "all", legacy: "it" },
+      available,
+    ),
+    { reading: "auto", sources: "all" },
+  );
+  assert.deepEqual(
+    resolveLanguageChoices(
+      { reading: "invalid", sources: "invalid", legacy: null },
+      available,
+    ),
+    { reading: "auto", sources: "all" },
+  );
 });
 
 test("news snapshots distinguish reusable, stale and expired data", () => {

@@ -132,7 +132,7 @@ export function restoreNewsSnapshot(
       return null;
     const articles = restoreSavedArticles(JSON.stringify(value.articles)).slice(
       0,
-      300,
+      1200,
     );
     if (!articles.length) return null;
     return {

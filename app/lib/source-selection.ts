@@ -24,17 +24,6 @@ export function rankSources<
     );
 }
 
-export function nextSourcePage<T extends SourceDefinition>(
-  sources: T[],
-  preferred: string,
-  attempted: ReadonlySet<string>,
-  size = 16,
-): T[] {
-  return rankSources(sources, preferred)
-    .filter((source) => !attempted.has(source.id))
-    .slice(0, size);
-}
-
 /** Never substitute Italian recommendations for a different selected language. */
 export function recommendedSources(
   sources: SourceDefinition[],
@@ -55,13 +44,33 @@ export function recommendedSources(
   const selected: SourceDefinition[] = [];
   const countries = new Set<string>();
   for (const source of ranked) {
-    if (countries.has(source.country)) continue;
+    const diversityKey = language === "all" ? source.language : source.country;
+    if (countries.has(diversityKey)) continue;
     selected.push(source);
-    countries.add(source.country);
+    countries.add(diversityKey);
     if (selected.length === size) return selected;
   }
   return [
     ...selected,
     ...ranked.filter((source) => !selected.includes(source)),
   ].slice(0, size);
+}
+
+/** Reading locale and original-source language are independent, including legacy migration. */
+export function resolveLanguageChoices(
+  values: {
+    reading: string | null;
+    sources: string | null;
+    legacy: string | null;
+  },
+  available: readonly string[],
+) {
+  const reading = values.reading ?? values.legacy;
+  return {
+    reading: reading && available.includes(reading) ? reading : "auto",
+    sources:
+      values.sources && available.includes(values.sources)
+        ? values.sources
+        : "all",
+  };
 }

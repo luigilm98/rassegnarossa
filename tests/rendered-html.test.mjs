@@ -38,6 +38,12 @@ test("server-renders the aggregator shell", async () => {
   assert.match(html, /Tesi su Feuerbach/);
   assert.match(html, /community-emblem/);
   assert.match(html, /OSSERVATORIO MONDIALE/);
+  assert.match(html, /aria-label="Lingua di lettura"/);
+  assert.match(html, /aria-label="Lingua delle fonti in analisi"/);
+  assert.match(html, /reading-language-control/);
+  assert.match(html, /source-language-control/);
+  assert.match(html, /LEGGERE PER CAPIRE E AGIRE/);
+  assert.doesNotMatch(html, /Carica altre fonti|Mostra altre fonti/);
   assert.doesNotMatch(html, /Il mondo, da un’altra/);
   assert.match(html, /Atlante delle fonti/);
   assert.match(html, /Biblioteca/);
