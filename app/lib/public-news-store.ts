@@ -18,7 +18,7 @@ export function createPublicNewsStore(db: NewsDatabase | undefined, sourceIds: R
     } else if (url.pathname === "/api/highlights") {
       if (!sourceIds.has(url.searchParams.get("sourceId") ?? "")) return null;
     } else return null;
-    const allowed = url.pathname === "/api/articles" ? ["sourceIds", "limitPerSource", "_public_cache"] : url.pathname === "/api/pulse" ? ["area", "_public_cache"] : ["sourceId", "_public_cache"];
+    const allowed = url.pathname === "/api/articles" ? ["sourceIds", "limitPerSource", "includeImages", "_public_cache"] : url.pathname === "/api/pulse" ? ["area", "_public_cache"] : ["sourceId", "_public_cache"];
     if ([...url.searchParams.keys()].some(key => !allowed.includes(key))) return null;
     if (allowed.some(key => url.searchParams.getAll(key).length > 1)) return null;
     // Host, cookies and identity are deliberately absent: content is public for the whole site.
@@ -26,9 +26,10 @@ export function createPublicNewsStore(db: NewsDatabase | undefined, sourceIds: R
     if (url.pathname === "/api/articles") {
       canonical.searchParams.set("sourceIds", url.searchParams.get("sourceIds")!);
       canonical.searchParams.set("limitPerSource", "24");
+      if (url.searchParams.get("includeImages") === "1") canonical.searchParams.set("includeImages", "1");
     } else if (url.pathname === "/api/pulse") canonical.searchParams.set("area", url.searchParams.get("area") ?? "europe");
     else canonical.searchParams.set("sourceId", url.searchParams.get("sourceId")!);
-    return "images-v3:" + canonical.pathname + canonical.search;
+    return "images-v4:" + canonical.pathname + canonical.search;
   };
   return {
     async match(request) {

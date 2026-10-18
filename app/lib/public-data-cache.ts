@@ -1,6 +1,6 @@
 /** Cache only public, read-only news endpoints. Account data and translation input never enter this cache. */
 const POLICIES: Record<string, readonly string[]> = {
-  "/api/articles": ["sourceIds", "limitPerSource"],
+  "/api/articles": ["sourceIds", "limitPerSource", "includeImages"],
   "/api/pulse": ["area"],
   "/api/highlights": ["sourceId"],
 };
@@ -17,7 +17,7 @@ export function publicDataKey(request: Request): Request | null {
   url.hash = "";
   if (url.searchParams.has("sourceIds"))
     url.searchParams.set("sourceIds", [...new Set(url.searchParams.get("sourceIds")!.split(",").map(id => id.trim()).filter(Boolean))].sort().join(","));
-  url.searchParams.set("_public_cache", "3");
+  url.searchParams.set("_public_cache", "4");
   url.searchParams.sort();
   return new Request(url, { method: "GET" });
 }

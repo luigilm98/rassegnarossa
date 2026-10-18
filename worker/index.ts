@@ -1,6 +1,7 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { GET as articleImageEndpoint } from "../app/api/article-image/route";
 import { GET as articlesEndpoint } from "../app/api/articles/route";
 import { GET as pulseEndpoint } from "../app/api/pulse/route";
 import { GET as highlightsEndpoint } from "../app/api/highlights/route";
@@ -35,7 +36,7 @@ interface ExecutionContext {
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
 const publicEndpoints: Record<string, (request: Request) => Promise<Response>> = {
-  "/api/articles": articlesEndpoint, "/api/pulse": pulseEndpoint, "/api/highlights": highlightsEndpoint,
+  "/api/article-image": articleImageEndpoint, "/api/articles": articlesEndpoint, "/api/pulse": pulseEndpoint, "/api/highlights": highlightsEndpoint,
 };
 const sourceIds = new Set(SOURCE_CATALOG.map(source => source.id));
 

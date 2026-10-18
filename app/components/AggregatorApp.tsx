@@ -357,7 +357,7 @@ export function AggregatorApp() {
       };
       const worker = async (source: SourceDefinition, signal: AbortSignal) => {
         const response = await fetch(
-          `/api/articles?sourceIds=${encodeURIComponent(source.id)}&limitPerSource=24`,
+          `/api/articles?sourceIds=${encodeURIComponent(source.id)}&limitPerSource=24&includeImages=1`,
           { signal },
         );
         if (!response.ok) throw new Error("Source unavailable");
@@ -1364,7 +1364,7 @@ const ArticleCard = memo(function ArticleCard({
   return (
     <article className="article-card">
       <button className="article-open" onClick={() => onSelect(article.id)}>
-        <ArticleImage image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
+        <ArticleImage sourceId={article.sourceId} articleId={article.id} image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
         <div className="article-copy">
           <div className="article-meta">
             <span>{article.sourceName}</span>

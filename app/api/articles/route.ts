@@ -5,6 +5,9 @@ import {
   type SourceFetchResult,
 } from "@/app/lib/feed";
 
+import { fetchPublisherPage } from "@/app/lib/publisher-page";
+import { applySourceImages } from "@/app/lib/source-highlights";
+
 export const dynamic = "force-dynamic";
 
 const MAX_SOURCES_PER_REQUEST = 14;
@@ -21,9 +24,16 @@ export async function GET(request: Request) {
     DEFAULT_LIMIT_PER_SOURCE,
   );
   const sources = getSources(ids).slice(0, MAX_SOURCES_PER_REQUEST);
-  const fetched = await promisePool(sources, 6, (source) =>
-    fetchSource(source, limitPerSource),
-  );
+  const withImages = url.searchParams.get("includeImages") === "1";
+  const fetched = await promisePool(sources, 6, async source => {
+    // Prepare both in parallel: photo metadata belongs to the article response, not a later browser queue.
+    const page = withImages && source.kind !== "radar" && !/youtube\.com/.test(source.homepage)
+      ? fetchPublisherPage(source) : null;
+    const result = await fetchSource(source, limitPerSource);
+    if (!result.articles.length) return result;
+    const metadata = await page;
+    return metadata?.images.length ? { ...result, articles: applySourceImages(result.articles, metadata.images) } : result;
+  });
   const results = fetched.filter(
     (result): result is SourceFetchResult => result !== null,
   );
