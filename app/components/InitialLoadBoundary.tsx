@@ -25,10 +25,12 @@ export function InitialLoadBoundary({ children, collecting, progress, language }
   const [revealed, setRevealed] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const work = useRef(new Set<symbol>());
+  const notify = useRef(() => {});
   const begin = useCallback(() => {
     const token = Symbol();
     work.current.add(token);
-    return () => { work.current.delete(token); };
+    notify.current();
+    return () => { work.current.delete(token); notify.current(); };
   }, []);
   const context = useMemo(() => ({ preparing: !revealed, begin }), [revealed, begin]);
   useEffect(() => {
@@ -41,30 +43,38 @@ export function InitialLoadBoundary({ children, collecting, progress, language }
     if (revealed || collecting || !root.current) return;
     const controller = new AbortController();
     let active = true;
+    let fontsReady = !document.fonts;
+    let readyTimer: ReturnType<typeof setTimeout> | undefined;
     const assets = new Map<HTMLImageElement, boolean>();
+    const check = () => {
+      if (!active || !fontsReady || work.current.size || [...assets.values()].some(ready => !ready) ||
+        root.current?.querySelector('[data-initial-pending="true"]')) {
+        clearTimeout(readyTimer); readyTimer = undefined; return;
+      }
+      // One quiet commit, without continuously polling the complete DOM.
+      readyTimer ??= setTimeout(() => { if (active) setRevealed(true); }, 140);
+    };
+    notify.current = check;
     const prepareAssets = () => {
       for (const image of root.current?.querySelectorAll("img") ?? []) {
         if (assets.has(image)) continue;
         assets.set(image, false);
-        void prepareImage(image, controller.signal).then(() => { assets.set(image, true); });
+        void prepareImage(image, controller.signal).then(() => { assets.set(image, true); check(); });
       }
     };
+    const observer = new MutationObserver(records => {
+      if (records.some(record => record.type === "childList")) prepareAssets();
+      check();
+    });
+    observer.observe(root.current, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-initial-pending"] });
     prepareAssets();
-    // Fonts have already been requested by the mounted edition. A failed font uses the CSS fallback.
-    let fontsReady = !document.fonts;
-    void document.fonts?.ready.then(() => { fontsReady = true; });
-    const fontDeadline = setTimeout(() => { fontsReady = true; }, 12000);
-    let quietSince = 0;
-    const check = setInterval(() => {
-      prepareAssets();
-      const ready = [...assets.values()].every(Boolean) && fontsReady && work.current.size === 0 &&
-        !root.current?.querySelector('[data-initial-pending="true"]');
-      if (!ready) { quietSince = 0; return; }
-      if (!quietSince) quietSince = Date.now();
-      // Allow React to commit translated text before the one-time reveal.
-      if (active && Date.now() - quietSince >= 250) setRevealed(true);
-    }, 100);
-    return () => { active = false; controller.abort(); clearInterval(check); clearTimeout(fontDeadline); };
+    void document.fonts?.ready.then(() => { fontsReady = true; check(); });
+    const fontDeadline = setTimeout(() => { fontsReady = true; check(); }, 1500);
+    check();
+    return () => {
+      active = false; notify.current = () => {}; observer.disconnect(); controller.abort();
+      clearTimeout(readyTimer); clearTimeout(fontDeadline);
+    };
   }, [collecting, revealed, language]);
   const copy = labels[language.split("-")[0]] ?? labels.en;
   return <Preparation.Provider value={context}>

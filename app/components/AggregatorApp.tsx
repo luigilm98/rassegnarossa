@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -37,6 +38,7 @@ import { THEORY_LIBRARY } from "@/app/data/library";
 import { DOSSIERS, READING_PATHS, GLOSSARY } from "@/app/data/editorial";
 import {
   filterArticles,
+  validateArticles,
   mergeArticles,
   restoreSavedArticles,
   restoreNewsSnapshot,
@@ -48,6 +50,8 @@ import {
   resolveLanguageChoices,
 } from "@/app/lib/source-selection";
 
+import type { SourceStatus } from "@/app/lib/feed";
+import { createBatchedSink } from "@/app/lib/batched-sink";
 import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
 import { InitialLoadBoundary, usePagePreparation } from "./InitialLoadBoundary";
@@ -74,15 +78,8 @@ import {
   type EditorialAxis,
 } from "@/app/lib/editorial-ranking";
 
+type FeedPayload = { articles: Article[]; statuses: SourceStatus[] };
 type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo";
-type SourceStatus = {
-  sourceId: string;
-  name: string;
-  ok: boolean;
-  count: number;
-  error: string | null;
-  cached: boolean;
-};
 type DirectorySource = SourceDefinition & {
   count: number;
   status?: SourceStatus;
@@ -188,6 +185,7 @@ export function AggregatorApp() {
   const [orderVersion, setOrderVersion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [collecting, setCollecting] = useState(false);
+  const [initialWindowReady, setInitialWindowReady] = useState(false);
   const [readingChoice, setReadingChoice] = useState("auto");
   const [editorialAxis, setEditorialAxis] = useState<EditorialAxis | "all">(
     "all",
@@ -335,16 +333,13 @@ export function AggregatorApp() {
       preferred = preferredRef.current,
       explicitIds?: string[],
     ) => {
-      const applyResult = (
-        _source: SourceDefinition,
-        payload: { articles: Article[]; statuses: SourceStatus[] },
-      ) => {
+      const applyResult = (payload: FeedPayload) => {
         if (
           !Array.isArray(payload.articles) ||
           !Array.isArray(payload.statuses)
         )
           return;
-        const cards = restoreSavedArticles(JSON.stringify(payload.articles));
+        const cards = validateArticles(payload.articles);
         if (cards.length) {
           hasArticlesRef.current = true;
           setLoading(false);
@@ -364,10 +359,7 @@ export function AggregatorApp() {
           { signal },
         );
         if (!response.ok) throw new Error("Source unavailable");
-        return (await response.json()) as {
-          articles: Article[];
-          statuses: SourceStatus[];
-        };
+        return (await response.json()) as FeedPayload;
       };
       // Opening one source never interrupts the full catalogue collection.
       if (explicitIds) {
@@ -376,10 +368,7 @@ export function AggregatorApp() {
             explicitIds.includes(source.id),
           ).map(async (source) => {
             try {
-              applyResult(
-                source,
-                await worker(source, AbortSignal.timeout(18000)),
-              );
+              applyResult(await worker(source, AbortSignal.timeout(18000)));
             } catch {
               /* Full collection remains active. */
             }
@@ -398,46 +387,55 @@ export function AggregatorApp() {
       setRefreshNotice("");
       setProgress({ done: 0, total: targets.length });
       const firstScreenDeadline = setTimeout(() => {
-        if (run === refreshNumber.current) setLoading(false);
+        if (run === refreshNumber.current) { setLoading(false); setInitialWindowReady(true); }
       }, 8000);
       try {
         let completed = 0;
+        const sink = createBatchedSink<{ payload?: FeedPayload; done?: number }>(updates => {
+          if (run !== refreshNumber.current) return;
+          const payloads = updates.flatMap(update => update.payload ? [update.payload] : []);
+          if (payloads.length) applyResult({
+            articles: payloads.flatMap(payload => Array.isArray(payload.articles) ? payload.articles : []),
+            statuses: payloads.flatMap(payload => Array.isArray(payload.statuses) ? payload.statuses : []),
+          });
+          const last = updates.filter(update => update.done !== undefined).at(-1);
+          if (last) setProgress({ done: last.done!, total: targets.length });
+        });
         const options = {
           signal: controller.signal,
           worker,
-          onResult: (source: SourceDefinition, payload: { articles: Article[]; statuses: SourceStatus[] }) => {
-            if (run === refreshNumber.current) applyResult(source, payload);
+          onResult: (_source: SourceDefinition, payload: FeedPayload) => {
+            if (run === refreshNumber.current) sink.push({ payload });
           },
           onError: (source: SourceDefinition) => {
             if (run !== refreshNumber.current) return;
-            setStatuses((current) => ({
-              ...current,
-              [source.id]: {
-                sourceId: source.id,
-                name: source.name,
-                ok: false,
-                count: 0,
-                error:
-                  "Verifica del feed non completata nel tempo previsto. Il sito originale resta accessibile.",
-                cached: false,
-              },
-            }));
+            sink.push({ payload: { articles: [], statuses: [{
+              sourceId: source.id, name: source.name, ok: false, count: 0, feedUrl: null,
+              fetchedAt: new Date().toISOString(), cached: false,
+              error: "Verifica del feed non completata nel tempo previsto. Il sito originale resta accessibile.",
+            }] } });
           },
           onProgress: () => {
             completed++;
-            if (run === refreshNumber.current) setProgress({ done: completed, total: targets.length });
+            if (run === refreshNumber.current) sink.push({ done: completed });
           },
         };
-        await Promise.all([
-          collectAll({ ...options, items: targets.filter(source => source.kind !== "radar"), concurrency: 6, timeoutMs: 14000 }),
-          collectAll({ ...options, items: targets.filter(source => source.kind === "radar"), concurrency: 2, timeoutMs: 18000 }),
-        ]);
+        try {
+          await Promise.all([
+            collectAll({ ...options, items: targets.filter(source => source.kind !== "radar"), concurrency: 6, timeoutMs: 14000 }),
+            collectAll({ ...options, items: targets.filter(source => source.kind === "radar"), concurrency: 2, timeoutMs: 18000 }),
+          ]);
+        } finally {
+          sink.flush();
+          sink.clear();
+        }
       } finally {
         clearTimeout(firstScreenDeadline);
         if (run === refreshNumber.current) {
           collectingRef.current = false;
           setCollecting(false);
           setLoading(false);
+          setInitialWindowReady(true);
           setLastRefresh(new Date().toISOString());
         }
       }
@@ -456,6 +454,7 @@ export function AggregatorApp() {
     setBrowserLanguage(detected);
     setPreferredLanguage(detected);
     preferredRef.current = detected;
+    let initialSourcePreference = detected;
     try {
       const previous = Number(
         sessionStorage.getItem("rassegna-rossa.quote") ?? "-1",
@@ -477,19 +476,21 @@ export function AggregatorApp() {
       );
       setReadingChoice(choices.reading);
       setLanguage(choices.sources);
+      initialSourcePreference = choices.sources !== ALL ? choices.sources : choices.reading !== "auto" ? choices.reading : detected;
       const snapshot = restoreNewsSnapshot(
         localStorage.getItem("rassegna-rossa.feed-cache"),
       );
       if (snapshot) {
         setArticles(snapshot.articles);
-        hasArticlesRef.current = true;
+        setInitialWindowReady(snapshot.articles.length > 0);
+        hasArticlesRef.current = snapshot.articles.length > 0;
         setLoading(false);
         setNewsUpdatedAt(snapshot.updatedAt);
       }
     } catch {
       /* Browser storage is optional. */
     }
-    void refresh("initial", detected);
+    void refresh("initial", initialSourcePreference);
     const timer = setInterval(() => {
       if (document.visibilityState === "visible" && !collectingRef.current)
         void refresh("all", preferredRef.current);
@@ -657,7 +658,7 @@ export function AggregatorApp() {
     }
   }, [selectedArticle]);
 
-  const toggleSave = (article: Article) => {
+  const toggleSave = useCallback((article: Article) => {
     const saving = !savedIds.has(article.id);
     cloud.change({ kind: "article", key: article.id, article, deleted: !saving });
     setSavedIds((current) => {
@@ -670,7 +671,7 @@ export function AggregatorApp() {
         ? mergeArticles(current, [article])
         : current.filter((a) => a.id !== article.id),
     );
-  };
+  }, [savedIds, cloud.change]);
   const directory = useMemo(() => {
     const counts = new Map<string, number>();
     const sources = new Map<string, DirectorySource>(
@@ -764,8 +765,8 @@ export function AggregatorApp() {
 
   return (
     <LocalizationProvider language={readingLanguage}>
-      <InitialLoadBoundary collecting={loading || collecting || progress.done < progress.total} progress={progress} language={readingLanguage}>
-      <div className="app-shell" data-initial-pending={sourceHighlights.coverage.busy ? "true" : undefined}>
+      <InitialLoadBoundary collecting={(view === "notizie" && !initialWindowReady && orderedArticles.length < PAGE_SIZE) || (view === "salvati" && cloud.status === "checking")} progress={progress} language={readingLanguage}>
+      <div className="app-shell">
         <a className="skip-link" href="#letture">
           <LocalizedText>{"Vai ai contenuti"}</LocalizedText>
         </a>
@@ -1190,8 +1191,8 @@ export function AggregatorApp() {
                               key={`${orderVersion}:${article.id}`}
                               article={article}
                               saved={savedIds.has(article.id)}
-                              onSelect={() => setSelectedId(article.id)}
-                              onSave={() => toggleSave(article)}
+                              onSelect={setSelectedId}
+                              onSave={toggleSave}
                             />
                           ))}
                       </div>
@@ -1347,7 +1348,7 @@ function Select({
   );
 }
 
-function ArticleCard({
+const ArticleCard = memo(function ArticleCard({
   article,
   saved,
   onSelect,
@@ -1355,15 +1356,15 @@ function ArticleCard({
 }: {
   article: Article;
   saved: boolean;
-  onSelect: () => void;
-  onSave: () => void;
+  onSelect: (id: string) => void;
+  onSave: (article: Article) => void;
 }) {
   const { preparing } = usePagePreparation();
   const [imageFailed, setImageFailed] = useState(false);
   const [image] = useState(() => safeWebUrl(article.image));
   return (
     <article className="article-card">
-      <button className="article-open" onClick={onSelect}>
+      <button className="article-open" onClick={() => onSelect(article.id)}>
         <div className={`article-image ${!image || imageFailed ? "image-unavailable" : ""}`}>
           {image ? (
             <img
@@ -1431,7 +1432,7 @@ function ArticleCard({
         <div>
           <button
             className={`save-button ${saved ? "is-saved" : ""}`}
-            onClick={onSave}
+            onClick={() => onSave(article)}
             aria-label={
               saved
                 ? `Rimuovi dai salvati: ${article.title}`
@@ -1446,7 +1447,7 @@ function ArticleCard({
       </div>
     </article>
   );
-}
+});
 
 function EmptyState({
   loading,

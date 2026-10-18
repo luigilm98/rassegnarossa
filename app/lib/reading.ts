@@ -16,10 +16,8 @@ export function safeWebUrl(value: unknown): string | null {
   }
 }
 
-export function restoreSavedArticles(raw: string | null): ReadingArticle[] {
-  if (!raw) return [];
+export function validateArticles(value: unknown): ReadingArticle[] {
   try {
-    const value: unknown = JSON.parse(raw);
     if (!Array.isArray(value)) return [];
     return value.filter((item): item is ReadingArticle => {
       if (!item || typeof item !== "object") return false;
@@ -50,6 +48,12 @@ export function restoreSavedArticles(raw: string | null): ReadingArticle[] {
   } catch {
     return [];
   }
+}
+
+export function restoreSavedArticles(raw: string | null): ReadingArticle[] {
+  if (!raw) return [];
+  try { return validateArticles(JSON.parse(raw)); }
+  catch { return []; }
 }
 
 export function mergeArticles(

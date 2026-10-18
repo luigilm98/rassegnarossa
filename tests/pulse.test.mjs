@@ -120,3 +120,24 @@ test("the complete network supplements a sparse regional collection without dupl
   assert.equal(rankPulse([...network, ...regional], now + SIX_HOURS_MS).length, 0,
     "stories expire as the six-hour window advances");
 });
+
+test("indexed clustering preserves representative-only comparisons, first matching group, language and four-word minimum", () => {
+ const input = [
+  card("a", 1000, "alpha bravo charlie delta echo foxtrot"),
+  card("b", 2000, "alpha bravo charlie delta golf hotel"),
+  card("both", 3000, "alpha bravo charlie delta echo golf"),
+  {...card("french", 4000, "alpha bravo charlie delta echo foxtrot"),language:"fr"},
+  card("short-a", 5000, "tiny short title"),
+  card("short-b", 6000, "tiny short title"),
+ ];
+ const grouped = rankPulse(input, now);
+ assert.deepEqual(grouped.find(story=>story.article.id==="a").coverage.map(article=>article.id),["a","both"]);
+ assert.deepEqual(grouped.find(story=>story.article.id==="b").coverage.map(article=>article.id),["b"]);
+ assert.equal(grouped.length,5);
+ const representative = [
+  card("first",1000,"alpha bravo charlie delta echo"),
+  card("second",2000,"alpha bravo charlie delta foxtrot"),
+  card("third",3000,"alpha bravo charlie foxtrot golf"),
+ ];
+ assert.deepEqual(rankPulse(representative,now).map(story=>story.coverage.map(article=>article.id)),[["first","second"],["third"]]);
+});

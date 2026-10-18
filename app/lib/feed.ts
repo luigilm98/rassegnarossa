@@ -557,22 +557,44 @@ function extractAtomLink(block: string) {
 }
 
 function extractImage(block: string, feedUrl: string) {
-  const enclosure = Array.from(block.matchAll(/<enclosure\b[^>]*>/gi))
-    .map((match) => match[0])
-    .find((tag) => /image\//i.test(getAttribute(tag, "type") ?? ""));
-  const media =
-    block.match(/<(media:thumbnail|media:content)\b[^>]*>/i)?.[0] ?? null;
-  const htmlImg = block.match(/<img\b[^>]*src=["']([^"']+)["']/i)?.[1] ?? null;
-  const raw =
-    (enclosure && getAttribute(enclosure, "url")) ??
-    (media && getAttribute(media, "url")) ??
-    htmlImg;
-  return raw ? normalizeUrl(raw, feedUrl) : null;
+  const html = decodeXml(block);
+  const tags = Array.from(html.matchAll(/<img\b[^>]*>/gi), match => match[0]);
+  // Use a size the publisher actually provides, instead of downloading the original full-size photo.
+  for (const tag of tags) {
+    if (Number(getAttribute(tag, "width")) === 1 || Number(getAttribute(tag, "height")) === 1) continue;
+    const srcset = getAttribute(tag, "srcset") ?? getAttribute(tag, "data-srcset") ?? "";
+    const sizes = srcset.split(",").flatMap(candidate => {
+      const match = candidate.trim().match(/^(\S+)\s+(\d+)w$/);
+      const url = match && normalizeUrl(match[1], feedUrl);
+      return url && Number(match![2]) >= 480 ? [{ url, width: Number(match![2]) }] : [];
+    }).sort((a, b) => a.width - b.width);
+    const responsive = sizes.find(size => size.width >= 640) ?? sizes.at(-1);
+    if (responsive) return responsive.url;
+  }
+  const thumbnails = Array.from(block.matchAll(/<media:thumbnail\b[^>]*>/gi), match => match[0]);
+  const suitableThumbnail = thumbnails.find(tag => Number(getAttribute(tag, "width")) >= 480);
+  const enclosure = Array.from(block.matchAll(/<enclosure\b[^>]*>/gi), match => match[0])
+    .find(tag => /^image\//i.test(getAttribute(tag, "type") ?? ""));
+  const media = Array.from(block.matchAll(/<media:content\b[^>]*>/gi), match => match[0])
+    .find(tag => /^image\//i.test(getAttribute(tag, "type") ?? "") || getAttribute(tag, "medium") === "image" ||
+      (!getAttribute(tag, "type") && /\.(?:jpe?g|png|webp|avif|gif)(?:[?#]|$)/i.test(getAttribute(tag, "url") ?? "")));
+  const candidates = [
+    suitableThumbnail && getAttribute(suitableThumbnail, "url"),
+    enclosure && getAttribute(enclosure, "url"),
+    media && getAttribute(media, "url"),
+    ...thumbnails.map(tag => getAttribute(tag, "url")),
+    ...tags.flatMap(tag => [getAttribute(tag, "data-src"), getAttribute(tag, "src")]),
+  ];
+  for (const raw of candidates) {
+    const url = raw && normalizeUrl(raw, feedUrl);
+    if (url) return url;
+  }
+  return null;
 }
 
 function getAttribute(tag: string, name: string) {
   const match = tag.match(
-    new RegExp(`${escapeRegExp(name)}=["']([^"']+)["']`, "i"),
+    new RegExp(`(?:^|\\s)${escapeRegExp(name)}\\s*=\\s*["']([^"']+)["']`, "i"),
   );
   return match?.[1] ? decodeXml(match[1]) : null;
 }

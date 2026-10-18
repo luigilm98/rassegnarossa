@@ -626,3 +626,26 @@ test("a failed Google edition backs off related searches while native Japanese p
   assert.equal(direct.articles[0].language,"ja");
  } finally {globalThis.fetch=original;}
 });
+
+test("article cards receive publisher-sized responsive photos and image thumbnails rather than video URLs or lazy placeholders", async () => {
+ const {default:worker}=await import("../dist/server/index.js");
+ const originalFetch=globalThis.fetch;
+ const bodies=[
+  '<media:content url="https://images.example/video.mp4" type="video/mp4"/><media:thumbnail url="https://images.example/thumb.jpg" width="480"/>',
+  '<description>&lt;img src="https://images.example/full.jpg" srcset="https://images.example/320.jpg 320w, https://images.example/640.jpg 640w, https://images.example/1600.jpg 1600w"&gt;</description>',
+  '<media:content url="https://images.example/only-video.mp4" type="video/mp4"/>',
+  '<description><![CDATA[<img src="data:image/gif;base64,AAAA" data-src="https://images.example/real.jpg">]]></description>',
+  '<enclosure url="https://images.example/photo.jpg" type="image/jpeg"/>',
+ ];
+ globalThis.fetch=async()=>new Response(`<rss><channel>${bodies.map((body,i)=>`<item><title>Photo fixture ${i}</title><link>https://example.org/photo-${i}</link>${body}</item>`).join("")}</channel></rss>`,{headers:{"content-type":"application/rss+xml"}});
+ try {
+  const response=await worker.fetch(new Request("http://localhost/api/articles?sourceIds=contropiano&limitPerSource=219"),{ASSETS:{fetch:async()=>new Response("Not found",{status:404})}},{waitUntil(){},passThroughOnException(){}});
+  const payload=await response.json();
+  const images=new Map(payload.articles.map(article=>[article.title,article.image]));
+  assert.equal(images.get("Photo fixture 0"),"https://images.example/thumb.jpg");
+  assert.equal(images.get("Photo fixture 1"),"https://images.example/640.jpg");
+  assert.equal(images.get("Photo fixture 2"),null);
+  assert.equal(images.get("Photo fixture 3"),"https://images.example/real.jpg");
+  assert.equal(images.get("Photo fixture 4"),"https://images.example/photo.jpg");
+ } finally {globalThis.fetch=originalFetch;}
+});

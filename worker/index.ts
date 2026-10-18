@@ -1,6 +1,7 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { publicDataResponse } from "../app/lib/public-data-cache";
 import { handleBookmarks } from "../app/lib/bookmarks";
 import { chatGPTUserFromHeaders, chatGPTSignInPath } from "../app/chatgpt-auth";
 import { THEORY_LIBRARY } from "../app/data/library";
@@ -46,7 +47,11 @@ const worker = {
       }, allowedWidths);
     }
 
-    return handler.fetch(request, env, ctx);
+    return publicDataResponse(request, {
+      cache: typeof caches === "undefined" ? undefined : (caches as CacheStorage & { default?: Cache }).default,
+      load: () => handler.fetch(request, env, ctx),
+      waitUntil: promise => ctx.waitUntil(promise),
+    });
   },
 };
 

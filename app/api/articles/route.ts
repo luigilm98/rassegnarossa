@@ -21,28 +21,6 @@ export async function GET(request: Request) {
     DEFAULT_LIMIT_PER_SOURCE,
   );
   const sources = getSources(ids).slice(0, MAX_SOURCES_PER_REQUEST);
-  const cacheUrl = new URL(request.url);
-  cacheUrl.search = "";
-  cacheUrl.searchParams.set("v", "2");
-  cacheUrl.searchParams.set(
-    "sourceIds",
-    sources
-      .map((source) => source.id)
-      .sort()
-      .join(","),
-  );
-  cacheUrl.searchParams.set("limitPerSource", String(limitPerSource));
-  const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
-  const edgeCache =
-    typeof caches === "undefined"
-      ? undefined
-      : (caches as CacheStorage & { default?: Cache }).default;
-  try {
-    const cached = await edgeCache?.match(cacheKey);
-    if (cached) return cached;
-  } catch {
-    /* Caching is optional; publisher errors must remain readable. */
-  }
   const fetched = await promisePool(sources, 6, (source) =>
     fetchSource(source, limitPerSource),
   );
@@ -73,13 +51,6 @@ export async function GET(request: Request) {
       },
     },
   );
-  if (results.some((result) => result.status.ok)) {
-    try {
-      await edgeCache?.put(cacheKey, response.clone());
-    } catch {
-      /* A cache miss must not fail the request. */
-    }
-  }
   return response;
 }
 

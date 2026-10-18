@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, RefreshCcw } from "lucide-react";
 import { rankPulse } from "@/app/lib/pulse";
 import {
-  restoreSavedArticles,
+  validateArticles,
   mergeArticles,
   safeWebUrl,
   type ReadingArticle,
@@ -22,7 +22,7 @@ const AREAS = [
   "mena",
   "pacific",
 ];
-export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticle[] }) {
+export const WorldWatch = memo(function WorldWatch({ networkArticles }: { networkArticles: ReadingArticle[] }) {
   const locale = useLocale();
   const [articles, setArticles] = useState<ReadingArticle[]>([]);
   const [country, setCountry] = useState("all");
@@ -57,7 +57,7 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
           });
           const data = await response.json();
           if (!response.ok) throw new Error("Collection unavailable");
-          const cards = restoreSavedArticles(JSON.stringify(data.articles));
+          const cards = validateArticles(data.articles);
           if (!data.ok && !cards.length) throw new Error("Collection unavailable");
           if (current === run.current)
             setArticles((previous) =>
@@ -86,6 +86,13 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
     }
   };
   useEffect(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem("rassegna-rossa.pulse-cache") ?? "null");
+      if (cached?.savedAt > Date.now() - 600_000 && cached.savedAt <= Date.now()) {
+        const restored = validateArticles(cached.articles);
+        if (restored.length) { setArticles(restored); setUpdatedAt(cached.savedAt); }
+      }
+    } catch { /* Public cache is optional. */ }
     void refresh();
     const tick = setInterval(() => setNow(Date.now()), 60_000);
     const refreshTimer = setInterval(() => {
@@ -100,6 +107,14 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
     // Collection is independent of the language and the main news filters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (!updatedAt || !articles.length) return;
+    const timer = setTimeout(() => {
+      try { localStorage.setItem("rassegna-rossa.pulse-cache", JSON.stringify({ savedAt: updatedAt, articles: articles.slice(0, 480) })); }
+      catch { /* Never evict private saved items for a public cache. */ }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [articles, updatedAt]);
   const allStories = useMemo(
     () => rankPulse([...networkArticles, ...articles], now),
     [networkArticles, articles, now],
@@ -125,7 +140,7 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
   return (
     <aside
       className="world-watch"
-      data-initial-pending={busy || !updatedAt ? "true" : undefined}
+      data-initial-pending={busy && !allStories.length && coverage.done === 0 ? "true" : undefined}
       aria-label="Osservatorio mondiale delle ultime sei ore"
     >
       <div className="watch-heading">
@@ -296,4 +311,4 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
       </p>
     </aside>
   );
-}
+});

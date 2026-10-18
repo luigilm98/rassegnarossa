@@ -23,14 +23,6 @@ function tokens(title: string) {
       ?.filter((word) => !STOP.has(word)) ?? [],
   );
 }
-function sameStory(left: ArticleRecord, right: ArticleRecord) {
-  if (left.link === right.link) return true;
-  const a = tokens(left.title),
-    b = tokens(right.title);
-  if (!a.size || !b.size || left.language !== right.language) return false;
-  const common = [...a].filter((word) => b.has(word)).length;
-  return common >= 4 && common / Math.max(a.size, b.size) >= 0.72;
-}
 /** A transparent signal of visibility in the sampled feeds, never a truth rating. */
 export function rankPulse(
   articles: ArticleRecord[],
@@ -43,13 +35,36 @@ export function rankPulse(
     })
     .sort((a, b) => Date.parse(b.publishedAt!) - Date.parse(a.publishedAt!));
   const groups: ArticleRecord[][] = [];
+  const groupTokens: Set<string>[] = [];
+  // Only group representatives are indexed: preserve the original first-match grouping.
+  const index = new Map<string, number[]>();
   const links = new Set<string>();
   for (const article of recent) {
     if (links.has(article.link)) continue;
     links.add(article.link);
-    const group = groups.find((group) => sameStory(group[0], article));
-    if (group) group.push(article);
-    else groups.push([article]);
+    const words = tokens(article.title);
+    const candidates = new Map<number, number>();
+    for (const word of words) {
+      for (const group of index.get(`${article.language}:${word}`) ?? [])
+        candidates.set(group, (candidates.get(group) ?? 0) + 1);
+    }
+    let matched = Infinity;
+    for (const [group, common] of candidates) {
+      if (group < matched && common >= 4 && common / Math.max(words.size, groupTokens[group].size) >= 0.72)
+        matched = group;
+    }
+    if (matched !== Infinity) groups[matched].push(article);
+    else {
+      const group = groups.length;
+      groups.push([article]);
+      groupTokens.push(words);
+      if (words.size >= 4) for (const word of words) {
+        const key = `${article.language}:${word}`;
+        const posting = index.get(key);
+        if (posting) posting.push(group);
+        else index.set(key, [group]);
+      }
+    }
   }
   return groups
     .map((coverage) => {

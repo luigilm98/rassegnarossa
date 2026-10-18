@@ -12,9 +12,11 @@ import {
 
 import { usePagePreparation } from "./InitialLoadBoundary";
 import { translateAvailableText, normalizeLanguage } from "@/app/lib/translation";
+import { createAvailabilityCircuit } from "@/app/lib/availability-circuit";
 import { createTranslationQueue } from "@/app/lib/translation-queue";
 
 let useDirectUntil = 0;
+const translationHealth = createAvailabilityCircuit();
 const failedKeys = new Set<string>();
 const Locale = createContext("it");
 export function useLocale() {
@@ -126,7 +128,9 @@ function persist() {
   }, 600);
 }
 const translationQueue = createTranslationQueue(async (task) => {
+  const pair = `${task.from}:${task.to}`;
   try {
+    if (translationHealth.blocked(pair)) throw new Error("Translation providers temporarily unavailable");
     let value: string;
     try {
       if (Date.now() < useDirectUntil) throw new Error("Use public CORS endpoint");
@@ -142,6 +146,7 @@ const translationQueue = createTranslationQueue(async (task) => {
       useDirectUntil = Date.now() + 60_000;
       value = await translateAvailableText(task.text, task.from, task.to);
     }
+    translationHealth.success(pair);
     if (memory.size >= 800) memory.delete(memory.keys().next().value!);
     memory.set(task.key, value);
     failedKeys.delete(task.key);
@@ -149,6 +154,7 @@ const translationQueue = createTranslationQueue(async (task) => {
     emit(); persist();
     return value;
   } catch (error) {
+    translationHealth.failure(pair);
     if (task.to === currentReadingLanguage) {
       failedKeys.add(task.key); failed = true; emit();
     }
@@ -242,14 +248,14 @@ export function LocalizedText({
   useEffect(() => {
     let live = true;
     if (
-      (preparing || visible) &&
+      ((preparing && priority > 0) || visible) &&
       text.trim() &&
       /\p{L}/u.test(text) &&
       from !== to &&
       !builtin &&
       text.length <= 2200
     ) {
-      const finish = preparing ? begin() : () => {};
+      const finish = preparing && priority > 0 ? begin() : () => {};
       void translate(text, from, to, priority).then((value) => {
         if (live && value !== null) setResult({ key, value });
       }).finally(finish);
@@ -308,6 +314,7 @@ export function TranslationNotice() {
           className="text-link"
           onClick={() => {
             failedKeys.clear();
+            translationHealth.clear();
             failed = false;
             useDirectUntil = 0;
             retryVersion++;

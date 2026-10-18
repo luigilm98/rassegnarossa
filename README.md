@@ -8,11 +8,12 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Ricerca, ordinamento, finestra temporale e aggiornamento dei feed.
 - Priorità politica e formativa: organizzarsi, studiare, acquisire competenze e capire i rapporti di potere. Ordinamento dedicato, senza clic o trend come segnali.
 - Atlante completo per aree, con testate, radar e fonti scoperte distinti e sezioni espandibili.
+- Cache condivisa delle sole API pubbliche: risultati pronti e rinnovo in background, senza coinvolgere dati personali. Aggiornamenti raggruppati per ridurre i ricalcoli su smartphone.
 - Catalogo di 130 testate, canali e risorse, distinto dai 136 radar di ricerca.
 - Lingua di lettura e lingua delle fonti in analisi hanno controlli sempre visibili e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
 - Tutte le 266 fonti e ricerche partecipano automaticamente: sei richieste parallele per le fonti dirette e due per i radar, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
 - Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e Google Translate e MyMemory come servizi alternativi, senza fermare la coda al primo errore.
-- Apertura della rassegna dopo la preparazione completa della prima pagina: raccolta iniziale con progresso, titoli/traduzioni e immagini delle 24 schede già caricate e decodificate; testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
+- Apertura della rassegna dopo la preparazione completa della prima pagina: cache riutilizzabile, titoli/traduzioni e immagini delle 24 schede iniziali preparati senza attendere il resto del catalogo; testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
 - Ordine selezionabile: in evidenza dalle fonti, ultimi articoli, più letti sulle fonti, priorità politica e formativa.
 - Le selezioni delle testate provengono dal loro HTML pubblico, separatamente dai feed. Nessun contatore di letture interno. “Più letti” usa soltanto classifiche pubblicate dalle fonti; se mancano, l’interfaccia lo segnala.
 - Osservatorio delle ultime sei ore: notizie da tutta la rete raccolta e da otto canali regionali aggiuntivi, filtri, attività oraria e collegamenti diretti alle testate, senza punteggi nelle schede.
