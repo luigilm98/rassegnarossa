@@ -53,6 +53,47 @@ test("deployed Worker routes public feed reads through the persistent cache with
   assert.equal(second.headers.get("x-rassegna-cache"),"hit");
   assert.equal((await second.json()).articles[0].title,"Shared public headline");
   assert.equal(calls,1);
-  assert.equal(sqlite.prepare("SELECT count(*) AS count FROM public_news_cache").get().count,1);
+  assert.equal(sqlite.prepare("SELECT count(*) AS count FROM public_news_cache").get().count,2);
+ }finally{globalThis.fetch=originalFetch;sqlite.close();}
+});
+
+test("photo references survive feed rotation and store recreation, remain bounded and reject unknown sources",async()=>{
+ const { createArticlePhotoStore }=await import("../app/lib/public-news-store.ts");
+ const {sqlite,db}=await setup();let now=1000;
+ const sources=new Set(["contropiano"]);
+ try{
+  const store=createArticlePhotoStore(db,sources,()=>now);
+  const article=id=>({id,sourceId:"contropiano",link:`https://contropiano.org/${id}`,image:`https://images.example.org/${id}.jpg`,title:"Not retained"});
+  await store.remember("contropiano",[article("old")]);
+  await store.remember("contropiano",[article("new")]);
+  const restored=createArticlePhotoStore(db,sources,()=>now);
+  assert.equal((await restored.find("contropiano","old")).image,"https://images.example.org/old.jpg");
+  assert.equal((await restored.find("contropiano","old")).title,undefined);
+  await store.remember("unknown",[{...article("evil"),sourceId:"unknown"}]);
+  assert.equal(await store.find("unknown","evil"),undefined);
+  await store.remember("contropiano",Array.from({length:170},(_,i)=>article(`item-${i}`)));
+  assert.equal(await store.find("contropiano","old"),undefined);
+  assert.ok(await store.find("contropiano","item-159"));
+  assert.equal(await store.find("contropiano","item-160"),undefined);
+  now+=7*86400000+1;
+  assert.equal(await restored.find("contropiano","item-0"),undefined);
+ }finally{sqlite.close();}
+});
+
+test("image endpoint serves an archived article after it has disappeared from its feed without fetching that feed",async()=>{
+ const { createArticlePhotoStore }=await import("../app/lib/public-news-store.ts");
+ const {sqlite,db}=await setup();const originalFetch=globalThis.fetch;const calls=[];
+ const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZlS0AAAAASUVORK5CYII=","base64");
+ try{
+  await createArticlePhotoStore(db,new Set(["contropiano"])).remember("contropiano",[{id:"archived-photo-id",sourceId:"contropiano",link:"https://contropiano.org/archived-story",image:"https://images.example.org/archive.png"}]);
+  globalThis.fetch=async raw=>{const url=String(raw);calls.push(url);
+   if(url==="https://contropiano.org/") return new Response("<html></html>",{headers:{"content-type":"text/html"}});
+   if(url==="https://images.example.org/archive.png")return new Response(png,{headers:{"content-type":"image/png"}});
+   throw new Error("The feed is unavailable");
+  };
+  const {default:worker}=await import("../dist/server/index.js");
+  const result=await worker.fetch(new Request("https://news.example/api/article-image?sourceId=contropiano&articleId=archived-photo-id"),{DB:db,ASSETS:{fetch:async()=>new Response(null,{status:404})}},{waitUntil(){},passThroughOnException(){}});
+  assert.equal(result.status,200);assert.deepEqual(Buffer.from(await result.arrayBuffer()),png);
+  assert.ok(!calls.some(url=>url.includes("feed")));
  }finally{globalThis.fetch=originalFetch;sqlite.close();}
 });

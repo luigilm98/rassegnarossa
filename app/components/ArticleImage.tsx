@@ -7,8 +7,8 @@ import { usePagePreparation } from "./InitialLoadBoundary";
 
 const nativeSources = new Set(SOURCE_CATALOG.filter(source => source.kind !== "radar").map(source => source.id));
 
-export const ArticleImage = memo(function ArticleImage({ image, fallbacks, region, sourceId, articleId }: {
-  image: string | null; fallbacks?: string[]; region: string; sourceId: string; articleId: string;
+export const ArticleImage = memo(function ArticleImage({ image, fallbacks, region, sourceId, articleId, articleLink }: {
+  image: string | null; fallbacks?: string[]; region: string; sourceId: string; articleId: string; articleLink: string;
 }) {
   const { preparing } = usePagePreparation();
   const candidates = useMemo(() => articleImages(image, fallbacks), [image, fallbacks]);
@@ -23,9 +23,11 @@ export const ArticleImage = memo(function ArticleImage({ image, fallbacks, regio
     return () => observer.disconnect();
   }, []);
   const proxy = near && nativeSources.has(sourceId)
-    ? `/api/article-image?${new URLSearchParams({ sourceId, articleId })}` : null;
+    ? `/api/article-image?${new URLSearchParams({ sourceId, articleId, articleLink })}` : null;
   const [failed, setFailed] = useState<ReadonlySet<string>>(() => new Set());
-  const src = candidates.find(candidate => !failed.has(candidate)) ?? (proxy && !failed.has(proxy) ? proxy : undefined);
+  // Prefer same-origin delivery: publisher hotlink restrictions must not decide whether a photo appears.
+  const src = nativeSources.has(sourceId) && !near ? undefined :
+    (proxy && !failed.has(proxy) ? proxy : undefined) ?? candidates.find(candidate => !failed.has(candidate));
   return <div ref={frame} className={`article-image ${!src ? "image-unavailable" : ""}`}>
     {src ? <img key={src} src={src} alt="" width={640} height={360}
       loading={preparing ? "eager" : "lazy"} decoding="async" referrerPolicy="no-referrer"

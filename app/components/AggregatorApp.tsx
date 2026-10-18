@@ -1364,7 +1364,7 @@ const ArticleCard = memo(function ArticleCard({
   return (
     <article className="article-card">
       <button className="article-open" onClick={() => onSelect(article.id)}>
-        <ArticleImage sourceId={article.sourceId} articleId={article.id} image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
+        <ArticleImage articleLink={article.link} sourceId={article.sourceId} articleId={article.id} image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
         <div className="article-copy">
           <div className="article-meta">
             <span>{article.sourceName}</span>

@@ -1,3 +1,4 @@
+import type { PhotoArticle } from "@/app/lib/public-news-store";
 import { SOURCE_CATALOG } from "@/app/data/catalog";
 import { fetchSource } from "@/app/lib/feed";
 import { fetchPublisherPage } from "@/app/lib/publisher-page";
@@ -19,12 +20,17 @@ const fail = (status: number) => new Response(null, { status, headers: { "cache-
 const responseFor = (entry: { bytes: Uint8Array; type: string }) => new Response(entry.bytes as unknown as BodyInit, { headers: {
   "content-type": entry.type, "cache-control": "public, max-age=600", "x-content-type-options": "nosniff",
 } });
-export async function GET(request: Request): Promise<Response> {
+export async function GET(request: Request, find?: (sourceId: string, id: string) => Promise<PhotoArticle | undefined>): Promise<Response> {
   const params = new URL(request.url).searchParams;
   const source = SOURCE_CATALOG.find(item => item.id === params.get("sourceId") && item.kind !== "radar");
   const id = params.get("articleId");
-  if (!source || !id || id.length > 150 || params.getAll("sourceId").length !== 1 || params.getAll("articleId").length !== 1 || [...params.keys()].some(key => !["sourceId", "articleId"].includes(key))) return fail(400);
-  const key = `${source.id}:${id}`;
+  if (!source || !id || id.length > 150 || params.getAll("sourceId").length !== 1 || params.getAll("articleId").length !== 1 || [...params.keys()].some(key => !["sourceId", "articleId", "articleLink"].includes(key))) return fail(400);
+  const rawLink = params.get("articleLink");
+  const suppliedLink = rawLink ? publicPhotoUrl(rawLink) : null;
+  const publisherHost = new URL(source.homepage).hostname.replace(/^www\./, "");
+  // Legacy/local cards may predate the retained feed. Limit their page lookup to this configured publisher.
+  if (params.getAll("articleLink").length > 1 || (rawLink !== null && (!suppliedLink || rawLink.length > 2048 || suppliedLink.hostname.replace(/^www\./, "") !== publisherHost || suppliedLink.pathname === "/"))) return fail(400);
+  const key = `${source.id}:${id}:${suppliedLink?.href ?? ""}`;
   const cached = cache.get(key);
   if (cached && cached.until > Date.now()) return responseFor(cached);
   const existing = pending.get(key); if (existing) return (await existing).clone();
@@ -32,12 +38,12 @@ export async function GET(request: Request): Promise<Response> {
   const task = (async () => {
     await acquire();
     try {
-    const result = await fetchSource(source, 24);
-    const article = result.articles.find(item => item.id === id);
+    // Resolve the exact reference already delivered to readers before consulting a rotating feed.
+    const stored = await find?.(source.id, id).catch(() => undefined);
+    const article = stored ?? (suppliedLink ? { id, sourceId: source.id, link: suppliedLink.href, image: null } :
+      (await fetchSource(source, 24)).articles.find(item => item.id === id));
     if (!article) return fail(404);
     const signal = AbortSignal.timeout(12000);
-    const page = await fetchPublisherPage(source);
-    const enriched = applySourceImages([article], page.images)[0];
     const headers = { "user-agent": "Mozilla/5.0 RassegnaRossa/1.0", referer: source.homepage, accept: "image/avif,image/webp,image/*" };
     const download = async (urls: string[]) => {
       for (const raw of urls) {
@@ -58,8 +64,13 @@ export async function GET(request: Request): Promise<Response> {
       }
       return null;
     };
-    const known = await download(articleImages(enriched.image, enriched.imageFallbacks));
+    const originalUrls = articleImages(article.image, "imageFallbacks" in article ? article.imageFallbacks : undefined);
+    const known = await download(originalUrls);
     if (known) return known;
+    const page = await fetchPublisherPage(source);
+    const enriched = applySourceImages([article as import("@/app/lib/feed").ArticleRecord], page.images)[0];
+    const homepagePhoto = await download(articleImages(enriched.image, enriched.imageFallbacks).filter(url => !originalUrls.includes(url)));
+    if (homepagePhoto) return homepagePhoto;
     const link = publicPhotoUrl(article.link), homeHost = new URL(source.homepage).hostname.replace(/^www\./, "");
     if (link && link.hostname.replace(/^www\./, "") === homeHost && link.pathname !== "/") {
       try {

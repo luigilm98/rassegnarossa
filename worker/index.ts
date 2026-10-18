@@ -6,6 +6,7 @@ import { GET as articlesEndpoint } from "../app/api/articles/route";
 import { GET as pulseEndpoint } from "../app/api/pulse/route";
 import { GET as highlightsEndpoint } from "../app/api/highlights/route";
 import { SOURCE_CATALOG } from "../app/data/catalog";
+import { createArticlePhotoStore } from "../app/lib/public-news-store";
 import { createPublicNewsStore } from "../app/lib/public-news-store";
 import { publicDataResponse } from "../app/lib/public-data-cache";
 import { handleBookmarks } from "../app/lib/bookmarks";
@@ -57,6 +58,9 @@ const worker = {
         },
       }, allowedWidths);
     }
+
+    if (request.method === "GET" && url.pathname === "/api/article-image")
+      return articleImageEndpoint(request, (sourceId, id) => createArticlePhotoStore(env.DB, sourceIds).find(sourceId, id));
 
     const endpoint = request.method === "GET" ? publicEndpoints[url.pathname] : undefined;
     if (endpoint) return publicDataResponse(request, {

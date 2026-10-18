@@ -46,6 +46,13 @@ test("article API includes its photo and the same-origin endpoint delivers actua
   assert.equal(calls.filter(url=>url==="https://ilmanifesto.it/fixture-story-two").length,1);
   const before=calls.length;assert.equal((await call(path(first.id))).status,200);assert.equal(calls.length,before);
   assert.equal((await call(path("unknown"))).status,404);
+  const legacy=await call(path("legacy-local-card")+"&articleLink="+encodeURIComponent("https://ilmanifesto.it/fixture-story-two"));
+  assert.equal(legacy.status,200);assert.deepEqual(Buffer.from(await legacy.arrayBuffer()),png);
+  const beforeUnsafe=calls.length;
+  for(const link of ["https://evil.example.org/story","https://127.0.0.1/story","https://ilmanifesto.it.evil.example.org/story","https://user:secret@ilmanifesto.it/story","https://ilmanifesto.it/"])
+   assert.equal((await call(path("bad-link")+"&articleLink="+encodeURIComponent(link))).status,400);
+  assert.equal(calls.length,beforeUnsafe);
+  assert.equal((await call(path("bad-link")+"&articleLink=https://ilmanifesto.it/one&articleLink=https://ilmanifesto.it/two")).status,400);
   assert.equal((await call(path(first.id)+"&url=http://127.0.0.1/private")).status,400);
  }finally{globalThis.fetch=originalFetch;}
 });
