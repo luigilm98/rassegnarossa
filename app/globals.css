@@ -180,9 +180,9 @@ em {
   line-height: 1;
   white-space: nowrap;
 }
-.wordmark-red,
+.wordmark-black,
 .brand-period {
-  color: var(--red);
+  color: var(--ink);
 }
 .brand-symbol {
   border: 1px solid var(--red);
@@ -1611,7 +1611,7 @@ em {
   white-space: nowrap;
 }
 .footer-brand > span {
-  color: var(--red);
+  color: var(--ink);
 }
 .footer-top > p {
   font-family: var(--serif);
@@ -3743,4 +3743,41 @@ em {
 @media (max-width: 600px) {
   .filter-toolbar .source-language-inline { flex-basis: 100%; border-bottom: 1px solid var(--line); }
   .filter-toolbar .source-language-inline select { max-width: none; }
+}
+
+/* The brand reads red “rassegna”, black “rossa”, in header and footer. */
+.wordmark, .footer-brand { color: var(--red); }
+.watch-publisher { display: flex; flex-wrap: wrap; gap: 4px 8px; line-height: 1.6; }
+.watch-country { color: var(--ink); }
+.watch-country::before { content: "·"; color: var(--muted); margin-inline-end: 8px; }
+/* Loading or failed images keep the same measured slot. */
+.article-image { contain: layout paint; aspect-ratio: 16/9; }
+.article-image.image-unavailable::after {
+  content: "—"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted);
+}
+.article-copy h3 {
+  line-height: 1.25; height: 3.75em; display: -webkit-box;
+  -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.featured .article-copy h3 { height: 5em; -webkit-line-clamp: 4; }
+.article-copy > p { min-height: 5.25em; }
+.cloud-library-status { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 16px; border: 1px solid var(--line); font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+.cloud-library-status a, .saved-books a { color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+.saved-books { margin-bottom: 28px; }
+.saved-books > h3 { font: 25px/1.3 var(--serif); margin-bottom: 12px; }
+.saved-books article { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.saved-books article p { font-size: 12px; color: var(--muted); margin-block: 6px; }
+.saved-books article a { font-size: 12px; display: inline-flex; gap: 6px; align-items: center; }
+.book-save { margin-block: 12px; }
+.watch-story-meta { justify-content: flex-end; }
+.article-bottom > span { min-height: 3.2em; line-height: 1.6; }
+.account-save-note { font-size: 11px; line-height: 1.6; margin-block: 10px; color: var(--muted); }
+.account-save-note a { color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+.translation-notice { min-block-size: 3.4em; line-height: 1.7; }
+.collection-status summary > span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.section-heading > .button { min-width: 120px; }
+.account-save-note { position: fixed; inset-inline-start: 18px; bottom: 18px; max-width: min(420px, calc(100vw - 36px)); background: var(--paper); border: 1px solid var(--line); padding: 12px 16px; z-index: 30; box-shadow: 0 5px 22px #0001; }
+@media(max-width:760px) {
+  .collection-status summary { min-block-size: 44px; }
+  .section-heading > .button { min-width: 36px; }
 }

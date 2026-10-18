@@ -85,6 +85,7 @@ export async function GET(request: Request) {
       feeds: results.map((result) => ({
         name: result.source.name,
         ok: result.status.ok,
+        stale: result.status.stale ?? false,
       })),
       error: results.some((result) => result.status.ok)
         ? null

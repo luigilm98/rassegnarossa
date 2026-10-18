@@ -1,6 +1,9 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { handleBookmarks } from "../app/lib/bookmarks";
+import { chatGPTUserFromHeaders, chatGPTSignInPath } from "../app/chatgpt-auth";
+import { THEORY_LIBRARY } from "../app/data/library";
 
 interface Env {
   ASSETS: Fetcher;
@@ -28,6 +31,9 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/bookmarks")
+      return handleBookmarks(request, env.DB, chatGPTUserFromHeaders(request.headers)?.id ?? null, new Set(THEORY_LIBRARY.map(book => book.id)), chatGPTSignInPath("/?view=salvati"));
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];

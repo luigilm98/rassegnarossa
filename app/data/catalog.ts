@@ -477,7 +477,7 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "antidiplomatico",
     name: "L'Antidiplomatico",
     homepage: "https://www.lantidiplomatico.it/",
-    feedUrls: ["https://www.lantidiplomatico.it/rss.xml"],
+    feedUrls: ["https://www.lantidiplomatico.it/rss.php"],
     region: "Italia",
     country: "Italia",
     language: "it",
@@ -518,7 +518,7 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "collettiva",
     name: "Collettiva CGIL",
     homepage: "https://www.collettiva.it/",
-    feedUrls: ["https://www.collettiva.it/rss.xml"],
+    feedUrls: ["https://www.collettiva.it/sitemaps/collettiva/rss"],
     region: "Italia",
     country: "Italia",
     language: "it",
@@ -973,7 +973,7 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "junge-welt",
     name: "Junge Welt",
     homepage: "https://www.jungewelt.de/",
-    feedUrls: ["https://www.jungewelt.de/feeds/rss.xml"],
+    feedUrls: ["https://www.jungewelt.de/feeds/newsticker.rss"],
     region: "Europa",
     country: "Germania",
     language: "de",
@@ -986,7 +986,7 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "neues-deutschland",
     name: "nd - Der Tag",
     homepage: "https://www.nd-aktuell.de/",
-    feedUrls: ["https://www.nd-aktuell.de/rss.xml"],
+    feedUrls: ["https://www.nd-aktuell.de/rss/neues-deutschland.xml"],
     region: "Europa",
     country: "Germania",
     language: "de",
@@ -1330,7 +1330,7 @@ const BASE_SOURCE_CATALOG: SourceDefinition[] = [
     id: "red-flag-au",
     name: "Red Flag",
     homepage: "https://redflag.org.au/",
-    feedUrls: ["https://redflag.org.au/rss.xml"],
+    feedUrls: ["https://redflag.org.au/rss/"],
     region: "Oceania",
     country: "Australia",
     language: "en",
@@ -2048,6 +2048,11 @@ const GLOBAL_RADAR_SOURCES: SourceDefinition[] = RADAR_LOCALES.flatMap(
 
 // RSS/Atom destinations checked on 2026-10-18. Political labels are not inferred from a feed URL.
 const ADDITIONAL_SOURCE_CATALOG: SourceDefinition[] = [
+  {
+    id: "akahata", name: "しんぶん赤旗 · Shimbun Akahata", homepage: "https://www.jcp.or.jp/akahata/",
+    feedUrls: ["https://www.jcp.or.jp/akahata/index.rdf"], region: "Asia", country: "Giappone", language: "ja",
+    kind: "giornale", ideologies: ["comunista"], tags: ["giappone", "lavoro", "politica", "pace"], priority: 9,
+  },
   {
     id: "consortium-news",
     name: "Consortium News",

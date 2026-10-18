@@ -51,6 +51,9 @@ import {
 import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
 import { WorldWatch } from "./WorldWatch";
+import { useStableNews } from "./StableNews";
+import { useCloudBookmarks, type RestoredCollection } from "./CloudBookmarks";
+import { createPublisherResolver } from "@/app/lib/publisher";
 import { useSourceHighlights } from "./SourceHighlights";
 import { highlightLinkKey, rankSourceHighlights } from "@/app/lib/source-highlights";
 import {
@@ -85,6 +88,7 @@ type DirectorySource = SourceDefinition & {
   discovered?: boolean;
 };
 const ALL = "all";
+const publisherFor = createPublisherResolver(SOURCE_CATALOG);
 const PAGE_SIZE = 24;
 const NAV: { id: View; label: string }[] = [
   { id: "notizie", label: "La rassegna" },
@@ -139,7 +143,7 @@ const HEADINGS = {
       </>
     ),
     description:
-      "Conserva gli articoli che meritano tempo. Le schede restano in questo browser, anche quando chiudi la rassegna. Nessun account necessario.",
+      "Articoli e libri da ritrovare. Accedi con ChatGPT per conservarli nel tuo archivio personale anche dopo la cancellazione dei dati del browser.",
   },
   metodo: {
     overline: "IL PROGETTO",
@@ -165,6 +169,7 @@ export function AggregatorApp() {
   const [statuses, setStatuses] = useState<Record<string, SourceStatus>>({});
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [savedArticles, setSavedArticles] = useState<Article[]>([]);
+  const [savedBooks, setSavedBooks] = useState<Set<string>>(new Set());
   const [storageReady, setStorageReady] = useState(false);
   const [storageWarning, setStorageWarning] = useState(false);
   const [query, setQuery] = useState("");
@@ -179,6 +184,7 @@ export function AggregatorApp() {
   const sourceHighlights = useSourceHighlights(articles, view === "notizie" && (sort === "featured" || sort === "popular"));
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [orderVersion, setOrderVersion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [collecting, setCollecting] = useState(false);
   const [readingChoice, setReadingChoice] = useState("auto");
@@ -201,6 +207,21 @@ export function AggregatorApp() {
   const refreshNumber = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const readerDialog = useRef<HTMLDialogElement>(null);
+
+  const restoreCollection = useCallback((snapshot: RestoredCollection) => {
+    const removedArticles = new Set(snapshot.removed.filter(item => item.kind === "article").map(item => item.key));
+    const removedBooks = new Set(snapshot.removed.filter(item => item.kind === "book").map(item => item.key));
+    setSavedArticles(current => mergeArticles(snapshot.replace ? [] : current, snapshot.articles).filter(article => !removedArticles.has(article.id)));
+    setSavedIds(current => new Set([...(snapshot.replace ? [] : current), ...snapshot.articles.map(article => article.id)].filter(id => !removedArticles.has(id))));
+    const validBooks = new Set(THEORY_LIBRARY.map(book => book.id));
+    setSavedBooks(current => new Set([...(snapshot.replace ? [] : current), ...snapshot.books].filter(id => validBooks.has(id) && !removedBooks.has(id))));
+  }, []);
+  const cloud = useCloudBookmarks({ ready: storageReady, articles: savedArticles, books: useMemo(() => [...savedBooks], [savedBooks]), onRestore: restoreCollection });
+  const toggleBook = (id: string) => {
+    const saving = !savedBooks.has(id);
+    setSavedBooks(current => { const next = new Set(current); saving ? next.add(id) : next.delete(id); return next; });
+    cloud.change({ kind: "book", key: id, deleted: !saving });
+  };
 
   useEffect(() => {
     setDateLabel(
@@ -225,15 +246,21 @@ export function AggregatorApp() {
       } catch {
         /* Valid saved cards still restore if legacy IDs are corrupt. */
       }
+      const claimed = Boolean(localStorage.getItem("rassegna-rossa.saved-account"));
       setSavedIds(
-        new Set([
+        new Set(claimed ? [] : [
           ...restored.map((a) => a.id),
           ...(Array.isArray(rawIds)
             ? rawIds.filter((id): id is string => typeof id === "string")
             : []),
         ]),
       );
-      setSavedArticles(restored);
+      if (!claimed) {
+        setSavedArticles(restored);
+        const books = JSON.parse(localStorage.getItem("rassegna-rossa.saved-books") ?? "[]");
+        if (Array.isArray(books)) setSavedBooks(new Set(books.filter(id => THEORY_LIBRARY.some(book => book.id === id))));
+      }
+      if (new URLSearchParams(window.location.search).get("view") === "salvati") setView("salvati");
     } catch {
       setStorageWarning(true);
     }
@@ -243,6 +270,7 @@ export function AggregatorApp() {
   useEffect(() => {
     if (!storageReady) return;
     try {
+      if (localStorage.getItem("rassegna-rossa.saved-account") && !cloud.account) return;
       localStorage.setItem(
         "rassegna-rossa.saved",
         JSON.stringify(Array.from(savedIds)),
@@ -251,10 +279,11 @@ export function AggregatorApp() {
         "rassegna-rossa.saved-articles",
         JSON.stringify(savedArticles),
       );
+      localStorage.setItem("rassegna-rossa.saved-books", JSON.stringify([...savedBooks]));
     } catch {
       setStorageWarning(true);
     }
-  }, [savedIds, savedArticles, storageReady]);
+  }, [savedIds, savedArticles, savedBooks, storageReady, cloud.account]);
 
   useEffect(() => {
     // Old saved IDs become persistent article cards when their feed is fetched again.
@@ -348,7 +377,7 @@ export function AggregatorApp() {
             try {
               applyResult(
                 source,
-                await worker(source, AbortSignal.timeout(10000)),
+                await worker(source, AbortSignal.timeout(18000)),
               );
             } catch {
               /* Full collection remains active. */
@@ -371,14 +400,14 @@ export function AggregatorApp() {
         if (run === refreshNumber.current) setLoading(false);
       }, 8000);
       try {
-        await collectAll({
-          items: targets,
+        let completed = 0;
+        const options = {
           signal: controller.signal,
           worker,
-          onResult: (source, payload) => {
+          onResult: (source: SourceDefinition, payload: { articles: Article[]; statuses: SourceStatus[] }) => {
             if (run === refreshNumber.current) applyResult(source, payload);
           },
-          onError: (source) => {
+          onError: (source: SourceDefinition) => {
             if (run !== refreshNumber.current) return;
             setStatuses((current) => ({
               ...current,
@@ -388,15 +417,20 @@ export function AggregatorApp() {
                 ok: false,
                 count: 0,
                 error:
-                  "La fonte non ha risposto. Il suo sito resta accessibile.",
+                  "Verifica del feed non completata nel tempo previsto. Il sito originale resta accessibile.",
                 cached: false,
               },
             }));
           },
-          onProgress: (done, total) => {
-            if (run === refreshNumber.current) setProgress({ done, total });
+          onProgress: () => {
+            completed++;
+            if (run === refreshNumber.current) setProgress({ done: completed, total: targets.length });
           },
-        });
+        };
+        await Promise.all([
+          collectAll({ ...options, items: targets.filter(source => source.kind !== "radar"), concurrency: 6, timeoutMs: 14000 }),
+          collectAll({ ...options, items: targets.filter(source => source.kind === "radar"), concurrency: 2, timeoutMs: 18000 }),
+        ]);
       } finally {
         clearTimeout(firstScreenDeadline);
         if (run === refreshNumber.current) {
@@ -499,6 +533,10 @@ export function AggregatorApp() {
     } catch {
       /* Optional storage. */
     }
+    if (value !== ALL) {
+      const immediate = SOURCE_CATALOG.filter(source => source.language === value && source.kind !== "radar").slice(0, 4).map(source => source.id);
+      if (immediate.length) void refresh("selection", preferredRef.current, immediate);
+    }
   };
   const openSource = (id: string) => {
     reset();
@@ -593,6 +631,8 @@ export function AggregatorApp() {
       ? rankEditorial(selected, preferredLanguage)
       : selected;
   }, [matched, editorialAxis, view, sort, preferredLanguage, sourceHighlights.highlights]);
+  const orderedArticles = useStableNews(filtered, JSON.stringify([view, query, region, language, kind, ideology, topic, sourceId, days, sort, editorialAxis, orderVersion]));
+  const newerOrderAvailable = orderedArticles.some((article, index) => filtered[index]?.id !== article.id);
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [
@@ -618,6 +658,7 @@ export function AggregatorApp() {
 
   const toggleSave = (article: Article) => {
     const saving = !savedIds.has(article.id);
+    cloud.change({ kind: "article", key: article.id, article, deleted: !saving });
     setSavedIds((current) => {
       const next = new Set(current);
       saving ? next.add(article.id) : next.delete(article.id);
@@ -694,7 +735,9 @@ export function AggregatorApp() {
         .sort(),
     [],
   );
-  const failedCount = Object.values(statuses).filter((s) => !s.ok).length;
+  const failedPublishers = SOURCE_CATALOG.filter(source => source.kind !== "radar" && statuses[source.id]?.ok === false).length;
+  const failedRadars = SOURCE_CATALOG.filter(source => source.kind === "radar" && statuses[source.id]?.ok === false).length;
+  const failedCount = failedPublishers + failedRadars;
   const filterCount =
     [region, language, kind, ideology, topic, sourceId, editorialAxis].filter((f) => f !== ALL).length +
     (days !== "30" ? 1 : 0) +
@@ -744,7 +787,7 @@ export function AggregatorApp() {
                 <CommunityEmblem compact />
               </span>
               <span>
-                rassegna<span className="wordmark-red">rossa</span>
+                rassegna<span className="wordmark-black">rossa</span>
                 <span className="brand-period">
                   <LocalizedText>{"."}</LocalizedText>
                 </span>
@@ -761,9 +804,9 @@ export function AggregatorApp() {
                   onClick={() => navigate(item.id)}
                 >
                   <LocalizedText>{item.label}</LocalizedText>
-                  {item.id === "salvati" && savedIds.size > 0 ? (
+                  {item.id === "salvati" && savedIds.size + savedBooks.size > 0 ? (
                     <span className="nav-count">
-                      <LocalizedText>{savedIds.size}</LocalizedText>
+                      <LocalizedText>{savedIds.size + savedBooks.size}</LocalizedText>
                     </span>
                   ) : null}
                 </button>
@@ -857,24 +900,31 @@ export function AggregatorApp() {
                   {view !== "salvati" ? (
                     <button
                       className="button button-outline"
-                      disabled={collecting}
-                      aria-label="Aggiorna notizie"
-                      onClick={() => void refresh("all")}
+                      aria-label="Aggiorna notizie e ordine"
+                      onClick={() => { setOrderVersion(value => value + 1); if (!collecting) void refresh("all"); }}
                     >
                       <RefreshCcw size={15} />
                       <span>
                         <LocalizedText>
-                          {collecting ? "Raccolta attiva" : "Aggiorna notizie"}
+                          {newerOrderAvailable ? "Aggiorna ordine" : "Aggiorna"}
                         </LocalizedText>
                       </span>
                     </button>
                   ) : (
                     <span className="local-note">
                       <Bookmark size={15} />
-                      <LocalizedText>{" Solo in questo browser"}</LocalizedText>
+                      <LocalizedText>{cloud.account ? " Raccolta personale" : " Copia su questo dispositivo"}</LocalizedText>
                     </span>
                   )}
                 </div>
+                {view === "salvati" ? (
+                  <div className="cloud-library-status" role="status">
+                    <LocalizedText>{cloud.status === "checking" ? "Verifica dell’archivio personale…" : cloud.status === "synced" ? "Articoli e libri salvati nel tuo account. Li ritrovi anche dopo aver cancellato i dati del browser." : cloud.status === "syncing" ? "Sincronizzazione dei salvataggi in corso…" : cloud.status === "local" ? "Questa copia è solo sul dispositivo. Accedi per conservarla nel tuo archivio personale." : "La sincronizzazione non è riuscita. Le modifiche in attesa restano sul dispositivo."}</LocalizedText>
+                    {!cloud.account && cloud.status === "local" ? <a href={cloud.signInUrl} target="_top"><LocalizedText>Accedi con ChatGPT</LocalizedText></a> : null}
+                    {cloud.status === "error" ? <button className="text-link" onClick={cloud.retry}><LocalizedText>Riprova sincronizzazione</LocalizedText></button> : null}
+                  </div>
+                ) : null}
+                {view !== "salvati" && cloud.status === "local" && savedIds.size + savedBooks.size > 0 ? <p className="account-save-note"><LocalizedText>Salvati su questo dispositivo.</LocalizedText> <a href={cloud.signInUrl} target="_top"><LocalizedText>Accedi per conservarli nel tuo account</LocalizedText></a></p> : null}
                 <TranslationNotice />
                 <div className="filter-toolbar">
                   <label className="search-box">
@@ -1123,12 +1173,19 @@ export function AggregatorApp() {
                           </p>
                         </div>
                       ) : null}
+                      {view === "salvati" && savedBooks.size ? <section className="saved-books" aria-label="Libri salvati">
+                        <h3><LocalizedText>Libri salvati</LocalizedText></h3>
+                        {THEORY_LIBRARY.filter(book => savedBooks.has(book.id) && `${book.title} ${book.author}`.toLowerCase().includes(query.toLowerCase())).map(book => <article key={book.id}>
+                          <div><strong><LocalizedText>{book.title}</LocalizedText></strong><p>{book.author}</p><a href={book.links[0].url} target="_blank" rel="noopener noreferrer"><LocalizedText>Apri il testo</LocalizedText><ArrowUpRight size={14} /></a></div>
+                          <button className="save-button is-saved" onClick={() => toggleBook(book.id)} aria-label={`Rimuovi libro dai salvati: ${book.title}`}><BookmarkCheck size={18} /></button>
+                        </article>)}
+                      </section> : null}
                       <div className="news-grid" aria-label="Articoli">
-                        {filtered
+                        {orderedArticles
                           .slice(0, visibleCount)
                           .map((article, index) => (
                             <ArticleCard
-                              key={article.id}
+                              key={`${orderVersion}:${article.id}`}
                               article={article}
                               featured={index === 0 && view === "notizie"}
                               saved={savedIds.has(article.id)}
@@ -1137,7 +1194,7 @@ export function AggregatorApp() {
                             />
                           ))}
                       </div>
-                      {!filtered.length ? (
+                      {!filtered.length && !(view === "salvati" && savedBooks.size) ? (
                         <EmptyState
                           loading={loading && view !== "salvati"}
                           collecting={collecting}
@@ -1176,13 +1233,7 @@ export function AggregatorApp() {
                       {!loading && failedCount > 0 && view === "notizie" ? (
                         <p className="feed-note">
                           <CircleHelp size={15} />{" "}
-                          <LocalizedText>{failedCount}</LocalizedText>
-                          <LocalizedText>
-                            {
-                              " canali non hanno risposto. Le notizie disponibili restano leggibili."
-                            }
-                          </LocalizedText>
-                          <LocalizedText> </LocalizedText>
+                          <span>{failedPublishers} <LocalizedText>fonti dirette con feed da ricontrollare</LocalizedText> · {failedRadars} <LocalizedText>ricerche radar non disponibili</LocalizedText>. <LocalizedText>Le copie già raccolte restano leggibili.</LocalizedText></span>
                           <button onClick={() => navigate("fonti")}>
                             <LocalizedText>{"Consulta le fonti"}</LocalizedText>
                           </button>
@@ -1195,7 +1246,7 @@ export function AggregatorApp() {
               </>
             ) : null}
             {view === "teoria" ? (
-              <LibraryView query={query} setQuery={setQuery} />
+              <LibraryView query={query} setQuery={setQuery} savedBooks={savedBooks} onToggleBook={toggleBook} />
             ) : null}
             {view === "metodo" ? (
               <MethodView onSources={() => navigate("fonti")} />
@@ -1235,7 +1286,7 @@ export function AggregatorApp() {
             <span>
               <LocalizedText>
                 {
-                  "Ogni contenuto appartiene alla sua fonte. I salvati restano nel tuo browser."
+                  "Ogni contenuto appartiene alla sua fonte. Accedi per sincronizzare i salvati."
                 }
               </LocalizedText>
             </span>
@@ -1308,20 +1359,22 @@ function ArticleCard({
   onSave: () => void;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
-  const image = safeWebUrl(article.image);
+  const [image] = useState(() => safeWebUrl(article.image));
   return (
     <article className={`article-card ${featured ? "featured" : ""}`}>
       <button className="article-open" onClick={onSelect}>
-        {image && !imageFailed ? (
-          <div className="article-image">
+        {image ? (
+          <div className={`article-image ${imageFailed ? "image-unavailable" : ""}`}>
             <img
               src={image}
               alt=""
               width={640}
               height={360}
-              loading="lazy"
+              loading={featured ? "eager" : "lazy"}
+              fetchPriority={featured ? "high" : "auto"}
               decoding="async"
               referrerPolicy="no-referrer"
+              style={{ opacity: imageFailed ? 0 : undefined }}
               onError={() => setImageFailed(true)}
             />
             <span className="image-category">
@@ -1341,7 +1394,7 @@ function ArticleCard({
             </span>
           </div>
           <h3>
-            <LocalizedText priority={2} defer from={article.language}>
+            <LocalizedText priority={2} defer from={publisherFor(article).language}>
               {article.title}
             </LocalizedText>
           </h3>
@@ -1349,7 +1402,7 @@ function ArticleCard({
             <LocalizedText
               priority={1}
               defer
-              from={article.excerpt ? article.language : "it"}
+              from={article.excerpt ? publisherFor(article).language : "it"}
             >
               {article.excerpt ||
                 "Questo feed non fornisce un estratto. Apri la fonte per leggere l’articolo."}
@@ -1368,12 +1421,12 @@ function ArticleCard({
       </a>
       <div className="article-bottom">
         <span>
-          <LocalizedText>{article.country}</LocalizedText>{" "}
+          <LocalizedText>{publisherFor(article).country ?? "Paese non verificato"}</LocalizedText>{" "}
           <i>
             <LocalizedText>{"·"}</LocalizedText>
           </i>
           <LocalizedText> </LocalizedText>
-          <LanguageName code={article.language} />
+          <LanguageName code={publisherFor(article).language} />
         </span>
         <div>
           <button
@@ -1650,9 +1703,13 @@ function SourcesDirectory({
 function LibraryView({
   query,
   setQuery,
+  savedBooks,
+  onToggleBook,
 }: {
   query: string;
   setQuery: (s: string) => void;
+  savedBooks: Set<string>;
+  onToggleBook: (id: string) => void;
 }) {
   const [path, setPath] = useState("all");
   const active = READING_PATHS.find((p) => p.id === path);
@@ -1769,6 +1826,9 @@ function LibraryView({
               <p>
                 <LocalizedText>{book.summary}</LocalizedText>
               </p>
+              <button className={`text-link book-save ${savedBooks.has(book.id) ? "is-saved" : ""}`} onClick={() => onToggleBook(book.id)} aria-pressed={savedBooks.has(book.id)}>
+                {savedBooks.has(book.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}<LocalizedText>{savedBooks.has(book.id) ? "Libro salvato" : "Salva libro"}</LocalizedText>
+              </button>
               <div className="book-links">
                 {book.links.map((link) => (
                   <a
@@ -1891,7 +1951,7 @@ function MethodView({ onSources }: { onSources: () => void }) {
           {
             n: "05",
             title: "Il tuo taccuino resta tuo",
-            text: "I salvati sono memorizzati in localStorage, solo in questo browser. Una cache temporanea delle schede dei feed velocizza le visite successive; la priorità linguistica segue le preferenze del browser ed è modificabile. Non sono sincronizzati e non richiedono un account. Cancellare i dati del browser elimina anche le schede salvate. Non conserviamo una cronologia personale di lettura sul server.",
+            text: "I salvati sono memorizzati in localStorage, solo in questo browser. Una cache temporanea delle schede dei feed velocizza le visite successive; la priorità linguistica segue le preferenze del browser ed è modificabile. Con l’accesso ChatGPT, articoli e libri sono sincronizzati in un archivio personale privato sul server. Senza accesso rimangono una copia locale, vulnerabile alla cancellazione dei dati del browser. Non conserviamo una cronologia personale di lettura sul server.",
           },
           {
             n: "06",
@@ -1969,7 +2029,7 @@ function ArticleReader({
         <div className="reader-meta">
           <span>{article.sourceName}</span>
           <span>
-            <LocalizedText>{article.country}</LocalizedText>
+            <LocalizedText>{publisherFor(article).country ?? "Paese non verificato"}</LocalizedText>
           </span>
           <span>
             <LocalizedText>
@@ -1980,19 +2040,19 @@ function ArticleReader({
           </span>
         </div>
         <h2 id="reader-title">
-          <LocalizedText priority={2} defer from={article.language}>
+          <LocalizedText priority={2} defer from={publisherFor(article).language}>
             {article.title}
           </LocalizedText>
         </h2>
         <p className="reader-byline">
           {article.author ? `${article.author} · ` : ""}
-          <LanguageName code={article.language} />
+          <LanguageName code={publisherFor(article).language} />
         </p>
         <p className="reader-excerpt">
           <LocalizedText
             priority={1}
             defer
-            from={article.excerpt ? article.language : "it"}
+            from={article.excerpt ? publisherFor(article).language : "it"}
           >
             {article.excerpt ||
               "La fonte non fornisce un estratto. Leggi il testo completo sul sito dell’editore."}
@@ -2029,7 +2089,7 @@ function ArticleReader({
             </LocalizedText>
           </p>
           <a
-            href={`https://translate.google.com/translate?sl=${encodeURIComponent(article.language)}&tl=${encodeURIComponent(readingLanguage)}&u=${encodeURIComponent(safeWebUrl(article.link) ?? "")}`}
+            href={`https://translate.google.com/translate?sl=${encodeURIComponent(publisherFor(article).language)}&tl=${encodeURIComponent(readingLanguage)}&u=${encodeURIComponent(safeWebUrl(article.link) ?? "")}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-link"

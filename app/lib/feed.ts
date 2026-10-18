@@ -1,9 +1,12 @@
 import { parseYouTubeListing } from "./youtube";
+import { createPublisherResolver } from "./publisher";
 import {
   SOURCE_CATALOG,
   TOPIC_TAXONOMY,
   type SourceDefinition,
 } from "@/app/data/catalog";
+
+const publisherFor = createPublisherResolver(SOURCE_CATALOG);
 
 export type ArticleRecord = {
   id: string;
@@ -35,6 +38,7 @@ export type SourceStatus = {
   error: string | null;
   fetchedAt: string;
   cached: boolean;
+  stale?: boolean;
 };
 
 export type SourceFetchResult = {
@@ -52,9 +56,8 @@ const feedCache = new Map<string, CacheEntry>();
 const discoveryCache = new Map<string, { expiresAt: number; urls: string[] }>();
 
 const FEED_TTL_MS = 10 * 60 * 1000;
+const REQUEST_TIMEOUT_MS = 8000;
 const DISCOVERY_TTL_MS = 60 * 60 * 1000;
-const REQUEST_TIMEOUT_MS = 6500;
-const SOURCE_BUDGET_MS = 8000;
 const MAX_FEED_CHARS = 1_800_000;
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) RassegnaRossa/1.0";
@@ -67,7 +70,18 @@ export function getSources(ids?: string[]) {
   return SOURCE_CATALOG.filter((source) => wanted.has(source.id));
 }
 
-export async function fetchSource(
+const pendingSources = new Map<string, Promise<SourceFetchResult>>();
+const radarBackoff = new Map<string, number>();
+export function fetchSource(source: SourceDefinition, limit = 10): Promise<SourceFetchResult> {
+  const key = `${source.id}:${limit}`;
+  const current = pendingSources.get(key);
+  if (current) return current;
+  const task = fetchSourceResult(source, limit).finally(() => pendingSources.delete(key));
+  pendingSources.set(key, task);
+  return task;
+}
+
+async function fetchSourceResult(
   source: SourceDefinition,
   limit = 10,
 ): Promise<SourceFetchResult> {
@@ -83,19 +97,24 @@ export async function fetchSource(
   }
 
   const isPulse = source.id.startsWith("pulse-");
-  const deadline = Date.now() + (isPulse ? 9000 : SOURCE_BUDGET_MS);
+  const deadline = Date.now() + (isPulse ? 9000 : source.kind === "radar" ? 14000 : 10000);
   const candidates = await getFeedCandidates(source);
-  let lastError = "No feed candidates";
+  let radarKey = "";
+  if (!isPulse && source.kind === "radar") {
+    try { const url = new URL(candidates[0]); if (url.hostname === "news.google.com") radarKey = url.searchParams.get("ceid") ?? source.language; } catch { /* Fixed catalogue URL validation already applies. */ }
+  }
+  const suspended = radarKey && (radarBackoff.get(radarKey) ?? 0) > Date.now();
+  let lastError = suspended ? "Radar edition temporarily unavailable; retry after backoff" : "No feed candidates";
   let feedShapeError: string | null = null;
 
-  for (const candidate of candidates.slice(0, 2)) {
+  for (const candidate of suspended ? [] : candidates.slice(0, 2)) {
     const remaining = deadline - Date.now();
     if (remaining <= 0) break;
     try {
       const xml = await fetchText(
         candidate,
         MAX_FEED_CHARS,
-        Math.min(isPulse ? 8500 : REQUEST_TIMEOUT_MS, remaining),
+        Math.min(isPulse ? 8500 : source.kind === "radar" ? 12500 : 8000, remaining),
       );
       const fromListing = candidate === source.listingUrl;
       if (!fromListing && !looksLikeFeed(xml)) {
@@ -134,7 +153,7 @@ export async function fetchSource(
         score: computeArticleScore(article, source),
       }));
 
-      if (!articles.length) {
+      if (!articles.length && (fromListing || /<(?:item|entry)\b/i.test(xml))) {
         feedShapeError = "Feed contained no readable items";
         continue;
       }
@@ -158,17 +177,19 @@ export async function fetchSource(
       return result;
     } catch (error) {
       lastError = error instanceof Error ? error.message : "Unknown feed error";
+      if (radarKey && /HTTP (?:403|429|503)|timeout|timed out|abort|fetch failed/i.test(lastError)) radarBackoff.set(radarKey, Date.now() + 300_000);
     }
   }
 
   const result: SourceFetchResult = {
     source,
-    articles: [],
+    articles: cached?.result.articles ?? [],
     status: {
       sourceId: source.id,
       name: source.name,
       ok: false,
-      count: 0,
+      count: cached?.result.articles.length ?? 0,
+      stale: Boolean(cached?.result.articles.length),
       feedUrl: candidates[0] ?? null,
       error: feedShapeError ?? lastError,
       fetchedAt: new Date().toISOString(),
@@ -435,14 +456,15 @@ function parseItemBlock(
   const idSeed =
     extractTag(block, ["guid", "id"]) ?? `${source.id}:${link}:${title}`;
 
+  const publisher = publisherFor({ sourceId: articleSourceId, sourceHomepage: articleSourceHomepage, country: source.country, language: source.language, kind: source.kind });
   return {
     id: stableHash(`${articleSourceId}:${idSeed}:${link}`),
     sourceId: articleSourceId,
     sourceName: articleSourceName,
     sourceHomepage: articleSourceHomepage,
     region: source.region,
-    country: source.country,
-    language: source.language,
+    country: publisher.country ?? "Paese non verificato",
+    language: publisher.language,
     kind: source.kind,
     ideologies,
     title,

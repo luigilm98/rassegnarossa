@@ -292,9 +292,7 @@ export function TranslationNotice() {
         (fallback[language] ?? fallback.en)
       ) : (
         <LocalizedText>
-          Interfaccia, titoli ed estratti vengono tradotti automaticamente con
-          Google Translate, con MyMemory come alternativa. Le traduzioni possono contenere errori. Apri e sostieni la
-          fonte per il testo completo.
+          Traduzione automatica nella lingua di lettura. Apri e sostieni la fonte per il testo completo.
         </LocalizedText>
       )}
       {unavailable ? (

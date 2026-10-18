@@ -37,9 +37,12 @@ test("server-renders the aggregator shell", async () => {
   assert.match(html, /Aggregatore socialista globale/);
   assert.match(html, /Tesi su Feuerbach/);
   assert.match(html, /community-emblem/);
+  assert.match(html, /rassegna<span class="wordmark-black">rossa<\/span>/);
   assert.match(html, /OSSERVATORIO MONDIALE/);
   const observatory = html.match(/<aside class="world-watch"[\s\S]*?<\/aside>/)?.[0];
   assert.ok(observatory);
+  assert.match(observatory, /Paese della testata/);
+  assert.doesNotMatch(observatory, /Tutte le aree/);
   assert.doesNotMatch(observatory, /Perché è in evidenza|Come viene calcolato|Freschezza|Segnale|\/100/);
   assert.match(html, /aria-label="Lingua di lettura"/);
   assert.match(html, /aria-label="Lingua delle fonti in analisi"/);
@@ -355,7 +358,7 @@ test("world observatory limits dates and remote destinations and reports partial
       );
       const data = await partial.json();
       assert.equal(data.ok, false);
-      assert.deepEqual(data.articles, []);
+      assert.equal(data.articles[0].title, "new");
       assert.ok(data.error);
       Date.now = () => realNow() + 360_000;
       globalThis.fetch = async (url) =>
@@ -371,7 +374,7 @@ test("world observatory limits dates and remote destinations and reports partial
       );
       const recovered = await fallback.json();
       assert.equal(recovered.ok, true);
-      assert.equal(recovered.articles[0].sourceName, "Morning Star");
+      assert.ok(recovered.articles.some(article => article.sourceName === "Morning Star"));
       assert.deepEqual(
         recovered.feeds.map((feed) => feed.ok),
         [false, true],
@@ -578,4 +581,45 @@ test("rate-limited Google requests back off while other article translations con
   }
   assert.equal(googleCalls, 1); assert.equal(alternateCalls, 2);
  } finally { globalThis.fetch = originalFetch; Date.now = realNow; }
+});
+
+test("an empty but valid RSS feed is available, simultaneous requests share one fetch, and temporary failures retain the last successful copy", async () => {
+ const {default:worker}=await import("../dist/server/index.js");
+ const env={ASSETS:{fetch:async()=>new Response("Not found",{status:404})}};
+ const ctx={waitUntil(){},passThroughOnException(){}};
+ const original=globalThis.fetch,realNow=Date.now;
+ const get=id=>worker.fetch(new Request(`http://localhost/api/articles?sourceIds=${id}&limitPerSource=19`),env,ctx);
+ try {
+  globalThis.fetch=async()=>new Response('<rss><channel><title>Empty edition</title></channel></rss>');
+  const empty=await(await get("akahata")).json();
+  assert.equal(empty.statuses[0].ok,true);assert.deepEqual(empty.articles,[]);
+  let calls=0;
+  globalThis.fetch=async()=>{calls++;await new Promise(resolve=>setTimeout(resolve,5));return new Response(`<rss><channel><item><title>A retained public article</title><link>https://example.org/retained</link><pubDate>${new Date(realNow()).toUTCString()}</pubDate></item></channel></rss>`)};
+  const values=await Promise.all([get("consortium-news"),get("consortium-news")]);
+  assert.equal(calls,1);assert.equal((await values[0].json()).articles.length,1);
+  Date.now=()=>realNow()+660_000;
+  globalThis.fetch=async()=>{throw new Error("Network offline")};
+  const stale=await(await get("consortium-news")).json();
+  assert.equal(stale.statuses[0].ok,false);assert.equal(stale.statuses[0].stale,true);
+  assert.equal(stale.articles[0].title,"A retained public article");
+ } finally {globalThis.fetch=original;Date.now=realNow;}
+});
+
+test("a failed Google edition backs off related searches while native Japanese publisher feeds remain available", async () => {
+ const {default:worker}=await import("../dist/server/index.js");
+ const env={ASSETS:{fetch:async()=>new Response("Not found",{status:404})}},ctx={waitUntil(){},passThroughOnException(){}};
+ const original=globalThis.fetch;
+ let calls=0;
+ globalThis.fetch=async()=>{calls++;return new Response("Provider unavailable",{status:503})};
+ try {
+  for(const id of ["radar-jp-core","radar-jp-labor"]){
+   const response=await worker.fetch(new Request(`http://localhost/api/articles?sourceIds=${id}&limitPerSource=18`),env,ctx);
+   assert.equal((await response.json()).statuses[0].ok,false);
+  }
+  assert.equal(calls,1);
+  globalThis.fetch=async()=>new Response('<rdf:RDF><item><title>労働者と平和</title><link>https://www.jcp.or.jp/akahata/article</link><dc:date>2026-10-18T10:00:00+09:00</dc:date></item></rdf:RDF>');
+  const direct=await(await worker.fetch(new Request("http://localhost/api/articles?sourceIds=akahata&limitPerSource=18"),env,ctx)).json();
+  assert.equal(direct.statuses[0].ok,true);assert.equal(direct.articles[0].country,"Giappone");
+  assert.equal(direct.articles[0].language,"ja");
+ } finally {globalThis.fetch=original;}
 });

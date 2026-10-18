@@ -8,8 +8,10 @@ import {
   safeWebUrl,
   type ReadingArticle,
 } from "@/app/lib/reading";
-import { TOPIC_TAXONOMY } from "@/app/data/catalog";
+import { SOURCE_CATALOG, TOPIC_TAXONOMY } from "@/app/data/catalog";
 import { LocalizedText as T, useLocale } from "./Localization";
+import { createPublisherResolver } from "@/app/lib/publisher";
+const publisherFor = createPublisherResolver(SOURCE_CATALOG);
 const AREAS = [
   "europe",
   "north",
@@ -23,7 +25,7 @@ const AREAS = [
 export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticle[] }) {
   const locale = useLocale();
   const [articles, setArticles] = useState<ReadingArticle[]>([]);
-  const [region, setRegion] = useState("all");
+  const [country, setCountry] = useState("all");
   const [topic, setTopic] = useState("all");
   const [hours, setHours] = useState(6);
   const [sort, setSort] = useState("signal");
@@ -54,8 +56,9 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
             ]),
           });
           const data = await response.json();
-          if (!response.ok || !data.ok) throw new Error("Area unavailable");
+          if (!response.ok) throw new Error("Collection unavailable");
           const cards = restoreSavedArticles(JSON.stringify(data.articles));
+          if (!data.ok && !cards.length) throw new Error("Collection unavailable");
           if (current === run.current)
             setArticles((previous) =>
               mergeArticles(previous, cards).filter(
@@ -64,7 +67,7 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
                   Date.parse(article.publishedAt) >= Date.now() - 21_600_000,
               ),
             );
-          ok = true;
+          ok = Boolean(data.ok);
         } catch {
           /* One failed area never blocks the other results. */
         }
@@ -101,21 +104,14 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
     () => rankPulse([...networkArticles, ...articles], now),
     [networkArticles, articles, now],
   );
-  const regions = [
-    ...new Set(
-      allStories.flatMap((story) =>
-        story.coverage.map((article) => article.region),
-      ),
-    ),
-  ];
-  const stories = allStories.filter((story) =>
-    story.coverage.some(
-      (article) =>
-        (region === "all" || article.region === region) &&
-        (topic === "all" || article.topics.includes(topic)) &&
-        Date.parse(article.publishedAt!) >= now - hours * 3_600_000,
-    ),
-  );
+  const countries = [...new Set(allStories.flatMap(story => story.coverage.map(article => publisherFor(article).country ?? "Paese non verificato")))].sort();
+  const stories = allStories.flatMap(story => {
+    const eligible = story.coverage.filter(article =>
+      (country === "all" || (publisherFor(article).country ?? "Paese non verificato") === country) &&
+      (topic === "all" || article.topics.includes(topic)) &&
+      Date.parse(article.publishedAt!) >= now - hours * 3_600_000);
+    return eligible.length ? [{ ...story, article: eligible[0] }] : [];
+  });
   if (sort === "fresh")
     stories.sort(
       (a, b) =>
@@ -170,15 +166,15 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
         <summary><T>Filtra l’osservatorio</T></summary>
       <div className="watch-controls">
         <label>
-          <T>Area</T>
+          <T>Paese della testata</T>
           <select
-            value={region}
-            onChange={(event) => setRegion(event.target.value)}
+            value={country}
+            onChange={(event) => setCountry(event.target.value)}
           >
             <option value="all">
-              <T>Tutte le aree</T>
+              <T>Tutti i paesi</T>
             </option>
-            {regions.map((value) => (
+            {countries.map((value) => (
               <option key={value} value={value}>
                 <T>{value}</T>
               </option>
@@ -234,11 +230,11 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
         <span>
           {busy ? (
             <>
-              <T>Aree aggiornate</T> {coverage.done}/{AREAS.length}
+              <T>Raccolte aggiornate</T> {coverage.done}/{AREAS.length}
             </>
           ) : (
             <>
-              <T>Aree disponibili</T> {coverage.ok}/{AREAS.length}
+              <T>Raccolte disponibili</T> {coverage.ok}/{AREAS.length}
             </>
           )}
         </span>
@@ -251,13 +247,9 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
         </button>
       </div>
       <ol className="watch-stories">
-        {stories.slice(0, 12).map((story, index) => (
+        {stories.slice(0, 12).map((story) => (
           <li key={story.article.id}>
             <div className="watch-story-meta">
-              <span>
-                {String(index + 1).padStart(2, "0")} /{" "}
-                <T>{story.article.region}</T>
-              </span>
               <time dateTime={story.article.publishedAt!}>
                 {time(Date.parse(story.article.publishedAt!))}
               </time>
@@ -268,12 +260,15 @@ export function WorldWatch({ networkArticles }: { networkArticles: ReadingArticl
               target="_blank"
               rel="noopener noreferrer"
             >
-              <T priority={2} defer from={story.article.language}>
+              <T priority={3} from={publisherFor(story.article).language}>
                 {story.article.title}
               </T>
               <ArrowUpRight size={14} />
             </a>
-            <p className="watch-publisher">{story.article.sourceName}</p>
+            <p className="watch-publisher">
+              <span>{story.article.sourceName}</span>
+              <span className="watch-country"><T>{publisherFor(story.article).country ?? "Paese non verificato"}</T></span>
+            </p>
           </li>
         ))}
       </ol>

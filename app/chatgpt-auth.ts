@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export type ChatGPTUser = {
+  id: string;
   displayName: string;
   email: string;
   fullName: string | null;
@@ -17,9 +18,13 @@ const SIGN_OUT_PATH = "/signout-with-chatgpt";
 const CALLBACK_PATH = "/callback";
 
 export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get(USER_EMAIL_HEADER);
-  if (!email) return null;
+  return chatGPTUserFromHeaders(await headers());
+}
+
+export function chatGPTUserFromHeaders(requestHeaders: Headers): ChatGPTUser | null {
+  const id = requestHeaders.get("oai-authenticated-user-id");
+  if (!id) return null;
+  const email = requestHeaders.get(USER_EMAIL_HEADER) ?? "";
 
   const encodedFullName = requestHeaders.get(USER_FULL_NAME_HEADER);
   const fullName =
@@ -29,7 +34,8 @@ export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
       : null;
 
   return {
-    displayName: fullName ?? email,
+    id,
+    displayName: fullName ?? (email || "Account ChatGPT"),
     email,
     fullName,
   };

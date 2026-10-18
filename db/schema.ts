@@ -1,4 +1,13 @@
-// Intentionally empty by default.
-// Add Drizzle tables here when the site actually needs a database.
-// See examples/d1/db/schema.ts for an opt-in example.
-export {};
+import { integer, sqliteTable, text, primaryKey, index } from "drizzle-orm/sqlite-core";
+// Private per-account metadata snapshots. Authentication is supplied by Sites.
+export const bookmarks = sqliteTable("bookmarks", {
+  ownerId: text("owner_id").notNull(),
+  kind: text("kind").notNull(),
+  itemKey: text("item_key").notNull(),
+  payload: text("payload").notNull(),
+  deleted: integer("deleted").notNull().default(0),
+  updatedAt: integer("updated_at").notNull(),
+}, table => [
+  primaryKey({ columns: [table.ownerId, table.kind, table.itemKey] }),
+  index("bookmarks_owner_updated_idx").on(table.ownerId, table.updatedAt),
+]);
