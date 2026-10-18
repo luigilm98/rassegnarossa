@@ -11,3 +11,10 @@ export const bookmarks = sqliteTable("bookmarks", {
   primaryKey({ columns: [table.ownerId, table.kind, table.itemKey] }),
   index("bookmarks_owner_updated_idx").on(table.ownerId, table.updatedAt),
 ]);
+// Bounded public news cache; never contains account or bookmark metadata.
+export const publicNewsCache = sqliteTable("public_news_cache", {
+  cacheKey: text("cache_key").primaryKey(),
+  body: text("body").notNull(),
+  headers: text("headers").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+});
