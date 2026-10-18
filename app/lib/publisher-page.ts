@@ -3,7 +3,8 @@ import { parseSourcePage, type SourceHighlight, type SourceImage } from "./sourc
 const cache = new Map<string, { until: number; highlights: SourceHighlight[]; images: SourceImage[]; ok: boolean }>();
 const pending = new Map<string, Promise<PublisherPage>>();
 export type PublisherPage = { until: number; highlights: SourceHighlight[]; images: SourceImage[]; ok: boolean };
-export function fetchPublisherPage(source: Pick<SourceDefinition, "homepage">): Promise<PublisherPage> {
+export function fetchPublisherPage(source: Pick<SourceDefinition, "homepage">, sharePending = true): Promise<PublisherPage> {
+  if (!sharePending) return loadPublisherPage(source);
   const existing = pending.get(source.homepage);
   if (existing) return existing;
   const task = loadPublisherPage(source).finally(() => pending.delete(source.homepage));

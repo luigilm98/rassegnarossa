@@ -19,7 +19,7 @@ test("metadata HTML reads can stop at a safe prefix while image downloads reject
  await assert.rejects(readLimited(new Response("small",{headers:{"content-length":"5000000"}}),4000000));
 });
 
-test("article API includes its photo and the same-origin endpoint delivers actual image bytes, including article-only metadata and coalesced requests",async()=>{
+test("article API includes its photo and the same-origin endpoint delivers actual image bytes, including article-only metadata and independent concurrent requests",async()=>{
  const {default:worker}=await import("../dist/server/index.js");
  const originalFetch=globalThis.fetch; const calls=[];
  const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZlS0AAAAASUVORK5CYII=","base64");
@@ -43,7 +43,7 @@ test("article API includes its photo and the same-origin endpoint delivers actua
   assert.deepEqual(Buffer.from(await direct.arrayBuffer()),png);
   const [left,right]=await Promise.all([call(path(second.id)),call(path(second.id))]);
   assert.equal(left.status,200);assert.deepEqual(Buffer.from(await left.arrayBuffer()),png);assert.deepEqual(Buffer.from(await right.arrayBuffer()),png);
-  assert.equal(calls.filter(url=>url==="https://ilmanifesto.it/fixture-story-two").length,1);
+  assert.equal(calls.filter(url=>url==="https://ilmanifesto.it/fixture-story-two").length,2);
   const before=calls.length;assert.equal((await call(path(first.id))).status,200);assert.equal(calls.length,before);
   assert.equal((await call(path("unknown"))).status,404);
   const legacy=await call(path("legacy-local-card")+"&articleLink="+encodeURIComponent("https://ilmanifesto.it/fixture-story-two"));

@@ -11,6 +11,7 @@ const publisherFor = createPublisherResolver(SOURCE_CATALOG);
 export type ArticleRecord = {
   id: string;
   sourceId: string;
+  feedSourceId?: string;
   sourceName: string;
   sourceHomepage: string;
   region: SourceDefinition["region"];
@@ -461,6 +462,7 @@ function parseItemBlock(
   return {
     id: stableHash(`${articleSourceId}:${idSeed}:${link}`),
     sourceId: articleSourceId,
+    feedSourceId: source.id,
     sourceName: articleSourceName,
     sourceHomepage: articleSourceHomepage,
     region: source.region,

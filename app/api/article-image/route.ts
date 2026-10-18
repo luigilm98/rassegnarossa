@@ -1,3 +1,4 @@
+import { resolveRadarLink, resolvePublisherHeadline } from "@/app/lib/radar-link";
 import type { PhotoArticle } from "@/app/lib/public-news-store";
 import { SOURCE_CATALOG } from "@/app/data/catalog";
 import { fetchSource } from "@/app/lib/feed";
@@ -7,43 +8,46 @@ import { articleImages } from "@/app/lib/article-images";
 import { articleMetadataImages, fetchPublicPhotoResource, publicPhotoUrl, readLimited } from "@/app/lib/article-photo";
 export const dynamic = "force-dynamic";
 const cache = new Map<string, { until: number; bytes: Uint8Array; type: string }>();
-const pending = new Map<string, Promise<Response>>();
 let cacheBytes = 0;
 let active = 0;
-const waiting: (() => void)[] = [];
-async function acquire() {
-  if (active >= 3) await new Promise<void>(resolve => waiting.push(resolve));
-  else active++;
-}
-function release() { const next = waiting.shift(); if (next) next(); else active--; }
 const fail = (status: number) => new Response(null, { status, headers: { "cache-control": "no-store" } });
 const responseFor = (entry: { bytes: Uint8Array; type: string }) => new Response(entry.bytes as unknown as BodyInit, { headers: {
   "content-type": entry.type, "cache-control": "public, max-age=600", "x-content-type-options": "nosniff",
 } });
 export async function GET(request: Request, find?: (sourceId: string, id: string) => Promise<PhotoArticle | undefined>): Promise<Response> {
   const params = new URL(request.url).searchParams;
-  const source = SOURCE_CATALOG.find(item => item.id === params.get("sourceId") && item.kind !== "radar");
+  let source = SOURCE_CATALOG.find(item => item.id === params.get("sourceId"));
+  if (!source && /^radar:[a-z0-9]+$/i.test(params.get("sourceId") ?? "")) source = { id: params.get("sourceId")!, homepage: "https://news.google.com/", kind: "radar" } as typeof SOURCE_CATALOG[number];
   const id = params.get("articleId");
   if (!source || !id || id.length > 150 || params.getAll("sourceId").length !== 1 || params.getAll("articleId").length !== 1 || [...params.keys()].some(key => !["sourceId", "articleId", "articleLink"].includes(key))) return fail(400);
   const rawLink = params.get("articleLink");
   const suppliedLink = rawLink ? publicPhotoUrl(rawLink) : null;
   const publisherHost = new URL(source.homepage).hostname.replace(/^www\./, "");
   // Legacy/local cards may predate the retained feed. Limit their page lookup to this configured publisher.
-  if (params.getAll("articleLink").length > 1 || (rawLink !== null && (!suppliedLink || rawLink.length > 2048 || suppliedLink.hostname.replace(/^www\./, "") !== publisherHost || suppliedLink.pathname === "/"))) return fail(400);
+  if (params.getAll("articleLink").length > 1 || (rawLink !== null && (!suppliedLink || rawLink.length > 2048 || (source.kind !== "radar" && suppliedLink.hostname.replace(/^www\./, "") !== publisherHost) || suppliedLink.pathname === "/"))) return fail(400);
+  const selectedSource = source;
   const key = `${source.id}:${id}:${suppliedLink?.href ?? ""}`;
   const cached = cache.get(key);
   if (cached && cached.until > Date.now()) return responseFor(cached);
-  const existing = pending.get(key); if (existing) return (await existing).clone();
-  if (waiting.length >= 32) return fail(429);
+  // A request must never await a resolver owned by a different Worker invocation.
+  if (active >= 12) return new Response(null, { status: 503, headers: { "cache-control": "no-store", "retry-after": "1" } });
   const task = (async () => {
-    await acquire();
+    active++;
     try {
+    let source = selectedSource;
     // Resolve the exact reference already delivered to readers before consulting a rotating feed.
     const stored = await find?.(source.id, id).catch(() => undefined);
-    const article = stored ?? (suppliedLink ? { id, sourceId: source.id, link: suppliedLink.href, image: null } :
+    let article = source.kind === "radar" ? stored : stored ?? (suppliedLink ? { id, sourceId: source.id, link: suppliedLink.href, image: null } :
       (await fetchSource(source, 24)).articles.find(item => item.id === id));
     if (!article) return fail(404);
-    const signal = AbortSignal.timeout(12000);
+    const signal = AbortSignal.timeout(source.kind === "radar" ? 20000 : 12000);
+    if (source.kind === "radar") {
+      if (!stored?.sourceHomepage || (suppliedLink && suppliedLink.href !== stored.link)) return fail(400);
+      const original = await resolveRadarLink(stored.link, stored.sourceHomepage, signal) ?? await resolvePublisherHeadline(stored.title ?? "", stored.sourceHomepage, signal);
+      if (!original) return fail(404);
+      article = { ...stored, link: original };
+      source = { ...source, homepage: new URL(original).origin + "/" };
+    }
     const headers = { "user-agent": "Mozilla/5.0 RassegnaRossa/1.0", referer: source.homepage, accept: "image/avif,image/webp,image/*" };
     const download = async (urls: string[]) => {
       for (const raw of urls) {
@@ -67,7 +71,7 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
     const originalUrls = articleImages(article.image, "imageFallbacks" in article ? article.imageFallbacks : undefined);
     const known = await download(originalUrls);
     if (known) return known;
-    const page = await fetchPublisherPage(source);
+    const page = await fetchPublisherPage(source, false);
     const enriched = applySourceImages([article as import("@/app/lib/feed").ArticleRecord], page.images)[0];
     const homepagePhoto = await download(articleImages(enriched.image, enriched.imageFallbacks).filter(url => !originalUrls.includes(url)));
     if (homepagePhoto) return homepagePhoto;
@@ -83,8 +87,7 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
       } catch { /* No invented covers when a source does not publish an accessible image. */ }
     }
     return fail(404);
-    } finally { release(); }
-  })().catch(() => fail(502)).finally(() => pending.delete(key));
-  pending.set(key, task);
+    } finally { active--; }
+  })().catch(() => fail(502));
   return (await task).clone();
 }

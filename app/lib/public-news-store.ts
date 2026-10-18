@@ -1,6 +1,6 @@
 import type { ArticleRecord } from "./feed";
 /** Server-observed public references survive feed rotation; no visitor URL enters this store. */
-export type PhotoArticle = Pick<ArticleRecord, "id" | "sourceId" | "link" | "image" | "imageFallbacks">;
+export type PhotoArticle = Pick<ArticleRecord, "id" | "sourceId" | "link" | "image" | "imageFallbacks" | "sourceHomepage" | "feedSourceId" | "title">;
 export type PhotoDatabase = { prepare(sql: string): { bind(...values: unknown[]): { first<T>(): Promise<T | null>; run(): Promise<unknown> } } };
 const RETAIN = 7 * 86400000;
 export function createArticlePhotoStore(db: PhotoDatabase | undefined, sources: ReadonlySet<string>, clock = Date.now) {
@@ -10,13 +10,24 @@ export function createArticlePhotoStore(db: PhotoDatabase | undefined, sources: 
     try { return row ? JSON.parse(row.body) : []; } catch { return []; }
   };
   return {
-    async find(sourceId: string, id: string) { return (await read(sourceId)).find(article => article.id === id); },
+    async find(sourceId: string, id: string) {
+      if (db && /^radar:[a-z0-9]+$/i.test(sourceId)) {
+        const row = await db.prepare("SELECT value FROM public_news_cache, json_each(body) WHERE cache_key LIKE 'photo-references-v1:radar-%' AND expires_at > ? AND json_extract(value, '$.id') = ? AND json_extract(value, '$.sourceId') = ? LIMIT 1").bind(clock(), id, sourceId).first<{value: string}>();
+        try { return row ? JSON.parse(row.value) as PhotoArticle : undefined; } catch { return undefined; }
+      }
+      return (await read(sourceId)).find(article => article.id === id);
+    },
     async remember(sourceId: string, articles: PhotoArticle[]) {
       if (!db || !sources.has(sourceId)) return;
-      const current = articles.filter(article => article.sourceId === sourceId).map(({ id, sourceId, link, image, imageFallbacks }) => ({ id, sourceId, link, image, imageFallbacks }));
+      const current = articles.filter(article => article.sourceId === sourceId || article.feedSourceId === sourceId).map(({ id, sourceId, feedSourceId, sourceHomepage, title, link, image, imageFallbacks }) => ({ id, sourceId, feedSourceId, sourceHomepage, title: sourceId.startsWith("radar:") || feedSourceId?.startsWith("radar-") ? title?.slice(0,1000) : undefined, link, image, imageFallbacks }));
       if (!current.length) return;
       const seen = new Set(current.map(article => article.id));
-      const merged = [...current, ...(await read(sourceId)).filter(article => !seen.has(article.id))].slice(0, 160);
+      const merged = []; let bytes = 2;
+      for (const article of [...current, ...(await read(sourceId)).filter(article => !seen.has(article.id))]) {
+        const size = new TextEncoder().encode(JSON.stringify(article)).length + 1;
+        if (bytes + size > 512000 || merged.length >= 160) break;
+        merged.push(article); bytes += size;
+      }
       await db.prepare("INSERT INTO public_news_cache (cache_key, body, headers, expires_at) VALUES (?, ?, ?, ?) ON CONFLICT(cache_key) DO UPDATE SET body=excluded.body, headers=excluded.headers, expires_at=excluded.expires_at")
         .bind(`photo-references-v1:${sourceId}`, JSON.stringify(merged), "[]", clock() + RETAIN).run();
     },
@@ -55,7 +66,7 @@ export function createPublicNewsStore(db: NewsDatabase | undefined, sourceIds: R
       if (url.searchParams.get("includeImages") === "1") canonical.searchParams.set("includeImages", "1");
     } else if (url.pathname === "/api/pulse") canonical.searchParams.set("area", url.searchParams.get("area") ?? "europe");
     else canonical.searchParams.set("sourceId", url.searchParams.get("sourceId")!);
-    return "images-v4:" + canonical.pathname + canonical.search;
+    return "images-v5:" + canonical.pathname + canonical.search;
   };
   return {
     async match(request) {

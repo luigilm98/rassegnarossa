@@ -1,0 +1,3242 @@
+[
+  {
+    "id": "manifesto",
+    "title": "Manifesto del Partito Comunista",
+    "author": "Karl Marx, Friedrich Engels",
+    "period": "1848",
+    "lane": "Fondamenti",
+    "summary": "Una prima lettura su classi, lavoro, proprietà e trasformazione sociale.",
+    "level": "base",
+    "tags": [
+      "fondamenti",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1848/communist-manifesto/index.htm",
+        "title": "Communist Manifesto",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1848-cm/index.htm",
+        "title": "بيان الحزب الشيوعي",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1848/manifesto.htm",
+        "title": "Манифест на Комунистическата партия",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bn",
+        "url": "https://www.marxists.org/bangla/archive/marx-engels/1848/communist-manifesto/index.htm",
+        "title": "Communist Manifesto (Bangla)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/manifest/index.htm",
+        "title": "El manifest comunista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "cs",
+        "url": "https://www.marxists.org/cestina/marx-engels/1848/manifest/index.htm",
+        "title": "Manifest Komunistick  strany",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/48-manif/index.htm",
+        "title": "Det Kommunistiske Partis Manifest",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1848/manifest/index.htm",
+        "title": "Manifest der Komm. Partei",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "el",
+        "url": "https://www.marxists.org/ellinika/archive/marx/works/1848/com-man/index.htm",
+        "title": "Μανιφέστο του Κομμουνιστικού Κόμματος",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1840s/48-manif.htm",
+        "title": "Manifiesto del Partido Comunista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "eu",
+        "url": "https://www.marxists.org/euskara/marx-engels/1848/komunista/index.htm",
+        "title": "Komunista Alderdia-ren agiria",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fa",
+        "url": "https://www.marxists.org/farsi/archive/marx/works/1848/manifest/manifest-titr.htm",
+        "title": "Communist Manifesto (Farsi)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1848/kommunistisen-puolueen-manifesti/index.htm",
+        "title": "Kommunistisen puolueen manifesti",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1847/00/kmfe18470000.htm",
+        "title": "Manifeste du Parti communiste",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/18480221-manifestokomunis/index.htm",
+        "title": "Manifesto Partai Komunis",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1848/manifesto/index.htm",
+        "title": "Manifesto del Partito Comunista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ko",
+        "url": "https://www.marxists.org/korean/marx/communist-manifesto/index.htm",
+        "title": "공산당 선언",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1848/manifestas/index.htm",
+        "title": "Komunistų Partijos manifestas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "he",
+        "url": "https://www.marxists.org/hebrew/Cm/CM.htm",
+        "title": "Manifesto del Partito Comunista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1848/communist-manifesto/index.htm",
+        "title": "A Kommunista P rt ki ltv nya",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1848/index.htm",
+        "title": "Manifest na Komunistichkata Partija",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1848/manifest/index.htm",
+        "title": "Manifest van de Communistische Partij",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1848/01/manifestet/index.htm",
+        "title": "Det kommunistiske manifest",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1848/manifest.htm",
+        "title": "Manifest Partii Komunistycznej",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1848/ManifestoDoPartidoComunista/index.htm",
+        "title": "Manifesto do Partido Comunista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1848/manifest/index.htm",
+        "title": "Manifestul Partidului Comunist",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/marx/1848/manifesto.htm",
+        "title": "Манифест Коммунистической Партии",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1848/manifest-komunisticke-partije/index.htm",
+        "title": "Manifest Komunisti ke Partije",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sk",
+        "url": "https://www.marxists.org/slovak/marx-engels/1848/manifest/index.htm",
+        "title": "Manifest Komunistickey Strany",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sl",
+        "url": "https://www.marxists.org/slovenian/marx-engels/1840s/manifesto/index.htm",
+        "title": "Komunisti ni Manifest",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1848/04-d037.htm",
+        "title": "Det Kommunistiska Partiets Manifest",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "th",
+        "url": "https://www.marxists.org/thai/archive/marx-engels/1848/communist-manifesto/index.htm",
+        "title": "Communist Manifesto (Thai)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "tr",
+        "url": "https://www.marxists.org/turkce/m-e/1848/manifest/index.htm",
+        "title": "Kom nist Parti Manifestosu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "uk",
+        "url": "https://www.marxists.org/ukrainian/marx-engels/1848/manifesto/index.htm",
+        "title": "Маніфест Комуністичної партії",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/marx-engels/1840s/tuyen/index.htm",
+        "title": "Tuy n ng n của Đảng Cộng sản",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/01.htm",
+        "title": "共产党宣言",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "capitale",
+    "title": "Il Capitale, Libro I",
+    "author": "Karl Marx",
+    "period": "1867",
+    "lane": "Economia politica",
+    "summary": "Un percorso avanzato attraverso valore, sfruttamento e accumulazione. Da affrontare dopo i testi introduttivi.",
+    "level": "avanzato",
+    "tags": [
+      "economia politica",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1867-c1/index.htm",
+        "title": "Capital vol. I",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1867-c1/index.htm",
+        "title": "رأس المال",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/Kapitalat/K1/kap-T1-index.html",
+        "title": "Капиталът. Книга I.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/capital/me23_000.htm",
+        "title": "El capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1867/Capital-I/index.htm",
+        "title": "Chapitres du",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1867/capital01.htm",
+        "title": "Capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1867/kapitalas-1/index.htm",
+        "title": "Kapitalas. Politinės ekonomijos kritika. I tomas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1867/a-toke/index.htm",
+        "title": "A tőke [I. könyv",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1867/tom1/index.htm",
+        "title": "Kapitalot, tom 1",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1867/kapitaal/index.htm",
+        "title": "Het Kapitaal - Deel I",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1867/kapital/index.htm",
+        "title": "Kapita  - tom I",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1867/ocapital-v1/index.htm",
+        "title": "O Capital, Volume 1",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1867/capitalul-vol1/index.htm",
+        "title": "Capitalul vol. 1",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/marx/1867/capital_vol1/index.htm",
+        "title": "Капитал. Т. 1",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1867/kapital/index.htm",
+        "title": "Kapital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1867/23-d100.htm",
+        "title": "Kapitalet, F rsta Bandet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/capital/index.htm",
+        "title": "资本论第一卷",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "socialismo-utopico-scientifico",
+    "title": "Socialismo utopistico e socialismo scientifico",
+    "author": "Friedrich Engels",
+    "period": "1880",
+    "lane": "Fondamenti",
+    "summary": "Un ponte tra le prime comunità cooperative e la critica materialista del capitalismo.",
+    "level": "base",
+    "tags": [
+      "fondamenti",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1880/soc-utop/index.htm",
+        "title": "Socialism: Utopian and Scientific",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1880/Ot-utopiq-v-nauka.html",
+        "title": "Развитието на социализма от утопия в наука",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bn",
+        "url": "https://www.marxists.org/bangla/archive/marx-engels/1880/utopia/index.htm",
+        "title": "Socialism: Utopian and Scientific (Bangla)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1877/utopi/index.htm",
+        "title": "Socialismens udvikling fra utopi til videnskab",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1880s/dsusc/index.htm",
+        "title": "Del socialismo ut pico al socialismo cientifico",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1880/sosialismin-kehitys-utopiasta-tieteeksi.htm",
+        "title": "Sosialismin kehitys utopiasta tieteeksi",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/80-utopi/index.htm",
+        "title": "Socialisme Utopique et Socialisme Scientifique",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/18800420-sosialismeutopis/index.html",
+        "title": "Sosialisme Dari Utopi Menjadi Ilmu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1880/evoluzione/index.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ko",
+        "url": "https://www.marxists.org/korean/marx/soc-utop/index.htm",
+        "title": "공상에서 과학으로의 사회주의의 발전",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1880/soc-issi/index.htm",
+        "title": "Socializmo išsivystymas iš utopijos į mokslą",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1880/szocializmus-utopiatol/index.htm",
+        "title": "A szocializmus fejlődése az utópiától a tudományig",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1880/razvitok-socijalizam/index.htm",
+        "title": "Razvitokot na socijalizmot od utopija do nauka",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1880/utopie/index.htm",
+        "title": "De ontwikkeling van het socialisme van utopie tot wetenschap",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1880/utopi/index.htm",
+        "title": "Sosialismens utvikling fra utopi til vitenskap",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1880/soc-utop/index.htm",
+        "title": "Rozw j socjalizmu od utopii do nauki",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1880/socialismo/index.htm",
+        "title": "Friederich Engels: Do Socialismo Utópico ao Socialismo Cientifico",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1880/dezv-soc/index.htm",
+        "title": "Dezvoltarea socialismului de la utopie la știință",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1880/19-d035.htm",
+        "title": "Socialismens utveckling fr n utopi till vetenskap",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/1880/index.htm",
+        "title": "社会主义从空想到科学的发展",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "comune-parigi",
+    "title": "La guerra civile in Francia",
+    "author": "Karl Marx",
+    "period": "1871",
+    "lane": "Autogoverno",
+    "summary": "La Comune di Parigi e le possibilità di un potere democratico organizzato dal basso.",
+    "level": "intermedio",
+    "tags": [
+      "autogoverno",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1871/civil-war-france/index.htm",
+        "title": "Civil War in France",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1871/GVF/index.html",
+        "title": "Гражданската война във Франция",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1871/burfr/index.htm",
+        "title": "La guerra civil a Fran a",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1870/pariskom/index.htm",
+        "title": "Pariserkommunen",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1871/05/burfrndx.htm",
+        "title": "Der B rgerkrieg in Frankreich",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/gcfran/index.htm",
+        "title": "La Guerra Civil en Francia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1871/kansalaissota-ranskassa/index.htm",
+        "title": "Kansalaissota Ranskassa",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/ait/index.htm",
+        "title": "La Guerre Civile en France",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1871/gcf/index.htm",
+        "title": "La Guerra Civile in Francia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1871/pil-karas-pranc/index.htm",
+        "title": "Pilietinis karas Prancūzijoje",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1871/1871burgeroorlog.htm",
+        "title": "De burgeroorlog in Frankrijk",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1871/05/pariserkommunen/index.htm",
+        "title": "Paris-kommunen",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1871/wdwf/index.htm",
+        "title": "Wojna domowa we Francji",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1871/guerra_civil/index.htm",
+        "title": "A Guerra Civil em Fran a",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1871/rcf/index.htm",
+        "title": "Războiul civil din Franța",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1871/17-d016.htm",
+        "title": "Pariskommunen",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/marxist.org-chinese-marx-1871-4.htm",
+        "title": "法兰西内战",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "salario-capitale",
+    "title": "Lavoro salariato e capitale",
+    "author": "Karl Marx",
+    "period": "1847",
+    "lane": "Economia politica",
+    "summary": "Un'introduzione breve al rapporto tra salario, capitale e dipendenza economica.",
+    "level": "base",
+    "tags": [
+      "economia politica",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1847/wage-labour/index.htm",
+        "title": "Wage-Labor and Capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1849-wl/index.htm",
+        "title": "العمل المأجور ورأس المال",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1849/NTK.html",
+        "title": "Наемен труд и капитал",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1849/trebassal/me06_397.htm",
+        "title": "Treball assalariat i capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1849/lonarbej.htm",
+        "title": "L narbejde og kapital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1840s/49-trab2.htm",
+        "title": "Trabajo asalariado y capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1849/palkkatyo-ja-paaoma.htm",
+        "title": "Palkkaty  ja p  oma",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1847/12/km18471230.htm",
+        "title": "Travail salari  et capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1847/kerja/index.htm",
+        "title": "Kerja-upahan dan Kapital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1847/lavcap.htm",
+        "title": "Lavoro salariato e capitale",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ko",
+        "url": "https://www.marxists.org/korean/marx/wage-labour-capital/index.htm",
+        "title": "임금 노동과 자본",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1847/samd-darbas/index.htm",
+        "title": "Samdomasis darbas ir kapitalas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1847/naemniot-trud/index.htm",
+        "title": "Naemniot trud i kapitalot",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1849/1849loonarbeid.htm",
+        "title": "Loonarbeid en kapitaal",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1849/04/05.htm",
+        "title": "Trabalho Assalariado e Capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1847/munca-salariata/index.htm",
+        "title": "Muncă salariată și capital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1849/12/najamni-rad/index.htm",
+        "title": "Najamni rad i kapital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1847/06-d013.htm",
+        "title": "L nearbete och kapital",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/mia-chinese-marx-1847-1849.htm",
+        "title": "雇佣劳动与资本",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "salario-prezzo-profitto",
+    "title": "Salario, prezzo e profitto",
+    "author": "Karl Marx",
+    "period": "1865",
+    "lane": "Economia politica",
+    "summary": "Domande concrete su salari e profitti per avvicinarsi alla critica dell'economia politica.",
+    "level": "base",
+    "tags": [
+      "economia politica",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1865/value-price-profit/index.htm",
+        "title": "Value, Price and Profit",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1865/marx-RZ.html",
+        "title": "Работна заплата, цена и печалба",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1860s/65-salar.htm",
+        "title": "Salario, precio y ganancia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1865/tyopalkka-hinta-ja-voitto/index.htm",
+        "title": "Ty palkka, hinta ja voitto",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1865/06/km18650626.htm",
+        "title": "Salaire, prix et profit",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1865/upah-harga-laba.htm",
+        "title": "Upah Harga dan Laba",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1865/salpp.htm",
+        "title": "Salario, prezzo e profitto",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ka",
+        "url": "https://www.marxists.org/georgian/m-e/1865/xelfasi-fasi-mogeba/xelfasi-fasi-mogeba.htm",
+        "title": "Salario, prezzo e profitto",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ko",
+        "url": "https://www.marxists.org/korean/marx/value-price-profit/index.htm",
+        "title": "임금 가격 이윤",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1865/d-uz-kaina-pelnas/index.htm",
+        "title": "Darbo užmokestis, kaina ir pelnas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1865/1865loonprijs.htm",
+        "title": "Loon, prijs en winst",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1865/salario/index.htm",
+        "title": "Sal rio, pre o e lucro",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1865/salariu-pret-profit/index.htm",
+        "title": "Salariu, preț și profit",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1865/16-d017.htm",
+        "title": "L n, pris och profit",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/marxist.org-chinese-marx-1865.htm",
+        "title": "工资、价格和利润",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "principi-comunismo",
+    "title": "Principi del comunismo",
+    "author": "Friedrich Engels",
+    "period": "1847",
+    "lane": "Fondamenti",
+    "summary": "Domande e risposte sulle classi e sull'organizzazione comune della produzione.",
+    "level": "base",
+    "tags": [
+      "fondamenti",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1847/11/prin-com.htm",
+        "title": "Princ. Communism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1847/prin_com.htm",
+        "title": "مبادئ الشيوعية",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1847/prinzipite-na-komunizma.html",
+        "title": "Принципите на комунизма",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1847/grundsatze.htm",
+        "title": "Fonaments de comunisme",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/47-kogru.htm",
+        "title": "Kommunismens grunds tninger",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1840s/47-princi.htm",
+        "title": "Principios Del Comunismo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1847/kommunismin-periaatteet.htm",
+        "title": "Kommunismin periaatteet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/47-pdc.htm",
+        "title": "Principes du communisme",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1847/prin-com/prin-com.htm",
+        "title": "Principi del Comunismo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ko",
+        "url": "https://www.marxists.org/korean/marx/principles-communism/index.htm",
+        "title": "공산주의의 원리",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1847/11/komun-princip.htm",
+        "title": "Komunizmo principai",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1847/principi-komunizam.htm",
+        "title": "Principi na komunizmot",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1847/1847beginselen.htm",
+        "title": "Ontwerp van de communistische geloofsbelijdenis",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1847/11/grundsetninger.htm",
+        "title": "Kommunismens grunds tninger",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1847/11/principios.htm",
+        "title": "Principios Comunismo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1847/11/prin-com.htm",
+        "title": "Principiile comunismului",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/engels/1847/11/principi-komunizma.htm",
+        "title": "Principi komunizma",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1847/04-d054.htm",
+        "title": "Kommunismens grundsatser",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1847-6-9.htm",
+        "title": "共产主义信条草案",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "gotha",
+    "title": "Critica del programma di Gotha",
+    "author": "Karl Marx",
+    "period": "1875",
+    "lane": "Oltre il capitalismo",
+    "summary": "Lavoro, distribuzione, cooperazione e differenze tra le fasi di una società postcapitalista.",
+    "level": "intermedio",
+    "tags": [
+      "oltre il capitalismo",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1875/gotha/index.htm",
+        "title": "Critique of the Gotha Program",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1875-cg/index.htm",
+        "title": "نقد برنامج غوتا",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1875/KritikaNaGotskataPrograma.html",
+        "title": "Критика на Готската програма",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1875/index.htm",
+        "title": "Cr tica del programa de Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1875/gotha/index.htm",
+        "title": "Kritik af Gothaprogrammet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1875/kritik/index.htm",
+        "title": "Kritik des Gothaer Programms",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/gotha/index.htm",
+        "title": "Cr tica al Programa de Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1875/gothan-ohjelman-arvostelua.htm",
+        "title": "Gothan ohjelman arvostelua",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1875/05/18750500.htm",
+        "title": "Critique du programme de Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1875/gotha/index.htm",
+        "title": "Critica del Programma di Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1875/got-program-kritika.htm",
+        "title": "Gotos programos kritika",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1875/a-gothai-program-kritikaja/index.htm",
+        "title": "A gothai program kritikája",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1875/critique-gotha-programme/index.htm",
+        "title": "Kritika na Gotskata Programa",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1875/1875gotha.htm",
+        "title": "Kritiek op het programma van Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1875/gotha/index.htm",
+        "title": "Cr tica do Programa de Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1875/gotha/index.htm",
+        "title": "Critica Programului de la Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/marx/1875/gotha.htm",
+        "title": "Критика Готской программы",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1875/kritika-gotskog-programa/index.htm",
+        "title": "Kritika Gotskog programa",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sl",
+        "url": "https://www.marxists.org/slovenian/marx-engels/1875/gotha/index.htm",
+        "title": "Kritika gothskega programa",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1875/19-d014.htm",
+        "title": "Kritik av Gothaprogrammet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/marx-engels/1875/gota/index.htm",
+        "title": "Ph  ph n cương lĩnh Gotha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/marxist.org-chinese-marx-1875-4.htm",
+        "title": "哥达纲领批判",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "inaugurale",
+    "title": "Indirizzo inaugurale dell'Associazione internazionale dei lavoratori",
+    "author": "Karl Marx",
+    "period": "1864",
+    "lane": "Cooperazione",
+    "summary": "Un testo breve sul lavoro cooperativo e sulla necessità di organizzare la solidarietà oltre la singola impresa.",
+    "level": "base",
+    "tags": [
+      "cooperazione",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1864/10/27.htm",
+        "title": "Inaugural Address",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1864/Manifest-I-Internazional.html",
+        "title": "Учредителен манифест на Международното работническо дружество",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1-int/64-inaug.htm",
+        "title": "Inauguraladresse for Den Internationale Arbejderassociation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1864/10/inaugadr.htm",
+        "title": "Inauguraladresse",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1860s/1864fait.htm",
+        "title": "Manifiesto inaugural de la Asociaci n Internacional de los Trabajadores",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1864/11/kansainvalisen-tyovaenliiton-perustamismanifesti.htm",
+        "title": "Kansainv lisen ty v enliiton perustamismanifesti",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1864/09/18640928.htm",
+        "title": "Adresse inaugurale",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ka",
+        "url": "https://www.marxists.org/georgian/m-e/1864/10/28.htm",
+        "title": "Indirizzo inaugurale dell'Associazione internazionale dei lavoratori",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1864/internacionalas/steig-manifestas.htm",
+        "title": "Tarptautinės Darbininkų Asociacijos steigiamasis manifestas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1864/1864rede.htm",
+        "title": "Inhuldigingsrede van de Internationale Arbeidersassociatie",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1864/10/manifest_msr.htm",
+        "title": "Inauguracyjny manifest Mi dzynarodowego Stowarzyszenia Robotnik w",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1864/10/27.htm",
+        "title": "Mensagem Inaugural da Associação Internacional dos Trabalhadores",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1864/aim/manifest.htm",
+        "title": "Manifestul constitutiv al Asociației Internaționale a Muncitorilor",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1864/10/27.htm",
+        "title": "Osnivacki manifest Medjunarodnog udruzenja radnika",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1864/16-d051.htm",
+        "title": "Inauguraladress f r Internationella Arbetarassociationen",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx-engels/16/001.htm",
+        "title": "国际工人协会成立宣言",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "colonie-comuniste",
+    "title": "Descrizione di colonie comuniste",
+    "author": "Friedrich Engels",
+    "period": "1844",
+    "lane": "Cooperazione",
+    "summary": "Esperienze storiche di vita e produzione in comune: risultati, limiti e domande da confrontare con il presente.",
+    "level": "base",
+    "tags": [
+      "cooperazione",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1844/ComCol.html",
+        "title": "ТОписание на възникналите в най-ново време и още съществуващи комунистически колонии",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1845/00/fe18450000.htm",
+        "title": "Colonies communistes",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1845/col.htm",
+        "title": "Descrierea coloniilor comuniste",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1845/01/komm-kol.htm",
+        "title": "De kommunistiska kolonierna",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "abitazione",
+    "title": "La questione delle abitazioni",
+    "author": "Friedrich Engels",
+    "period": "1873",
+    "lane": "Beni comuni",
+    "summary": "Casa, rendita e trasformazione sociale: perché una questione quotidiana è anche politica.",
+    "level": "intermedio",
+    "tags": [
+      "beni comuni",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1872/housing-question/index.htm",
+        "title": "The Housing Question",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1873/housing.html",
+        "title": "Към жилищния въпрос",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1872/xx/me18_209.htm",
+        "title": "La q esti  de l",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/vivienda/index.htm",
+        "title": "Contribuci n al problema de la vivienda",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1873/asuntokysymyksesta/index.htm",
+        "title": "Asuntokysymyksest",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1872/00/logement.htm",
+        "title": "La question du logement",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1872/abitazioni/index.htm",
+        "title": "La Questione delle Abitazioni",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1872/butu-klausimu/index.htm",
+        "title": "Butų klausimu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1872/1872woning.htm",
+        "title": "La questione delle abitazioni",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1873/habita/index.htm",
+        "title": "Para a Questão da Habitação",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1872/probl-loc/index.htm",
+        "title": "Contribuții la problema locuințelor",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1873/18-d031.htm",
+        "title": "I Bostadsfr gan",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx-engels2/03/11.htm",
+        "title": "论住宅问题",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "famiglia-proprieta",
+    "title": "L'origine della famiglia, della proprietà privata e dello Stato",
+    "author": "Friedrich Engels",
+    "period": "1884",
+    "lane": "Cura e società",
+    "summary": "Famiglia e potere in una ricostruzione storica da leggere criticamente alla luce delle ricerche successive.",
+    "level": "intermedio",
+    "tags": [
+      "cura e società",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1884/origin-family/index.htm",
+        "title": "Origin of The Family etc.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1884/Engels-Proizhod.html",
+        "title": "Произход на семейството, частната собственост и държавата",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1884/ursprung/me21_025.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1880s/origen/index.htm",
+        "title": "El origen de la familia, la propiedad privada y el estado",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1884/perheen-yksityisomaisuuden-ja-valtion-alkupera/index.htm",
+        "title": "Perheen, yksityisomaisuuden ja valtion alkuper",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1884/00/fe18840000.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1884/famiglia/index.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1884/valstybes-kilme/index.htm",
+        "title": "Šeimos, privatinės nuosavybės ir valstybės kilmė",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1884/csalad-magantulajdon-allam/index.htm",
+        "title": "A csal�d, a mag�ntulajdon �s az �llam eredete",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1884/potekloto/index.htm",
+        "title": "Потеклото на семејството, приватната сопственост и државата",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1884/oorsprong_gezin/index.htm",
+        "title": "De oorsprong van het gezin, van de particuliere eigendom en van de staat",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1884/pochodzenie/index.htm",
+        "title": "Pochodzenie rodziny, w asno ci prywatnej i pa stwa",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1884/origem/index.htm",
+        "title": "A Origem da Fam lia, da Propriedade Privada e do Estado",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1884/orig/index.htm",
+        "title": "Originea familiei, a proprietății private și a statului",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sl",
+        "url": "https://www.marxists.org/slovenian/marx-engels/1884/privatna_lastnina/index.htm",
+        "title": "Izvor družine, privatne lastnine in države",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1884/21-d039.htm",
+        "title": "Familjens, privategendomens och statens ursprung",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "th",
+        "url": "https://www.marxists.org/thai/archive/marx-engels/1884/origin-family/abstract.htm",
+        "title": "Origin of Family (Thai)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1884-3.htm",
+        "title": "家庭、私有制和国家的起源",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "manoscritti-1844",
+    "title": "Manoscritti economico-filosofici del 1844",
+    "author": "Karl Marx",
+    "period": "1844",
+    "lane": "Lavoro e libertà",
+    "summary": "Alienazione, bisogni e vita umana: perché immaginare il cambiamento significa ripensare il lavoro.",
+    "level": "intermedio",
+    "tags": [
+      "lavoro e libertà",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1844/manuscripts/preface.htm",
+        "title": "Econ.-Phil. Manuscripts",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/44-okfil/index.htm",
+        "title": "konomisk-filosofiske manuskripter",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1844/oek-phil/index.htm",
+        "title": "konomisch-philosophische Manuskripte (1844)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1840s/manuscritos/index.htm",
+        "title": "Manuscritos econ micos y filos ficos de 1844",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1844/taloudellis-filosofiset-kasikirjoitukset/index.htm",
+        "title": "Taloudellis-filosofiset k sikirjoitukset",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1844/00/km18440000/index.htm",
+        "title": "La Sainte Faille",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1844/2/Manoscritti/indexman.html",
+        "title": "Manoscritti economico-filosofici del 1844",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1844/ekonomsko-filozofski-rakopisi/index.htm",
+        "title": "Ekonomsko-filozofski rakopisi od 1844 godina",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1844/manuscripten/index.htm",
+        "title": "Manoscritti economico-filosofici del 1844",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1844/pariser/fremmedgj_arb.htm",
+        "title": "Fremmedgjort arbeide",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1844/rekopisy/index.htm",
+        "title": "R kopisy filozoficzno-ekonomiczne z 1844 roku",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1844/manuscritos/index.htm",
+        "title": "Manuscritos Econômico-Filosóficos",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1844/mef/index.htm",
+        "title": "Manuscrise economico-filozofice din 1844",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/marx/1844/manuscr/index.htm",
+        "title": "Экономическо-философские рукописи",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1844/ekonomsko-filozofski-rukopisi/index.htm",
+        "title": "Ekonomsko-filozofski rukopisi Iz 1844",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1844/40-d005.htm",
+        "title": "Ekonomisk-filosofiska manuskript",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/marxist.org-chinese-marx-1844.htm",
+        "title": "1844年经济学哲学手稿",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "ideologia-tedesca",
+    "title": "L'ideologia tedesca",
+    "author": "Karl Marx, Friedrich Engels",
+    "period": "1845",
+    "lane": "Metodo",
+    "summary": "Condizioni materiali, divisione del lavoro e produzione delle idee.",
+    "level": "avanzato",
+    "tags": [
+      "metodo",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1845/german-ideology/index.htm",
+        "title": "The German Ideology",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1846/NI/index.html",
+        "title": "Немска идеология",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bn",
+        "url": "https://www.marxists.org/bangla/archive/marx-engels/1845/german-ideology/index.htm",
+        "title": "The German Ideology (Bangla)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1846/ideoalem/me03_009.htm",
+        "title": "La ideologia alemanya",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1846/ideoalemana/index.htm",
+        "title": "Feuerbach. Oposición entre las concepciones materialistas e idealistas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1846/saksalainen-ideologia/index.htm",
+        "title": "Saksalainen ideologia (1. luku)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1845/00/kmfe18450000.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1846/ideologia/index.htm",
+        "title": "Ideologia Tedesca",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1845/ideo/index.htm",
+        "title": "Germanskata Ideologija",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1845/duitse_ideologie/hoofd-index.htm",
+        "title": "L'ideologia tedesca",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1846/03-d036.htm",
+        "title": "Den tyska ideologin (Urval)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/marxist.org-chinese-marx-1846.htm",
+        "title": "德意志意识形态(节选)",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "tesi-feuerbach",
+    "title": "Tesi su Feuerbach",
+    "author": "Karl Marx",
+    "period": "1845",
+    "lane": "Metodo",
+    "summary": "Undici tesi brevi sul rapporto tra conoscenza e pratica trasformativa.",
+    "level": "base",
+    "tags": [
+      "metodo",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1845/theses/theses.htm",
+        "title": "Theses on Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1845/feuerbach.htm",
+        "title": "موضوعات عن فورباخ",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1845/Tezisi_Feuerbach.html",
+        "title": "Тезиси за Фойербах",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1845/thesen/thesfeue.htm",
+        "title": "Tesis sobre Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "cs",
+        "url": "https://www.marxists.org/cestina/marx-engels/1845/teze-feuerbachovi.htm",
+        "title": "Teze Feuerbachovi",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/45-feuer.htm",
+        "title": "Teser om Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1845/thesen/thesfeue.htm",
+        "title": "Thesen  ber Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1840s/45-feuer.htm",
+        "title": "Tesis sobre Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1845/teeseja-feuerbachista.htm",
+        "title": "Teesej  Feuerbachista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1845/00/kmfe18450001.htm",
+        "title": "Theses sur Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/18450401-tesisfeuerbachversiasli.html",
+        "title": "Thesis Tentang Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1845/3/tesi-f.htm",
+        "title": "Tesi su Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ka",
+        "url": "https://www.marxists.org/georgian/m-e/1845/tezisebi.htm",
+        "title": "Tesi su Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ko",
+        "url": "https://www.marxists.org/korean/marx/theses-feuerbach/index.htm",
+        "title": "포이에르바흐에 관한 테제",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1845/tezes-feurbacha.htm",
+        "title": "Tezės apie Feuerbachą",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/misc/misc/feuerbachrol.htm",
+        "title": "Tezisek Feuerbachrol",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1845/tezi_za_fojerbah.htm",
+        "title": "Tezi za Fojerbah",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1845/1845feuerbach.htm",
+        "title": "Stellingen over Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1845/marx_feuerbach_teser/index.htm",
+        "title": "Teser om Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1845/tezy_o_feuerbachu.htm",
+        "title": "Tezy o Feuerbachu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1845/tesfeuer.htm",
+        "title": "Teses sobre Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1845/teze.htm",
+        "title": "Teze despre Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/marx/1845/feuerb.htm",
+        "title": "Тезисы о Фейербахе",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/marks/1845/misc/teze-fojerbah.htm",
+        "title": "Teze o Feuerbachu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sl",
+        "url": "https://www.marxists.org/slovenian/marx-engels/1845/o-feuerbachu.htm",
+        "title": "Marx o Feuerbachu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1845/03-d006.htm",
+        "title": "Teser om Feuerbach",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "th",
+        "url": "https://www.marxists.org/thai/archive/marx-engels/1845/theses/index.htm",
+        "title": "Theses on Feuerbach (Thai)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "tr",
+        "url": "https://www.marxists.org/turkce/m-e/1845/tezler.htm",
+        "title": "Feuerbach  zerine Tezler",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/marxist.org-chinese-marx-1845.htm",
+        "title": "关于费尔巴哈的提纲",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "brumaio",
+    "title": "Il diciotto brumaio di Luigi Bonaparte",
+    "author": "Karl Marx",
+    "period": "1852",
+    "lane": "Stato e potere",
+    "summary": "Interessi di classe, istituzioni e crisi politiche attraverso un caso storico.",
+    "level": "intermedio",
+    "tags": [
+      "stato e potere",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1852/18th-brumaire/index.htm",
+        "title": "18th Brumaire of Louis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1852/18BLB.html",
+        "title": "Осемнадесети брюмер на Луи Бонапарт",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1852/brumaire/index.htm",
+        "title": "El divuit de brumari de Louis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1852/brumaire/index.htm",
+        "title": "Der achtzehnte Brumaire des Louis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1850s/brumaire/brum1.htm",
+        "title": "El Dieciocho Brumario de Luis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1852/louis-bonaparten-brumairekuun-18/index.htm",
+        "title": "Louis Bonaparten brumairekuun 18.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1851/12/brum.htm",
+        "title": "Le 18 Brumaire de Louis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1852/brumaio/index.htm",
+        "title": "Il 18 Brumaio di Luigi Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1852/bonaparto-astuonioliktoji/index.htm",
+        "title": "Luji Bonaparto briumero aštuonioliktoji",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1852/18e.htm",
+        "title": "De Achttiende Brumaire van Louis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1852/brumario/index.htm",
+        "title": "O 18 de Brum rio de Louis Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1852/18-brumar/index.htm",
+        "title": "Optsprezece brumar al lui Ludovic Bonaparte",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sl",
+        "url": "https://www.marxists.org/slovenian/marx-engels/1852/18st_brumaire/index.htm",
+        "title": "Osemnajsti brumaire Ludvika Bonaparta",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1852/08-d028.htm",
+        "title": "Louis Bonapartes Adertonde Brumaire",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/1851-1852/index.htm",
+        "title": "路易·波拿巴的雾月十八日",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "lotte-francia",
+    "title": "Le lotte di classe in Francia",
+    "author": "Karl Marx",
+    "period": "1850",
+    "lane": "Storia",
+    "summary": "Conflitto sociale, rappresentanza e alleanze nella Francia del 1848.",
+    "level": "intermedio",
+    "tags": [
+      "storia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1850/class-struggles-france/index.htm",
+        "title": "Class Struggles in France",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1850/KBF.html",
+        "title": "Класовата борба във Франция от 1848 до 1850 г.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1850s/francia/index.htm",
+        "title": "Las luchas de clases en Francia de 1848 a 1850",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1850/luokkataistelut-ranskassa/index.htm",
+        "title": "Luokkataistelut Ranskassa",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1850/03/km18500301.htm",
+        "title": "Les luttes de classe en France 1848-1850",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1850/lottecf/index.htm",
+        "title": "Le lotte di classe in Francia dal 1848 al 1850",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1850/klasiu-kova-pranc/index.htm",
+        "title": "Klasių kova Prancūzijoje 1848—1850 m.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1850/wkwf/index.htm",
+        "title": "Walki klasowe we Francji",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1850/lcf/index.htm",
+        "title": "Luptele de clasă în Franța. 1848-1850",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1850/07-d024.htm",
+        "title": "Klasstriderna i Frankrike 1848-1850",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/marx-engels/1850s/dautranhgcphap/index.htm",
+        "title": "Đấu tranh giai cấp ở Ph p 1848-1850",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1895-3-6.htm",
+        "title": "1848年至1850年的法兰西阶级斗争",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "miseria-filosofia",
+    "title": "Miseria della filosofia",
+    "author": "Karl Marx",
+    "period": "1847",
+    "lane": "Economia politica",
+    "summary": "Il confronto con Proudhon su scambio, lavoro e rapporti sociali.",
+    "level": "avanzato",
+    "tags": [
+      "economia politica",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1847/poverty-philosophy/index.htm",
+        "title": "Poverty of Philosophy",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1847-pv/index.htm",
+        "title": "بؤس الفلسفة",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1847/Nishteta-na-filosofiqta.html",
+        "title": "Нищета на философията",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1847/miseria/index.htm",
+        "title": "La mis ria de la filosofia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1847/06/km18470615.htm",
+        "title": "Mis re de la philosophie",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1847/miseria-filosofia/index.htm",
+        "title": "Miseria della filosofia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1847/a-filozofia-nyomora/index.htm",
+        "title": "A filozófia nyomorúsága",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1847/armoede/index.htm",
+        "title": "De armoede van de filosofie",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1847/miseria/index.htm",
+        "title": "Mis ria da Filosofia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1847/mizeria-filozofiei/index.htm",
+        "title": "Mizeria filozofiei",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1847/04-d038.htm",
+        "title": "Filosofins el nde",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/marx-engels/1840s/sukhoncung/sukhoncung.htm",
+        "title": "Phương ph p",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx-engels2/01/17.htm",
+        "title": "哲学的贫困",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "classe-operaia",
+    "title": "La situazione della classe operaia in Inghilterra",
+    "author": "Friedrich Engels",
+    "period": "1845",
+    "lane": "Lavoro e società",
+    "summary": "L'esperienza della rivoluzione industriale vista dalle condizioni di vita di chi lavorava.",
+    "level": "intermedio",
+    "tags": [
+      "lavoro e società",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1845/condition-working-class/index.htm",
+        "title": "Condition W/Class in Eng.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1845/PRKA/index.html",
+        "title": "Положението на работническата класа в Англия",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1840s/situacion/index.htm",
+        "title": "La situacion de la clase obrera en inglaterra",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1845/03/fe_18450315.htm",
+        "title": "Situation ourviere Angleterre",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1845/toestand/index.htm",
+        "title": "La situazione della classe operaia in Inghilterra",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1845/02-d030.htm",
+        "title": "Den arbetande klassens l ge i England",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/1844-1845/index.htm",
+        "title": "英国工人阶级状况",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "lavoro-umanita",
+    "title": "Parte avuta dal lavoro nel processo di umanizzazione",
+    "author": "Friedrich Engels",
+    "period": "1876",
+    "lane": "Cooperazione",
+    "summary": "Un saggio storico su lavoro, linguaggio e collaborazione, con i limiti scientifici del suo tempo.",
+    "level": "base",
+    "tags": [
+      "cooperazione",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1876/part-played-labour/index.htm",
+        "title": "Labour in Transition Ape to Man",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1886/dnp/ch10.html",
+        "title": "Ролята на труда при превръщането на маймуната в човек",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1876/arbej.htm",
+        "title": "Arbejdets rolle ved abens forvandling til menneske",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/1876trab.htm",
+        "title": "El papel del trabajo en la transformaci n del mono en hombre",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/76-rotra.htm",
+        "title": "Le R le du Travail dans la Trans- formation du Singe en Homme",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1876/apetoman.htm",
+        "title": "Peranan Yang Dimainkan Kerja Dalam Peralihan Dari Kera Pada Manusia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1876/6/pr-umani.htm",
+        "title": "Parte avuta dal lavoro nel processo di umanizzazione della scimmia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ka",
+        "url": "https://www.marxists.org/georgian/m-e/1876/shromis-roli.htm",
+        "title": "Parte avuta dal lavoro nel processo di umanizzazione",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1876/darbo-vaidmuo.htm",
+        "title": "Darbo vaidmuo beždžionės sužmogėjimo procese",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1876/1876aapmens.htm",
+        "title": "De rol van de arbeid in de overgang van aap naar mens",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1876/mes/macaco.htm",
+        "title": "O Papel do Trabalho na Transformação do Macaco em Homem",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1876/rolul-muncii-transf.htm",
+        "title": "Rolul muncii în procesul de transformare a maimuței în om",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1876/20-d043.htm",
+        "title": "Arbetets andel i apans f rvandling till m nniska",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "th",
+        "url": "https://www.marxists.org/thai/archive/marx-engels/1876/ape-to-man/index.htm",
+        "title": "Labour in Transition from Ape to Man (Thai)",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1875a.htm",
+        "title": "劳动在从猿到人转变过程中的作用",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "feuerbach",
+    "title": "Ludwig Feuerbach e il punto d'approdo della filosofia classica tedesca",
+    "author": "Friedrich Engels",
+    "period": "1886",
+    "lane": "Metodo",
+    "summary": "Una lettura introduttiva al materialismo e al confronto con la filosofia tedesca.",
+    "level": "intermedio",
+    "tags": [
+      "metodo",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1886/ludwig-feuerbach/index.htm",
+        "title": "Ludwig Feuerbach etc",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1886/LF.html",
+        "title": "Лудвиг Фойербах и краят на класическата немска философия",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/marx/1886/me21_259.htm",
+        "title": "Ludwig Feuerbach i la fi de la filosofia cl ssica alemanya",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1880s/feuer/index.htm",
+        "title": "Ludwig Feuerbach y el fin de la filosof a cl sica alemana",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1886/ludwig-feuerbach-ja-klassisen-saksalaisen-filosofian-loppu.htm",
+        "title": "Ludwig Feuerbach ja klassisen saksalaisen filosofian loppu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1888/02/fe_18880221.htm",
+        "title": "Ludwig Feuerbach et la fin de la philosophie classique allemande",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1886/ludwig-feuerbach/pengantar.htm",
+        "title": "Feuerbach dan Akhir Filsafat Klasik Jerman",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1886/ludwig-feuerbach/index.htm",
+        "title": "Liudvigas Feuerbachas ir klasikinės vokiečių filosofijos pabaiga",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1886/1886feuerbach.htm",
+        "title": "Ludwig Feuerbach en het einde van de klassieke Duitse filosofie",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1886/zmierzch_filozofii.htm",
+        "title": "Ludwik Feuerbach i zmierzch klasycznej filozofii niemieckiej",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1886/mes/fim.htm",
+        "title": "Ludwig Feuerbach e o Fim da Filosofia Cl ssica Alema",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1886/ludwig-feuerbach/index.htm",
+        "title": "Ludwig Feuerbach și sfîrșitul filozofiei clasice germane",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1886/21-d023.htm",
+        "title": "Ludwig Feuerbach och den klassiska tyska filosofins slut",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1888.htm",
+        "title": "费尔巴哈和德国古典哲学的终结",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "antiduhring",
+    "title": "Anti-Dühring",
+    "author": "Friedrich Engels",
+    "period": "1878",
+    "lane": "Fondamenti",
+    "summary": "Una trattazione ampia di filosofia, economia e socialismo: utile come approfondimento, non come prima lettura.",
+    "level": "avanzato",
+    "tags": [
+      "fondamenti",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1877/anti-duhring/index.htm",
+        "title": "Anti-Dühring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1878/AD/index.html",
+        "title": "Анти-Дюринг",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/1878vpro.htm",
+        "title": "La revoluci n de la ciencia de Eugenio D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1878/anti-duhring/index.htm",
+        "title": "Anti-D¨hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1878/06/fe18780611.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1878/tentang-dialektika.htm",
+        "title": "Kata-Pengantar Lama Pada Anti-Duhring. Tentang Dialektika",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1878/antiduhring/index.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1877/anti-diuringas/index.htm",
+        "title": "Anti-Diuringas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1878/anti-duhring/index.htm",
+        "title": "Anti-D�hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1877/anti-duhring/index.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1876/anty_dur/index.htm",
+        "title": "Anty D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1877/antiduhring/index.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1878/20-d025.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/marx-engels/1870s/chongduhring/index.htm",
+        "title": "Chong Duhring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1876a.htm",
+        "title": "《反杜林论》旧序。论辩证法",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "contadini",
+    "title": "La questione contadina in Francia e in Germania",
+    "author": "Friedrich Engels",
+    "period": "1894",
+    "lane": "Cooperazione",
+    "summary": "Piccola proprietà, organizzazione collettiva e problemi della transizione agricola.",
+    "level": "intermedio",
+    "tags": [
+      "cooperazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1894/peasant-question/index.htm",
+        "title": "Peasant Q. in France & Germany",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1894/SVFG.html",
+        "title": "Селският въпрос във Франция и Германия",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/94-bonft.htm",
+        "title": "Bondesp rgsm let i Frankrig og Tyskland",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1894/11/bauern.htm",
+        "title": "Die Bauernfrage in Frankreich und Deutschland",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1890s/procam94.htm",
+        "title": "El problema campesino en Francia y en Alemania",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1894/valstieciu-klausimas/index.htm",
+        "title": "Valstiečių klausimas Prancūzijoje ir Vokietijoje",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1894/1894boeren.htm",
+        "title": "La questione contadina in Francia e in Germania",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1894/11/22.htm",
+        "title": "A Questao Camponesa em Fran a e na Alemanha",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1894/probl-tar/index.htm",
+        "title": "Problema țărănească în Franța și Germania",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1894/22-d041.htm",
+        "title": "Bondefr gan i Frankrike och Tyskland",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/mia-chinese-engels-18941115-22.htm",
+        "title": "法德农民问题",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "stato-rivoluzione",
+    "title": "Stato e rivoluzione",
+    "author": "Vladimir I. Lenin",
+    "period": "1917",
+    "lane": "Stato e potere",
+    "summary": "Democrazia, potere di classe e istituzioni della transizione socialista.",
+    "level": "intermedio",
+    "tags": [
+      "stato e potere",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1917/staterev/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/lenin/1917-sr/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/lenin/1917/stat-rev/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/lenin/1917/staatrev/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "el",
+        "url": "https://www.marxists.org/ellinika/archive/lenin/works/1917/staterev/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/lenin/1917/valtio-ja-vallankumous.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1917/08/er00t.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/lenin/19170901-lenin-negaradanrevolusi/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/lenin/1917/stat-riv/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/lenin/1917/allam-es-forradalom/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/lenin/1917/drzava_revolucija/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/lenin/1917/staat-revolutie/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/lenin/1917/staten_og_revolusjonen/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1917/par/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1917/08/estadoerevolucao/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1917/statrev/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/lenin/works/lenin007.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sk",
+        "url": "https://www.marxists.org/slovak/lenin/1917/08/statarev/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/lenjin/1917/09/drzava-revolucija/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1917/staten.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "th",
+        "url": "https://www.marxists.org/thai/archive/lenin/1917/state-revolution/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/191708-09/index.htm",
+        "title": "The State and Revolution",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "imperialismo",
+    "title": "L'imperialismo fase suprema del capitalismo",
+    "author": "Vladimir I. Lenin",
+    "period": "1916",
+    "lane": "Imperialismo",
+    "summary": "Monopoli, finanza e divisione internazionale del mondo.",
+    "level": "intermedio",
+    "tags": [
+      "imperialismo",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1916/imp-hsc/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/lenin/1916-ihsc/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/lenin/1917/imp/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fa",
+        "url": "https://www.marxists.org/farsi/archive/lenin/works/1916/imperializm/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1916/vlimperi/vlimp.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/lenin/1916/imperialismo/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/lenin/1916/imperijalizmot/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/lenin/1916/imperialisme/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1916/imperializm/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1916/imperialismo/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1916/imper/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/lenjin/1916/imperijalizam/index.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1916/imper.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/15.htm",
+        "title": "Imperialism, The Highest Stage of Capitalism",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "cooperazione-lenin",
+    "title": "Sulla cooperazione",
+    "author": "Vladimir I. Lenin",
+    "period": "1923",
+    "lane": "Cooperazione",
+    "summary": "Educazione, partecipazione e organizzazione cooperativa nel contesto della Russia sovietica.",
+    "level": "base",
+    "tags": [
+      "cooperazione",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1923/jan/06.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/lenin/1923/1/sullacooperazione.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1923/ian/06.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/lenjin/1923/01/06.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1923/01/06.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/lenin/1923/jan/06.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin-cworks/43/100.htm",
+        "title": "On Cooperation",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "tre-fonti",
+    "title": "Tre fonti e tre parti integranti del marxismo",
+    "author": "Vladimir I. Lenin",
+    "period": "1913",
+    "lane": "Fondamenti",
+    "summary": "Un orientamento breve tra filosofia, economia e socialismo.",
+    "level": "base",
+    "tags": [
+      "fondamenti",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1913/mar/x01.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/lenin/1913/03-03.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/lenin/13-ma3ki.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/lenin/1913/03/quellen.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "el",
+        "url": "https://www.marxists.org/ellinika/archive/lenin/works/1913/03/three.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/lenin/1913/marxilaisuuden.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1913/03/19130300.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/lenin/1913/tigasumb.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/lenin/1913/3/font-mar.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/leninas/rastai/1913/trys.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/lenin/1913/03/marxizmus_harom_forrasa.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/lenin/1913/1913driecomponenten.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/lenin/1913/03/tre_kilder.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1913/03/3zrodla.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1913/03/tresfont.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1913/mar/x01.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/lenin/1913/03/a.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/lenjin/1913/03/tri-izvora.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1913/03.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/12.htm",
+        "title": "Three Sources & Three Comp. Parts of M.",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mutuo-appoggio",
+    "title": "Il mutuo appoggio",
+    "author": "Pëtr Kropotkin",
+    "period": "1902",
+    "lane": "Cooperazione",
+    "summary": "Cooperazione e solidarietà come fattori della vita sociale: un classico da discutere e confrontare con gli studi contemporanei.",
+    "level": "base",
+    "tags": [
+      "cooperazione",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/kropotkin-peter/1902/mutual-aid/",
+        "title": "Il mutuo appoggio",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/kropotkin/1902/kolcsonos-segitseg/index.htm",
+        "title": "Il mutuo appoggio",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.edizionianarchismo.net/library/il-mutuo-appoggio",
+        "title": "Il mutuo appoggio",
+        "source": "Edizioni Anarchismo"
+      },
+      {
+        "language": "de",
+        "url": "https://de.anarchistlibraries.net/library/peter-kropotkin-gegenseitige-hilfe-in-der-tier-und-menschenwelt",
+        "title": "Il mutuo appoggio",
+        "source": "Anarchistische Bibliothek"
+      }
+    ]
+  },
+  {
+    "id": "conquista-pane",
+    "title": "La conquista del pane",
+    "author": "Pëtr Kropotkin",
+    "period": "1892",
+    "lane": "Oltre il capitalismo",
+    "summary": "Bisogni, produzione e distribuzione in una proposta di società fondata sull’aiuto reciproco.",
+    "level": "base",
+    "tags": [
+      "oltre il capitalismo",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "it",
+        "url": "https://www.edizionianarchismo.net/library/petr-kropotkin-la-conquista-del-pane",
+        "title": "La conquista del pane",
+        "source": "Edizioni Anarchismo"
+      },
+      {
+        "language": "en",
+        "url": "https://www.gutenberg.org/files/23428/23428-h/23428-h.htm",
+        "title": "La conquista del pane",
+        "source": "Project Gutenberg"
+      }
+    ]
+  },
+  {
+    "id": "lavoro-utile",
+    "title": "Lavoro utile e fatica inutile",
+    "author": "William Morris",
+    "period": "1884",
+    "lane": "Lavoro e libertà",
+    "summary": "Un saggio breve su tempo, bellezza, lavoro necessario e possibilità di una vita condivisa migliore.",
+    "level": "base",
+    "tags": [
+      "lavoro e libertà",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/morris/works/1884/useful.htm",
+        "title": "Lavoro utile e fatica inutile",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "notizie-nessun-luogo",
+    "title": "Notizie da nessun luogo",
+    "author": "William Morris",
+    "period": "1890",
+    "lane": "Oltre il capitalismo",
+    "summary": "Un romanzo utopico che rende concrete le domande su produzione, cura, piacere e relazioni sociali.",
+    "level": "base",
+    "tags": [
+      "oltre il capitalismo",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/morris/works/1890/nowhere/nowhere.htm",
+        "title": "Notizie da nessun luogo",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "commons-viventi",
+    "title": "Free, Fair and Alive",
+    "author": "Silke Helfrich, David Bollier",
+    "period": "2019",
+    "lane": "Beni comuni",
+    "summary": "Pratiche di commoning: governare risorse insieme, decidere in modo condiviso e costruire alternative nella vita quotidiana.",
+    "level": "base",
+    "tags": [
+      "beni comuni",
+      "base"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://freefairandalive.org/read-it/",
+        "title": "Free, Fair and Alive",
+        "source": "Sito degli autori"
+      },
+      {
+        "language": "de",
+        "url": "https://freefairandalive.org/de/hineinlesen/",
+        "title": "Frei, fair und lebendig",
+        "source": "Sito degli autori"
+      },
+      {
+        "language": "es",
+        "url": "https://freefairandalive.org/es/leelo/",
+        "title": "Libres, dignos, vivos",
+        "source": "Sito degli autori"
+      }
+    ]
+  },
+  {
+    "id": "riforma-rivoluzione",
+    "title": "Riforma sociale o rivoluzione?",
+    "author": "Rosa Luxemburg",
+    "period": "1899",
+    "lane": "Strategia",
+    "summary": "Il rapporto tra miglioramenti immediati, organizzazione e trasformazione della società.",
+    "level": "intermedio",
+    "tags": [
+      "strategia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/luxembur/1899/rif-riv/index.htm",
+        "title": "Riforma sociale o rivoluzione?",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/luxemburg/1900/reform-revolution/index.htm",
+        "title": "Riforma sociale o rivoluzione?",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/luxembur/r_ou_r/index.html",
+        "title": "Riforma sociale o rivoluzione?",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/luxemburg/1908/tarsadalmi-reform-vagy-forradalom/index.htm",
+        "title": "Riforma sociale o rivoluzione?",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "sciopero-massa",
+    "title": "Sciopero di massa, partito e sindacati",
+    "author": "Rosa Luxemburg",
+    "period": "1906",
+    "lane": "Organizzazione",
+    "summary": "La partecipazione collettiva al cambiamento e il rapporto tra iniziativa sociale e organizzazione politica.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/luxemburg/1906/mass-strike/index.htm",
+        "title": "Sciopero di massa, partito e sindacati",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  }
+]

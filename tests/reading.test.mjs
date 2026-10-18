@@ -116,14 +116,18 @@ test("refresh merges new records without discarding existing or saved entries", 
   assert.equal(result.find((a) => a.id === "b").sourceName, "Una fonte");
 });
 
-test('reading paths point to existing works and preserve all library entries', async () => {
+test('introductory paths point to available works, keep historical saved IDs and cover cooperation and alternatives', async () => {
   const { READING_PATHS, DOSSIERS } = await import('../app/data/editorial.ts');
   const { THEORY_LIBRARY } = await import('../app/data/library.ts');
   const { TOPIC_TAXONOMY } = await import('../app/data/catalog.ts');
   const ids = new Set(THEORY_LIBRARY.map(book => book.id));
   const topics = new Set(TOPIC_TAXONOMY.map(topic => topic.id));
   for (const path of READING_PATHS) for (const id of path.books) assert.ok(ids.has(id), `Missing book ${id}`);
-  assert.deepEqual(new Set(READING_PATHS.flatMap(path => path.books)), ids);
+  const recommended = new Set(READING_PATHS.flatMap(path => path.books));
+  for (const id of ["manifesto","mutuo-appoggio","cooperazione-lenin","commons-viventi","conquista-pane"]) assert.ok(recommended.has(id));
+  for (const id of ["manifesto","capitale","stato-rivoluzione","imperialismo","riforma-rivoluzione","socialismo-utopico-scientifico","gramsciana","comune-parigi","dipendenza","femminismo-marxista"]) assert.ok(ids.has(id));
+  assert.ok(THEORY_LIBRARY.filter(book => book.editions?.length).length >= 30);
+  assert.ok(new Set(THEORY_LIBRARY.flatMap(book => book.editions?.map(edition => edition.language) ?? [])).size >= 20);
   for (const dossier of DOSSIERS) assert.ok(topics.has(dossier.id), `Missing topic ${dossier.id}`);
 });
 

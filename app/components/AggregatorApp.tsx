@@ -34,7 +34,7 @@ import {
   REGION_ORDER,
   type SourceDefinition,
 } from "@/app/data/catalog";
-import { THEORY_LIBRARY } from "@/app/data/library";
+import { THEORY_LIBRARY, BOOK_LANGUAGES } from "@/app/data/library";
 import { DOSSIERS, READING_PATHS, GLOSSARY } from "@/app/data/editorial";
 import {
   filterArticles,
@@ -1181,7 +1181,7 @@ export function AggregatorApp() {
                       {view === "salvati" && savedBooks.size ? <section className="saved-books" aria-label="Libri salvati">
                         <h3><LocalizedText>Libri salvati</LocalizedText></h3>
                         {THEORY_LIBRARY.filter(book => savedBooks.has(book.id) && `${book.title} ${book.author}`.toLowerCase().includes(query.toLowerCase())).map(book => <article key={book.id}>
-                          <div><strong><LocalizedText>{book.title}</LocalizedText></strong><p>{book.author}</p><a href={book.links[0].url} target="_blank" rel="noopener noreferrer"><LocalizedText>Apri il testo</LocalizedText><ArrowUpRight size={14} /></a></div>
+                          <div><strong><LocalizedText>{book.title}</LocalizedText></strong><p>{book.author}</p><a href={book.editions?.length ? `/read?${new URLSearchParams({book:book.id, edition:book.editions.find(item=>item.language === "it")?.language ?? book.editions[0].language})}` : book.links[0].url}><LocalizedText>Apri il testo</LocalizedText><ArrowUpRight size={14} /></a></div>
                           <button className="save-button is-saved" onClick={() => toggleBook(book.id)} aria-label={`Rimuovi libro dai salvati: ${book.title}`}><BookmarkCheck size={18} /></button>
                         </article>)}
                       </section> : null}
@@ -1364,7 +1364,7 @@ const ArticleCard = memo(function ArticleCard({
   return (
     <article className="article-card">
       <button className="article-open" onClick={() => onSelect(article.id)}>
-        <ArticleImage articleLink={article.link} sourceId={article.sourceId} articleId={article.id} image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
+        <ArticleImage articleLink={article.link} sourceId={article.feedSourceId ?? article.sourceId} articleId={article.id} image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
         <div className="article-copy">
           <div className="article-meta">
             <span>{article.sourceName}</span>
@@ -1694,10 +1694,20 @@ function LibraryView({
   savedBooks: Set<string>;
   onToggleBook: (id: string) => void;
 }) {
+  const readingLanguage = useLocale();
+  const [bookLanguage, setBookLanguage] = useState("all");
+  const availableLanguages = [...new Set(THEORY_LIBRARY.flatMap(book => book.editions?.map(edition => edition.language) ?? []))].sort((a,b) => (BOOK_LANGUAGES[a] ?? a).localeCompare(BOOK_LANGUAGES[b] ?? b));
+  const readingLink = (book: typeof THEORY_LIBRARY[number]) => {
+    const preferred = bookLanguage === "all" ? readingLanguage : bookLanguage;
+    const edition = book.editions?.find(item => item.language === preferred) ?? book.editions?.find(item => item.language === "en") ?? book.editions?.[0];
+    return edition ? `/read?${new URLSearchParams({ book: book.id, edition: edition.language })}` : book.links[0]?.url;
+  };
   const [path, setPath] = useState("all");
   const active = READING_PATHS.find((p) => p.id === path);
   const books = THEORY_LIBRARY.filter(
     (book) =>
+      Boolean(book.editions?.length) &&
+      (bookLanguage === "all" || book.editions?.some(edition => edition.language === bookLanguage)) &&
       (!active || active.books.includes(book.id)) &&
       `${book.title} ${book.author} ${book.summary} ${book.tags.join(" ")}`
         .toLowerCase()
@@ -1713,7 +1723,7 @@ function LibraryView({
             </LocalizedText>
           </p>
           <h2>
-            <LocalizedText>{"Tre percorsi, molte domande."}</LocalizedText>
+            <LocalizedText>{"Leggere, cooperare, cambiare."}</LocalizedText>
           </h2>
         </div>
         <BookOpen size={24} strokeWidth={1.3} />
@@ -1774,12 +1784,17 @@ function LibraryView({
           </button>
         ) : null}
       </div>
+      <div className="library-language-bar">
+        <label><LocalizedText>Lingua delle edizioni</LocalizedText><select value={bookLanguage} onChange={event => setBookLanguage(event.target.value)} aria-label="Lingua delle edizioni dei libri"><option value="all">Tutte le lingue</option>{availableLanguages.map(code => <option key={code} value={code}>{BOOK_LANGUAGES[code] ?? code}</option>)}</select></label>
+        <p><strong>{books.length}</strong> <LocalizedText>libri e saggi gratuiti</LocalizedText> · {availableLanguages.length} <LocalizedText>lingue disponibili</LocalizedText></p>
+        <small><LocalizedText>Accedi per leggere nel sito e ritrovare la tua ultima pagina su ogni dispositivo.</LocalizedText></small>
+      </div>
       <div className="book-grid">
         {books.map((book, index) => (
           <article className="book-card" key={book.id}>
-            <div
+            <a href={readingLink(book)}
               className={`book-cover book-tone-${index % 4}`}
-              aria-hidden="true"
+              aria-label={`Leggi ${book.title}`}
             >
               <span>
                 <LocalizedText>
@@ -1793,14 +1808,12 @@ function LibraryView({
               <span className="cover-year">
                 <LocalizedText>{book.period}</LocalizedText>
               </span>
-            </div>
+            </a>
             <div className="book-info">
               <p className="eyebrow">
                 <LocalizedText>{book.lane}</LocalizedText>
               </p>
-              <h3>
-                <LocalizedText>{book.title}</LocalizedText>
-              </h3>
+              <h3><a href={readingLink(book)}><LocalizedText>{book.title}</LocalizedText></a></h3>
               <p className="book-author">
                 {book.author}
                 <LocalizedText>{" · "}</LocalizedText>
@@ -1812,6 +1825,8 @@ function LibraryView({
               <button className={`text-link book-save ${savedBooks.has(book.id) ? "is-saved" : ""}`} onClick={() => onToggleBook(book.id)} aria-pressed={savedBooks.has(book.id)}>
                 {savedBooks.has(book.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}<LocalizedText>{savedBooks.has(book.id) ? "Libro salvato" : "Salva libro"}</LocalizedText>
               </button>
+              <a className="book-read-link" href={readingLink(book)}><BookOpen size={17}/><LocalizedText>Leggi online</LocalizedText><ArrowUpRight size={17}/></a>
+              <p className="book-edition-count">{book.editions?.length} <LocalizedText>edizioni linguistiche</LocalizedText> · <LocalizedText>{book.level === "base" ? "Per iniziare" : book.level === "avanzato" ? "Approfondimento" : "Lettura intermedia"}</LocalizedText></p>
               <div className="book-links">
                 {book.links.map((link) => (
                   <a
@@ -1847,6 +1862,7 @@ function LibraryView({
           </LocalizedText>
         </div>
       ) : null}
+      <details className="library-resources"><summary><LocalizedText>Archivi e percorsi di approfondimento</LocalizedText></summary>{THEORY_LIBRARY.filter(book => !book.editions?.length).map(book => <p key={book.id}><strong>{book.title}</strong> — {book.links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label} ↗ </a>)}</p>)}</details>
       <section className="glossary">
         <div>
           <p className="eyebrow">

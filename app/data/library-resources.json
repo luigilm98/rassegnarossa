@@ -1,0 +1,67 @@
+[
+  {
+    "id": "gramsciana",
+    "title": "Quaderni del carcere",
+    "author": "Antonio Gramsci",
+    "period": "1929-1935",
+    "lane": "Egemonia",
+    "summary": "Egemonia, blocco storico, intellettuali, guerra di posizione: lessico indispensabile per capire politica e cultura.",
+    "links": [
+      {
+        "label": "Fondazione Gramsci",
+        "url": "https://www.fondazionegramsci.org/"
+      }
+    ],
+    "tags": [
+      "gramsci",
+      "egemonia",
+      "cultura"
+    ]
+  },
+  {
+    "id": "dipendenza",
+    "title": "Teoria della dipendenza",
+    "author": "Ruy Mauro Marini e scuola latinoamericana",
+    "period": "anni 1960-1970",
+    "lane": "Sud globale",
+    "summary": "Per leggere centro, periferia, scambio ineguale, sovrasfruttamento e sviluppo dipendente.",
+    "links": [
+      {
+        "label": "Monthly Review",
+        "url": "https://monthlyreview.org/"
+      },
+      {
+        "label": "Tricontinental",
+        "url": "https://thetricontinental.org/"
+      }
+    ],
+    "tags": [
+      "dipendenza",
+      "america latina",
+      "imperialismo"
+    ]
+  },
+  {
+    "id": "femminismo-marxista",
+    "title": "Riproduzione sociale",
+    "author": "Tradizione femminista marxista",
+    "period": "anni 1970-oggi",
+    "lane": "Femminismi",
+    "summary": "Lavoro salariato, lavoro domestico, cura, genere e accumulazione letti come un unico campo di conflitto.",
+    "links": [
+      {
+        "label": "Viewpoint Magazine",
+        "url": "https://viewpointmag.com/"
+      },
+      {
+        "label": "Historical Materialism",
+        "url": "https://www.historicalmaterialism.org/"
+      }
+    ],
+    "tags": [
+      "femminismo",
+      "riproduzione",
+      "cura"
+    ]
+  }
+]

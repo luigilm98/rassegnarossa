@@ -1,3 +1,5 @@
+import { handleReadingProgress } from "../app/lib/reading-progress";
+import { readBook } from "../app/lib/book-reader";
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
@@ -44,6 +46,22 @@ const sourceIds = new Set(SOURCE_CATALOG.map(source => source.id));
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/reading-progress" || url.pathname === "/api/library/read") {
+      const userId = chatGPTUserFromHeaders(request.headers)?.id ?? null;
+      const bookId = url.searchParams.get("bookId") ?? "", edition = url.searchParams.get("edition") ?? "";
+      const signInUrl = chatGPTSignInPath(`/read?${new URLSearchParams({ book: bookId, edition })}`);
+      if (url.pathname === "/api/reading-progress") return handleReadingProgress(request, env.DB, userId, signInUrl);
+      const reply = (data: unknown, status = 200) => Response.json(data, { status, headers: { "cache-control": "private, no-store", vary: "cookie" } });
+      if (!userId) return reply({ authenticated: false, signInUrl }, 401);
+      if (request.method !== "GET") return reply({ error: "Method not allowed" }, 405);
+      if ([...url.searchParams.keys()].some(key => !["bookId", "edition", "chapter"].includes(key)) || [...url.searchParams.keys()].some(key => url.searchParams.getAll(key).length > 1)) return reply({ error: "Invalid request" }, 400);
+      if (!THEORY_LIBRARY.some(book => book.id === bookId && book.editions?.some(item => item.language === edition))) return reply({ error: "Unknown edition" }, 400);
+      const chapter = Number(url.searchParams.get("chapter") ?? 0);
+      if (!Number.isSafeInteger(chapter) || chapter < 0 || chapter > 255) return reply({ error: "Invalid chapter" }, 400);
+      try { return reply(await readBook(bookId, edition, chapter)); }
+      catch (error) { return reply({ error: error instanceof RangeError ? "Capitolo non disponibile" : "Non è stato possibile aprire questa edizione. Puoi riprovare o consultare l’archivio originale." }, error instanceof RangeError ? 400 : 503); }
+    }
 
     if (url.pathname === "/api/bookmarks")
       return handleBookmarks(request, env.DB, chatGPTUserFromHeaders(request.headers)?.id ?? null, new Set(THEORY_LIBRARY.map(book => book.id)), chatGPTSignInPath("/?view=salvati"));

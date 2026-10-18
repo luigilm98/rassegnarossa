@@ -48,35 +48,9 @@ export const DOSSIERS = [
 ];
 
 export const READING_PATHS = [
-  {
-    id: "iniziare",
-    title: "Da dove cominciare",
-    subtitle: "Una prima mappa del pensiero socialista",
-    description:
-      "Parti dal Manifesto, affronta il materialismo con Engels e torna alle notizie con domande nuove su classe e potere.",
-    books: ["manifesto", "socialismo-utopico-scientifico", "capitale"],
-  },
-  {
-    id: "potere",
-    title: "Chi ha il potere?",
-    subtitle: "Stato, rivoluzione ed egemonia",
-    description:
-      "Dalla Comune di Parigi al dibattito su riforme e rivoluzione: confronta prospettive diverse sul cambiamento politico.",
-    books: [
-      "comune-parigi",
-      "stato-rivoluzione",
-      "riforma-rivoluzione",
-      "gramsciana",
-    ],
-  },
-  {
-    id: "mondo",
-    title: "Leggere il presente",
-    subtitle: "Imperialismo, dipendenza e cura",
-    description:
-      "Collega rapporti internazionali e vita quotidiana: centro e periferia, produzione e riproduzione sociale.",
-    books: ["imperialismo", "dipendenza", "femminismo-marxista"],
-  },
+  { id: "cooperare", title: "Imparare a cooperare", subtitle: "Aiuto reciproco, beni comuni, vita condivisa", description: "Comincia dal mutuo appoggio e dal lavoro utile, poi confronta esperienze e proposte di organizzazione collettiva.", books: ["mutuo-appoggio", "lavoro-utile", "commons-viventi", "cooperazione-lenin", "inaugurale", "colonie-comuniste", "contadini"] },
+  { id: "iniziare", title: "Capire il capitalismo", subtitle: "Prime letture, senza dare nulla per scontato", description: "Domande e risposte con Engels, salari e profitti con Marx: una base accessibile prima dei testi più impegnativi.", books: ["principi-comunismo", "manifesto", "salario-capitale", "salario-prezzo-profitto", "socialismo-utopico-scientifico", "tre-fonti", "capitale"] },
+  { id: "alternative", title: "Immaginare e costruire alternative", subtitle: "Dalla critica alla trasformazione", description: "Confronta comunismo, socialismo, autogoverno e commons: prospettive diverse per pensare una società oltre il capitalismo.", books: ["conquista-pane", "notizie-nessun-luogo", "gotha", "comune-parigi", "riforma-rivoluzione", "sciopero-massa", "stato-rivoluzione", "commons-viventi"] },
 ];
 
 export const GLOSSARY = [

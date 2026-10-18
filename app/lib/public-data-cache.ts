@@ -17,7 +17,7 @@ export function publicDataKey(request: Request): Request | null {
   url.hash = "";
   if (url.searchParams.has("sourceIds"))
     url.searchParams.set("sourceIds", [...new Set(url.searchParams.get("sourceIds")!.split(",").map(id => id.trim()).filter(Boolean))].sort().join(","));
-  url.searchParams.set("_public_cache", "4");
+  url.searchParams.set("_public_cache", "5");
   url.searchParams.sort();
   return new Request(url, { method: "GET" });
 }

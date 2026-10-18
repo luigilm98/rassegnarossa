@@ -93,3 +93,11 @@ GitHub contiene i sorgenti e avvia i controlli automatici su `main` e nelle pull
 Le cache dei feed rimangono temporanee; le raccolte personali degli utenti autenticati sono persistenti in D1 e separate per account. L’accesso è necessario per recuperarle dopo la cancellazione completa dei dati del browser. Feed, ricerca radar e traduzioni dipendono da servizi esterni, dai loro limiti e dai loro cambiamenti. La suite attuale non copre in modo esaustivo parser, accessibilità, rete o browser. Non sono inclusi credenziali, dati di produzione o dipendenze installate. Questo repository non aggiunge una licenza: verificare i diritti prima di redistribuire codice o contenuti di terzi.
 
 I sorgenti pubblici non includono identificativi di hosting specifici del proprietario.
+
+## Biblioteca gratuita e lettore personale
+
+La biblioteca comprende 34 libri e saggi con oltre 450 edizioni in 37 lingue, incluse numerose lingue europee. Tre percorsi introducono cooperazione e mutuo appoggio, critica del capitalismo e costruzione di alternative. Il filtro delle edizioni seleziona testi realmente pubblicati in quella lingua; il lettore non sostituisce una traduzione editoriale con una traduzione automatica.
+
+Le copertine e il comando **Leggi online** aprono `/read`. L’accesso con ChatGPT è richiesto per il testo e per il segnalibro. Capitolo, pagina di lettura e posizione nello scorrimento vengono salvati in D1 per account ed edizione; si ripristinano anche dopo la cancellazione dei dati locali e su un altro dispositivo. Gli articoli salvati continuano a usare la raccolta privata già presente. Le pagine del lettore sono una suddivisione per la lettura sullo schermo, non la numerazione di un’edizione a stampa. Le schede storiche che rimandano ad archivi tematici restano disponibili senza essere conteggiate come libri integrali.
+
+Vedere [fonti e limiti della biblioteca](docs/LIBRARY.md).

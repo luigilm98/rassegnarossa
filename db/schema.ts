@@ -18,3 +18,14 @@ export const publicNewsCache = sqliteTable("public_news_cache", {
   headers: text("headers").notNull(),
   expiresAt: integer("expires_at").notNull(),
 });
+// Last reading location is private, persistent and separate from public content caches.
+export const readingProgress = sqliteTable("reading_progress", {
+  ownerId: text("owner_id").notNull(),
+  bookId: text("book_id").notNull(),
+  edition: text("edition").notNull(),
+  chapter: integer("chapter").notNull(),
+  page: integer("page").notNull(),
+  scroll: integer("scroll").notNull().default(0),
+  revision: text("revision").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+}, table => [primaryKey({ columns: [table.ownerId, table.bookId, table.edition] })]);
