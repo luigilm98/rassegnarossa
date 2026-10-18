@@ -8,10 +8,11 @@ import { LocalizationProvider, LocalizedText } from "./Localization";
 
 export function BookReader() {
  const [language,setLanguage]=useState("it");
- useEffect(()=>{try {const saved=localStorage.getItem("rassegna-rossa.reading-language");setLanguage(saved&&saved!=="auto"?saved:navigator.language.split("-")[0]);}catch{setLanguage(navigator.language.split("-")[0]);}},[]);
- return <LocalizationProvider language={language}><Reader language={language}/></LocalizationProvider>;
+ const [ready,setReady]=useState(false);
+ useEffect(()=>{try {const saved=localStorage.getItem("rassegna-rossa.reading-language");setLanguage(saved&&saved!=="auto"?saved:navigator.language.split("-")[0]);}catch{setLanguage(navigator.language.split("-")[0]);}setReady(true);},[]);
+ return <LocalizationProvider language={language}><Reader language={language} ready={ready}/></LocalizationProvider>;
 }
-function Reader({language}:{language:string}) {
+function Reader({language,ready}:{language:string;ready:boolean}) {
  const [bookId,setBookId]=useState("");
  const [edition,setEdition]=useState("");
  const [document,setDocument]=useState<ReaderDocument|null>(null);
@@ -40,7 +41,7 @@ function Reader({language}:{language:string}) {
   if(sending.current)return;sending.current=true;
   try{
    while(pending.current){const point=pending.current;pending.current=null;setSaveState("saving");
-    try{const response=await fetch("/api/reading-progress",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(point),signal:AbortSignal.timeout(12000)});
+    try{const response=await fetch("/api/reading-progress",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(point),keepalive:true,signal:AbortSignal.timeout(12000)});
      if(response.status===401){const data=await response.json();setAuth(false);setSignIn(data.signInUrl);throw Error("Login required");}
      if(response.status===409){pending.current=null;current.current=null;setRetryKey(value=>value+1);return;}
      if(!response.ok)throw Error("Save failed");setSaveState("saved");
@@ -67,12 +68,13 @@ function Reader({language}:{language:string}) {
   finally{if(version===request.current)setLoading(false);}
  },[bookId,edition]);
  useEffect(()=>{
+  if(!ready)return;
   const params=new URLSearchParams(window.location.search),id=params.get("book")??"manifesto";
   const entry=THEORY_LIBRARY.find(item=>item.id===id);
   if(!entry?.editions?.length){setError("Libro non disponibile nel lettore.");setLoading(false);return;}
   const preferred=params.get("edition")??language;
   setBookId(id);setEdition(entry.editions.find(item=>item.language===preferred)?.language??entry.editions.find(item=>item.language==="en")?.language??entry.editions[0].language);
- },[]);
+ },[ready]);
  useEffect(()=>{
   if(!bookId||!edition)return;let alive=true;setLoading(true);setError("");setAuth(true);setResumed(false);setDocument(null);setSaveState("idle");current.current=null;
   const params=new URLSearchParams({bookId,edition});
