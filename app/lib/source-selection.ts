@@ -34,3 +34,34 @@ export function nextSourcePage<T extends SourceDefinition>(
     .filter((source) => !attempted.has(source.id))
     .slice(0, size);
 }
+
+/** Never substitute Italian recommendations for a different selected language. */
+export function recommendedSources(
+  sources: SourceDefinition[],
+  language: string,
+  size = 3,
+): SourceDefinition[] {
+  const eligible = sources.filter(
+    (source) => language === "all" || source.language === language,
+  );
+  if (language === "it") {
+    const ids = ["ottolina", "dazibao", "ottolina-dazibao"];
+    return ids
+      .map((id) => eligible.find((source) => source.id === id))
+      .filter((source): source is SourceDefinition => !!source)
+      .slice(0, size);
+  }
+  const ranked = rankSources(eligible, language);
+  const selected: SourceDefinition[] = [];
+  const countries = new Set<string>();
+  for (const source of ranked) {
+    if (countries.has(source.country)) continue;
+    selected.push(source);
+    countries.add(source.country);
+    if (selected.length === size) return selected;
+  }
+  return [
+    ...selected,
+    ...ranked.filter((source) => !selected.includes(source)),
+  ].slice(0, size);
+}

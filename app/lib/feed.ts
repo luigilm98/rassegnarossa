@@ -82,7 +82,8 @@ export async function fetchSource(
     };
   }
 
-  const deadline = Date.now() + SOURCE_BUDGET_MS;
+  const isPulse = source.id.startsWith("pulse-");
+  const deadline = Date.now() + (isPulse ? 9000 : SOURCE_BUDGET_MS);
   const candidates = await getFeedCandidates(source);
   let lastError = "No feed candidates";
   let feedShapeError: string | null = null;
@@ -94,7 +95,7 @@ export async function fetchSource(
       const xml = await fetchText(
         candidate,
         MAX_FEED_CHARS,
-        Math.min(REQUEST_TIMEOUT_MS, remaining),
+        Math.min(isPulse ? 8500 : REQUEST_TIMEOUT_MS, remaining),
       );
       const fromListing = candidate === source.listingUrl;
       if (!fromListing && !looksLikeFeed(xml)) {
@@ -153,7 +154,7 @@ export async function fetchSource(
         },
       };
 
-      feedCache.set(cacheKey, { expiresAt: now + FEED_TTL_MS, result });
+      feedCache.set(cacheKey, { expiresAt: now + (source.id.startsWith("pulse-") ? 120_000 : FEED_TTL_MS), result });
       return result;
     } catch (error) {
       lastError = error instanceof Error ? error.message : "Unknown feed error";

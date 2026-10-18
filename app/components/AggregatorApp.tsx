@@ -48,7 +48,20 @@ import {
   preferredLanguageFor,
   rankSources,
   nextSourcePage,
+  recommendedSources,
 } from "@/app/lib/source-selection";
+
+import { CommunityEmblem } from "./CommunityEmblem";
+import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
+import { WorldWatch } from "./WorldWatch";
+import {
+  LocalizationProvider,
+  LocalizedText,
+  TranslationNotice,
+  useLocale,
+  LanguageName,
+  LocalizedInput,
+} from "./Localization";
 
 type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo";
 type SourceStatus = {
@@ -66,25 +79,6 @@ type DirectorySource = SourceDefinition & {
 };
 const ALL = "all";
 const PAGE_SIZE = 24;
-const LANGUAGES: Record<string, string> = {
-  it: "Italiano",
-  en: "Inglese",
-  es: "Spagnolo",
-  pt: "Portoghese",
-  fr: "Francese",
-  de: "Tedesco",
-  ar: "Arabo",
-  zh: "Cinese",
-  ru: "Russo",
-  el: "Greco",
-  fa: "Persiano",
-  ja: "Giapponese",
-  ko: "Coreano",
-  hi: "Hindi",
-  tr: "Turco",
-  id: "Indonesiano",
-  vi: "Vietnamita",
-};
 const NAV: { id: View; label: string }[] = [
   { id: "notizie", label: "La rassegna" },
   { id: "fonti", label: "Atlante delle fonti" },
@@ -95,13 +89,7 @@ const NAV: { id: View; label: string }[] = [
 const HEADINGS = {
   notizie: {
     overline: "NOTIZIE · ANALISI · PROSPETTIVE",
-    title: (
-      <>
-        Il mondo, da un’altra
-        <br />
-        <em>prospettiva.</em>
-      </>
-    ),
+    title: "Una citazione per cominciare",
     description:
       "Voci e idee dal lavoro, dai movimenti e dal Sud globale. Una rassegna per collegare le notizie, capire i conflitti, allargare lo sguardo.",
   },
@@ -109,9 +97,11 @@ const HEADINGS = {
     overline: "L’ATLANTE",
     title: (
       <>
-        Le voci. I luoghi.
+        <LocalizedText>{"Le voci. I luoghi."}</LocalizedText>
         <br />
-        <em>Le prospettive.</em>
+        <em>
+          <LocalizedText>{"Le prospettive."}</LocalizedText>
+        </em>
       </>
     ),
     description:
@@ -121,9 +111,11 @@ const HEADINGS = {
     overline: "LA BIBLIOTECA",
     title: (
       <>
-        Capire il presente.
+        <LocalizedText>{"Capire il presente."}</LocalizedText>
         <br />
-        <em>Leggere in profondità.</em>
+        <em>
+          <LocalizedText>{"Leggere in profondità."}</LocalizedText>
+        </em>
       </>
     ),
     description:
@@ -133,9 +125,11 @@ const HEADINGS = {
     overline: "IL TUO TACCUINO",
     title: (
       <>
-        Le letture che
+        <LocalizedText>{"Le letture che"}</LocalizedText>
         <br />
-        <em>vuoi ritrovare.</em>
+        <em>
+          <LocalizedText>{"vuoi ritrovare."}</LocalizedText>
+        </em>
       </>
     ),
     description:
@@ -145,9 +139,11 @@ const HEADINGS = {
     overline: "IL PROGETTO",
     title: (
       <>
-        Molte fonti.
+        <LocalizedText>{"Molte fonti."}</LocalizedText>
         <br />
-        <em>Uno sguardo consapevole.</em>
+        <em>
+          <LocalizedText>{"Uno sguardo consapevole."}</LocalizedText>
+        </em>
       </>
     ),
     description:
@@ -156,6 +152,8 @@ const HEADINGS = {
 };
 
 export function AggregatorApp() {
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [browserLanguage, setBrowserLanguage] = useState("it");
   const [view, setView] = useState<View>("notizie");
   const [articles, setArticles] = useState<Article[]>([]);
   const [statuses, setStatuses] = useState<Record<string, SourceStatus>>({});
@@ -429,6 +427,17 @@ export function AggregatorApp() {
       navigator.languages?.length ? navigator.languages : [navigator.language],
       available,
     );
+    setBrowserLanguage(preferred);
+    try {
+      const previous = Number(
+        sessionStorage.getItem("rassegna-rossa.quote") ?? "-1",
+      );
+      const next = nextQuotation(Number.isInteger(previous) ? previous : -1);
+      setQuoteIndex(next);
+      sessionStorage.setItem("rassegna-rossa.quote", String(next));
+    } catch {
+      setQuoteIndex(Math.floor(Math.random() * QUOTATIONS.length));
+    }
     let fresh = false;
     try {
       const chosen = localStorage.getItem("rassegna-rossa.language");
@@ -670,672 +679,829 @@ export function AggregatorApp() {
     [region, language, kind, ideology, topic, sourceId].filter((f) => f !== ALL)
       .length + (query ? 1 : 0);
   const heading = HEADINGS[view];
+  const readingLanguage =
+    preferredLanguage === ALL ? browserLanguage : preferredLanguage;
+  const quote = QUOTATIONS[quoteIndex];
+  useEffect(() => {
+    setDateLabel(
+      new Intl.DateTimeFormat(readingLanguage, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date()),
+    );
+  }, [readingLanguage]);
 
   return (
-    <div className="app-shell">
-      <a className="skip-link" href="#letture">
-        Vai ai contenuti
-      </a>
-      <header className="site-header">
-        <div className="utility-bar">
-          <span>{dateLabel}</span>
-          <span>
-            <span className="live-dot" /> Fonti aperte. Sguardo internazionale.
-          </span>
-        </div>
-        <div className="masthead">
-          <button
-            className="wordmark"
-            onClick={() => navigate("notizie")}
-            aria-label="Rassegna Rossa, pagina iniziale"
-          >
-            <span className="brand-symbol" aria-hidden="true">
-              <Globe2 size={30} strokeWidth={1.3} />
-            </span>
+    <LocalizationProvider language={readingLanguage}>
+      <div className="app-shell">
+        <a className="skip-link" href="#letture">
+          <LocalizedText>{"Vai ai contenuti"}</LocalizedText>
+        </a>
+        <header className="site-header">
+          <div className="utility-bar">
+            <span>{dateLabel}</span>
             <span>
-              rassegna<span className="wordmark-red">rossa</span>
-              <span className="brand-period">.</span>
+              <span className="live-dot" />
+              <LocalizedText>
+                {" Fonti aperte. Sguardo internazionale."}
+              </LocalizedText>
             </span>
-          </button>
-          <p className="brand-note">
-            Le notizie passano.
-            <br />
-            <strong>Le connessioni restano.</strong>
-          </p>
-        </div>
-        <nav className="main-nav" aria-label="Navigazione principale">
-          <div className="nav-links">
-            {NAV.map((item) => (
-              <button
-                key={item.id}
-                aria-current={view === item.id ? "page" : undefined}
-                onClick={() => navigate(item.id)}
-              >
-                {item.label}
-                {item.id === "salvati" && savedIds.size > 0 ? (
-                  <span className="nav-count">{savedIds.size}</span>
-                ) : null}
-              </button>
-            ))}
           </div>
-          <span className="nav-caption">
-            Un osservatorio, molte voci <ArrowUpRight size={14} />
-          </span>
-        </nav>
-      </header>
-
-      <main>
-        <section
-          className={`editorial-hero ${view !== "notizie" ? "hero-compact" : ""}`}
-          aria-labelledby="page-title"
-        >
-          <div className="hero-copy">
-            <p className="eyebrow">
-              <span className="small-square" /> {heading.overline}
-            </p>
-            <h1 id="page-title">{heading.title}</h1>
-            <p className="hero-description">{heading.description}</p>
-            {view === "notizie" ? (
-              <div className="hero-links">
-                <a href="#letture" className="button button-dark">
-                  Entra nella rassegna <ArrowDown size={16} />
-                </a>
-                <button
-                  className="text-link"
-                  onClick={() => navigate("teoria")}
-                >
-                  Esplora la biblioteca <ArrowUpRight size={16} />
-                </button>
-              </div>
-            ) : null}
-          </div>
-          {view === "notizie" ? (
-            <div className="hero-art" aria-hidden="true">
-              <OrbitalGlobe />
-              <span className="globe-note">
-                NESSUN CONFINE
-                <br />
-                ALLA COMPRENSIONE.
+          <div className="masthead">
+            <button
+              className="wordmark"
+              onClick={() => navigate("notizie")}
+              aria-label="Rassegna Rossa, pagina iniziale"
+            >
+              <span className="brand-symbol" aria-hidden="true">
+                <CommunityEmblem compact />
               </span>
-              <span className="globe-coordinate">
-                RR / OSSERVATORIO GLOBALE
-              </span>
-            </div>
-          ) : (
-            <div className="hero-index" aria-hidden="true">
-              {view === "fonti"
-                ? "02"
-                : view === "teoria"
-                  ? "03"
-                  : view === "salvati"
-                    ? "04"
-                    : "05"}
-              <span>RASSEGNA ROSSA</span>
-            </div>
-          )}
-        </section>
-
-        <div className="edition-line">
-          <span>
-            <span className="live-dot" />{" "}
-            {loading
-              ? "Raccolta delle notizie in corso"
-              : "Una rete di prospettive"}
-          </span>
-          <span>
-            {directory.filter((s) => !s.discovered).length} testate e canali{" "}
-            <i>/</i> {countries} paesi <i>/</i> {languages.length} lingue
-          </span>
-          <button onClick={() => navigate("metodo")}>
-            Come leggiamo le fonti <ArrowUpRight size={14} />
-          </button>
-        </div>
-
-        {view === "notizie" ? (
-          <section className="dossier-strip" aria-label="Percorsi tematici">
-            {DOSSIERS.slice(0, 4).map((d) => (
-              <button
-                key={d.id}
-                onClick={() => pickTopic(d.id)}
-                className={topic === d.id ? "active" : ""}
-              >
-                <span>{d.number} / ESPLORA</span>
-                <strong>{d.short}</strong>
-                <ArrowUpRight size={18} />
-              </button>
-            ))}
-          </section>
-        ) : null}
-
-        <section
-          id="letture"
-          className="reading-section"
-          aria-label="Contenuti della rassegna"
-        >
-          {view === "notizie" || view === "salvati" || view === "fonti" ? (
-            <>
-              <div className="section-heading">
-                <div>
-                  <p className="eyebrow">
-                    {view === "fonti"
-                      ? "L’INFORMAZIONE HA UN’ORIGINE"
-                      : view === "salvati"
-                        ? "IL TEMPO DI APPROFONDIRE"
-                        : "DALLA RETE AL CONTESTO"}
-                  </p>
-                  <h2>
-                    {view === "notizie"
-                      ? "La rassegna"
-                      : view === "salvati"
-                        ? "Le tue letture"
-                        : "Atlante delle fonti"}
-                    <span className="section-count">
-                      {view === "fonti"
-                        ? visibleSources.length
-                        : filtered.length}
-                    </span>
-                  </h2>
-                </div>
-                {view !== "salvati" ? (
-                  <button
-                    className="button button-outline"
-                    disabled={loading}
-                    onClick={() =>
-                      void refresh(
-                        filterCount && eligibleSources.length
-                          ? "selection"
-                          : "all",
-                      )
-                    }
-                  >
-                    {loading ? (
-                      <Loader2 size={15} className="spin" />
-                    ) : (
-                      <RefreshCcw size={15} />
-                    )}
-                    <span>
-                      {loading ? "Aggiornamento" : "Aggiorna notizie"}
-                    </span>
-                  </button>
-                ) : (
-                  <span className="local-note">
-                    <Bookmark size={15} /> Solo in questo browser
-                  </span>
-                )}
-              </div>
-              <div className="language-priority">
-                <label>
-                  <Languages size={16} />
-                  <span>Prima i titoli in</span>
-                  <select
-                    aria-label="Lingua da mettere in evidenza"
-                    value={preferredLanguage}
-                    onChange={(event) => choosePriority(event.target.value)}
-                  >
-                    <option value={ALL}>Tutte le lingue</option>
-                    {languages.map((code) => (
-                      <option key={code} value={code}>
-                        {LANGUAGES[code] ?? code.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <span>
-                  Preferenza del browser, modificabile. Le altre lingue restano
-                  disponibili.
+              <span>
+                rassegna<span className="wordmark-red">rossa</span>
+                <span className="brand-period">
+                  <LocalizedText>{"."}</LocalizedText>
                 </span>
-              </div>
-              {view === "notizie" ? (
-                <div
-                  className="source-shortcuts"
-                  aria-label="Fonti in evidenza"
+              </span>
+            </button>
+            <p className="brand-note">
+              <LocalizedText>{"Le notizie passano."}</LocalizedText>
+              <br />
+              <strong>
+                <LocalizedText>{"Le connessioni restano."}</LocalizedText>
+              </strong>
+            </p>
+          </div>
+          <nav className="main-nav" aria-label="Navigazione principale">
+            <div className="nav-links">
+              {NAV.map((item) => (
+                <button
+                  key={item.id}
+                  aria-current={view === item.id ? "page" : undefined}
+                  onClick={() => navigate(item.id)}
                 >
-                  {["ottolina", "dazibao", "ottolina-dazibao"].map((id) => {
-                    const source = SOURCE_CATALOG.find(
-                      (item) => item.id === id,
-                    )!;
-                    return (
-                      <div key={id}>
-                        <button onClick={() => openSource(id)}>
-                          <Newspaper size={15} />
-                          {source.name}
-                          <ArrowRight size={14} />
-                        </button>
-                        <a
-                          href={source.homepage}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Apri direttamente ${source.name}`}
-                        >
-                          <ExternalLink size={14} />
-                        </a>
-                      </div>
-                    );
-                  })}
+                  <LocalizedText>{item.label}</LocalizedText>
+                  {item.id === "salvati" && savedIds.size > 0 ? (
+                    <span className="nav-count">
+                      <LocalizedText>{savedIds.size}</LocalizedText>
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+            <span className="nav-caption">
+              <LocalizedText>{"Un osservatorio, molte voci "}</LocalizedText>
+              <ArrowUpRight size={14} />
+            </span>
+          </nav>
+        </header>
+
+        <main>
+          <section
+            className={`editorial-hero ${view !== "notizie" ? "hero-compact" : ""}`}
+            aria-labelledby="page-title"
+          >
+            <div className="hero-copy">
+              <p className="eyebrow">
+                <span className="small-square" />{" "}
+                <LocalizedText>{heading.overline}</LocalizedText>
+              </p>
+              <h1
+                id="page-title"
+                className={view === "notizie" ? "quotation-title" : undefined}
+              >
+                {view === "notizie" ? (
+                  <>
+                    <LocalizedText>{"“"}</LocalizedText>
+                    <LocalizedText priority={2}>{quote.text}</LocalizedText>
+                    <LocalizedText>{"”"}</LocalizedText>
+                  </>
+                ) : (
+                  heading.title
+                )}
+              </h1>
+              {view === "notizie" ? (
+                <p className="quote-attribution">
+                  <strong>{quote.author}</strong>
+                  <span>
+                    <LocalizedText>{quote.work}</LocalizedText>
+                    <LocalizedText>{", "}</LocalizedText>
+                    <LocalizedText>{quote.year}</LocalizedText>
+                  </span>
+                  <a href={quote.url} target="_blank" rel="noopener noreferrer">
+                    <LocalizedText>{"Consulta il testo "}</LocalizedText>
+                    <ArrowUpRight size={13} />
+                  </a>
+                  <small>
+                    <LocalizedText>{quote.note}</LocalizedText>
+                    <LocalizedText>
+                      {" · Marxists Internet Archive"}
+                    </LocalizedText>
+                  </small>
+                </p>
+              ) : null}
+              <p className="hero-description">
+                <LocalizedText>{heading.description}</LocalizedText>
+              </p>
+              {view === "notizie" ? (
+                <div className="hero-links">
+                  <a href="#letture" className="button button-dark">
+                    <LocalizedText>{"Entra nella rassegna "}</LocalizedText>
+                    <ArrowDown size={16} />
+                  </a>
                   <button
                     className="text-link"
-                    onClick={() => navigate("fonti")}
+                    onClick={() => navigate("teoria")}
                   >
-                    Tutte le{" "}
-                    {directory.filter((source) => !source.discovered).length}{" "}
-                    fonti <ArrowUpRight size={14} />
+                    <LocalizedText>{"Esplora la biblioteca "}</LocalizedText>
+                    <ArrowUpRight size={16} />
                   </button>
                 </div>
               ) : null}
-              <div className="filter-toolbar">
-                <label className="search-box">
-                  <Search size={18} />
-                  <input
-                    id="rassegna-search"
-                    aria-label={
-                      view === "fonti" ? "Cerca fonti" : "Cerca articoli"
-                    }
-                    placeholder={
-                      view === "fonti"
-                        ? "Cerca una fonte, un paese…"
-                        : "Cerca notizie, fonti, parole chiave…"
-                    }
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                  />
-                  {query ? (
+            </div>
+            {view === "notizie" ? (
+              <div className="hero-art" aria-hidden="true">
+                <CommunityEmblem />
+                <span className="globe-note">
+                  <LocalizedText>{"SAPERE, CREARE,"}</LocalizedText>
+                  <br />
+                  <LocalizedText>{"CONDIVIDERE."}</LocalizedText>
+                </span>
+                <span className="globe-coordinate">
+                  <LocalizedText>
+                    {"RR / INTELLIGENZA COLLETTIVA"}
+                  </LocalizedText>
+                </span>
+              </div>
+            ) : (
+              <div className="hero-index" aria-hidden="true">
+                <LocalizedText>
+                  {view === "fonti"
+                    ? "02"
+                    : view === "teoria"
+                      ? "03"
+                      : view === "salvati"
+                        ? "04"
+                        : "05"}
+                </LocalizedText>
+                <span>RASSEGNA ROSSA</span>
+              </div>
+            )}
+          </section>
+
+          <div className="edition-line">
+            <span>
+              <span className="live-dot" />
+              <LocalizedText> </LocalizedText>
+              <LocalizedText>
+                {loading
+                  ? "Raccolta delle notizie in corso"
+                  : "Una rete di prospettive"}
+              </LocalizedText>
+            </span>
+            <span>
+              <LocalizedText>
+                {directory.filter((s) => !s.discovered).length}
+              </LocalizedText>
+              <LocalizedText>{" testate e canali"}</LocalizedText>
+              <LocalizedText> </LocalizedText>
+              <i>
+                <LocalizedText>{"/"}</LocalizedText>
+              </i>{" "}
+              <LocalizedText>{countries}</LocalizedText>
+              <LocalizedText>{" paesi "}</LocalizedText>
+              <i>
+                <LocalizedText>{"/"}</LocalizedText>
+              </i>{" "}
+              <LocalizedText>{languages.length}</LocalizedText>
+              <LocalizedText>{" lingue"}</LocalizedText>
+            </span>
+            <button onClick={() => navigate("metodo")}>
+              <LocalizedText>{"Come leggiamo le fonti "}</LocalizedText>
+              <ArrowUpRight size={14} />
+            </button>
+          </div>
+
+          {view === "notizie" ? (
+            <section className="dossier-strip" aria-label="Percorsi tematici">
+              {DOSSIERS.slice(0, 4).map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => pickTopic(d.id)}
+                  className={topic === d.id ? "active" : ""}
+                >
+                  <span>
+                    <LocalizedText>{d.number}</LocalizedText>
+                    <LocalizedText>{" / ESPLORA"}</LocalizedText>
+                  </span>
+                  <strong>
+                    <LocalizedText>{d.short}</LocalizedText>
+                  </strong>
+                  <ArrowUpRight size={18} />
+                </button>
+              ))}
+            </section>
+          ) : null}
+
+          <section
+            id="letture"
+            className="reading-section"
+            aria-label="Contenuti della rassegna"
+          >
+            {view === "notizie" || view === "salvati" || view === "fonti" ? (
+              <>
+                <div className="section-heading">
+                  <div>
+                    <p className="eyebrow">
+                      <LocalizedText>
+                        {view === "fonti"
+                          ? "L’INFORMAZIONE HA UN’ORIGINE"
+                          : view === "salvati"
+                            ? "IL TEMPO DI APPROFONDIRE"
+                            : "DALLA RETE AL CONTESTO"}
+                      </LocalizedText>
+                    </p>
+                    <h2>
+                      <LocalizedText>
+                        {view === "notizie"
+                          ? "La rassegna"
+                          : view === "salvati"
+                            ? "Le tue letture"
+                            : "Atlante delle fonti"}
+                      </LocalizedText>
+                      <span className="section-count">
+                        <LocalizedText>
+                          {view === "fonti"
+                            ? visibleSources.length
+                            : filtered.length}
+                        </LocalizedText>
+                      </span>
+                    </h2>
+                  </div>
+                  {view !== "salvati" ? (
                     <button
-                      onClick={() => setQuery("")}
-                      aria-label="Cancella ricerca"
+                      className="button button-outline"
+                      disabled={loading}
+                      onClick={() =>
+                        void refresh(
+                          filterCount && eligibleSources.length
+                            ? "selection"
+                            : "all",
+                        )
+                      }
                     >
-                      <X size={16} />
+                      {loading ? (
+                        <Loader2 size={15} className="spin" />
+                      ) : (
+                        <RefreshCcw size={15} />
+                      )}
+                      <span>
+                        <LocalizedText>
+                          {loading ? "Aggiornamento" : "Aggiorna notizie"}
+                        </LocalizedText>
+                      </span>
                     </button>
                   ) : (
-                    <kbd>/</kbd>
+                    <span className="local-note">
+                      <Bookmark size={15} />
+                      <LocalizedText>{" Solo in questo browser"}</LocalizedText>
+                    </span>
                   )}
-                </label>
-                <label className="inline-select">
-                  <Globe2 size={16} />
-                  <span className="sr-only">Area geografica</span>
-                  <select
-                    value={region}
-                    onChange={(e) => setRegion(e.target.value)}
-                  >
-                    <option value={ALL}>Tutto il mondo</option>
-                    {REGION_ORDER.map((r) => (
-                      <option key={r}>{r}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} />
-                </label>
-                {view === "notizie" ? (
-                  <label className="inline-select">
-                    <span className="sr-only">Periodo</span>
+                </div>
+                <div className="language-priority">
+                  <label>
+                    <Languages size={16} />
+                    <span>
+                      <LocalizedText>{"Lingua di lettura"}</LocalizedText>
+                    </span>
                     <select
-                      value={days}
-                      onChange={(e) => setDays(e.target.value)}
+                      aria-label="Lingua da mettere in evidenza"
+                      value={preferredLanguage}
+                      onChange={(event) => choosePriority(event.target.value)}
                     >
-                      <option value="1">Ultime 24 ore</option>
-                      <option value="7">Ultimi 7 giorni</option>
-                      <option value="30">Ultimi 30 giorni</option>
-                      <option value="Infinity">Tutte le date</option>
+                      <option value={ALL}>
+                        <LocalizedText>{"Tutte le lingue"}</LocalizedText>
+                      </option>
+                      {languages.map((code) => (
+                        <option key={code} value={code}>
+                          <LanguageName code={code} />
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <span>
+                    <LocalizedText>
+                      {
+                        "Interfaccia e notizie nella lingua scelta. Le fonti originali restano accessibili."
+                      }
+                    </LocalizedText>
+                  </span>
+                </div>
+                <TranslationNotice />
+                {view === "notizie" ? (
+                  <div
+                    className="source-shortcuts"
+                    aria-label="Fonti in evidenza"
+                  >
+                    {recommendedSources(SOURCE_CATALOG, preferredLanguage).map(
+                      (source) => {
+                        const id = source.id;
+                        return (
+                          <div key={id}>
+                            <button onClick={() => openSource(id)}>
+                              <Newspaper size={15} />
+                              {source.name}
+                              <ArrowRight size={14} />
+                            </button>
+                            <a
+                              href={source.homepage}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Apri direttamente ${source.name}`}
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                          </div>
+                        );
+                      },
+                    )}
+                    <button
+                      className="text-link"
+                      onClick={() => navigate("fonti")}
+                    >
+                      <LocalizedText>{"Tutte le"}</LocalizedText>
+                      <LocalizedText> </LocalizedText>
+                      <LocalizedText>
+                        {
+                          directory.filter((source) => !source.discovered)
+                            .length
+                        }
+                      </LocalizedText>
+                      <LocalizedText> </LocalizedText>
+                      <LocalizedText>{"fonti "}</LocalizedText>
+                      <ArrowUpRight size={14} />
+                    </button>
+                  </div>
+                ) : null}
+                <div className="filter-toolbar">
+                  <label className="search-box">
+                    <Search size={18} />
+                    <LocalizedInput
+                      id="rassegna-search"
+                      aria-label={
+                        view === "fonti" ? "Cerca fonti" : "Cerca articoli"
+                      }
+                      placeholder={
+                        view === "fonti"
+                          ? "Cerca una fonte, un paese…"
+                          : "Cerca notizie, fonti, parole chiave…"
+                      }
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                    {query ? (
+                      <button
+                        onClick={() => setQuery("")}
+                        aria-label="Cancella ricerca"
+                      >
+                        <X size={16} />
+                      </button>
+                    ) : (
+                      <kbd>
+                        <LocalizedText>{"/"}</LocalizedText>
+                      </kbd>
+                    )}
+                  </label>
+                  <label className="inline-select">
+                    <Globe2 size={16} />
+                    <span className="sr-only">
+                      <LocalizedText>{"Area geografica"}</LocalizedText>
+                    </span>
+                    <select
+                      value={region}
+                      onChange={(e) => setRegion(e.target.value)}
+                    >
+                      <option value={ALL}>
+                        <LocalizedText>{"Tutto il mondo"}</LocalizedText>
+                      </option>
+                      {REGION_ORDER.map((r) => (
+                        <option key={r} value={r}>
+                          <LocalizedText>{r}</LocalizedText>
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown size={14} />
                   </label>
-                ) : null}
-                <button
-                  className={`filter-toggle ${filtersOpen ? "active" : ""}`}
-                  onClick={() => setFiltersOpen(!filtersOpen)}
-                  aria-expanded={filtersOpen}
-                  aria-controls="advanced-filters"
-                >
-                  <SlidersHorizontal size={16} /> Filtri{" "}
-                  {filterCount > 0 ? <span>{filterCount}</span> : null}
-                </button>
-              </div>
-              {filtersOpen ? (
-                <div id="advanced-filters" className="advanced-filters">
-                  <Select label="Lingua" value={language} change={setLanguage}>
-                    <option value={ALL}>Tutte le lingue</option>
-                    {languages.map((l) => (
-                      <option value={l} key={l}>
-                        {LANGUAGES[l] ?? l.toUpperCase()}
-                      </option>
-                    ))}
-                  </Select>
-                  <Select label="Tipo di fonte" value={kind} change={setKind}>
-                    <option value={ALL}>Tutti i tipi</option>
-                    {[...new Set(directory.map((s) => s.kind))].map((k) => (
-                      <option key={k}>{k}</option>
-                    ))}
-                  </Select>
-                  <Select
-                    label="Orientamento dichiarato nel catalogo"
-                    value={ideology}
-                    change={setIdeology}
-                  >
-                    <option value={ALL}>Tutti gli orientamenti</option>
-                    {ideologies.map((i) => (
-                      <option key={i}>{i}</option>
-                    ))}
-                  </Select>
-                  {view !== "fonti" ? (
-                    <Select label="Ordina per" value={sort} change={setSort}>
-                      <option value="fresh">Più recenti</option>
-                      <option value="score">Punteggio tematico</option>
-                      <option value="source">Nome della fonte</option>
-                    </Select>
+                  {view === "notizie" ? (
+                    <label className="inline-select">
+                      <span className="sr-only">
+                        <LocalizedText>{"Periodo"}</LocalizedText>
+                      </span>
+                      <select
+                        value={days}
+                        onChange={(e) => setDays(e.target.value)}
+                      >
+                        <option value="1">
+                          <LocalizedText>{"Ultime 24 ore"}</LocalizedText>
+                        </option>
+                        <option value="7">
+                          <LocalizedText>{"Ultimi 7 giorni"}</LocalizedText>
+                        </option>
+                        <option value="30">
+                          <LocalizedText>{"Ultimi 30 giorni"}</LocalizedText>
+                        </option>
+                        <option value="Infinity">
+                          <LocalizedText>{"Tutte le date"}</LocalizedText>
+                        </option>
+                      </select>
+                      <ChevronDown size={14} />
+                    </label>
                   ) : null}
-                  <button className="text-link" onClick={reset}>
-                    <X size={14} /> Azzera filtri
+                  <button
+                    className={`filter-toggle ${filtersOpen ? "active" : ""}`}
+                    onClick={() => setFiltersOpen(!filtersOpen)}
+                    aria-expanded={filtersOpen}
+                    aria-controls="advanced-filters"
+                  >
+                    <SlidersHorizontal size={16} />
+                    <LocalizedText>{" Filtri"}</LocalizedText>
+                    <LocalizedText> </LocalizedText>
+                    {filterCount > 0 ? (
+                      <span>
+                        <LocalizedText>{filterCount}</LocalizedText>
+                      </span>
+                    ) : null}
                   </button>
                 </div>
-              ) : null}
-              {view !== "fonti" ? (
-                <div className="topic-tabs" aria-label="Argomenti">
-                  <button
-                    onClick={() => setTopic(ALL)}
-                    aria-pressed={topic === ALL}
-                  >
-                    Tutti i temi
-                  </button>
-                  {TOPIC_TAXONOMY.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setTopic(t.id)}
-                      aria-pressed={topic === t.id}
+                {filtersOpen ? (
+                  <div id="advanced-filters" className="advanced-filters">
+                    <Select
+                      label="Lingua"
+                      value={language}
+                      change={setLanguage}
                     >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-              {sourceId !== ALL ? (
-                <div className="active-source">
-                  <Newspaper size={16} />
-                  <span>
-                    Fonte:{" "}
-                    <strong>
-                      {directory.find((s) => s.id === sourceId)?.name ??
-                        sourceId}
-                    </strong>
-                  </span>
-                  <button
-                    onClick={() => setSourceId(ALL)}
-                    aria-label="Mostra tutte le fonti"
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-              ) : null}
-              {storageWarning ? (
-                <p className="notice" role="status">
-                  Il browser non ha consentito l’accesso ai salvataggi. Puoi
-                  continuare a leggere, ma i nuovi preferiti potrebbero non
-                  restare dopo la chiusura.
-                </p>
-              ) : null}
-              {refreshNotice ? (
-                <p className="notice" role="status">
-                  {refreshNotice}
-                </p>
-              ) : null}
-              {loading && view !== "salvati" ? (
-                <div className="sync-progress" role="status">
-                  <div>
-                    <span>
-                      <Loader2 size={13} className="spin" /> Le notizie arrivano
-                      progressivamente
-                    </span>
-                    <span>
-                      {progress.done} / {progress.total} canali{" "}
-                      <button onClick={stopRefresh}>Interrompi</button>
-                    </span>
-                  </div>
-                  <progress
-                    value={progress.done}
-                    max={progress.total || 1}
-                    aria-label="Raccolta dei canali"
-                  />
-                </div>
-              ) : null}
-              {view === "fonti" ? (
-                <SourcesDirectory
-                  sources={visibleSources}
-                  onSelect={openSource}
-                />
-              ) : (
-                <div className="news-layout">
-                  <div className="news-main">
-                    {topic !== ALL ? (
-                      <div className="topic-intro">
-                        <p className="eyebrow">PERCORSO TEMATICO</p>
-                        <h3>
-                          {DOSSIERS.find((d) => d.id === topic)?.title ??
-                            TOPIC_TAXONOMY.find((t) => t.id === topic)?.label}
-                        </h3>
-                        <p>
-                          {DOSSIERS.find((d) => d.id === topic)?.description ??
-                            "Una selezione automatica dai feed: confronta le voci e risali sempre alla fonte originale."}
-                        </p>
-                      </div>
-                    ) : null}
-                    <div className="news-grid" aria-label="Articoli">
-                      {filtered.slice(0, visibleCount).map((article, index) => (
-                        <ArticleCard
-                          key={article.id}
-                          article={article}
-                          featured={index === 0 && view === "notizie"}
-                          saved={savedIds.has(article.id)}
-                          onSelect={() => setSelectedId(article.id)}
-                          onSave={() => toggleSave(article)}
-                        />
+                      <option value={ALL}>
+                        <LocalizedText>{"Tutte le lingue"}</LocalizedText>
+                      </option>
+                      {languages.map((l) => (
+                        <option value={l} key={l}>
+                          <LanguageName code={l} />
+                        </option>
                       ))}
-                    </div>
-                    {!filtered.length ? (
-                      <EmptyState
-                        loading={loading && view !== "salvati"}
-                        saved={view === "salvati"}
-                        filtered={filterCount > 0 || topic !== ALL}
-                        onReset={reset}
-                        onExplore={() =>
-                          navigate(view === "salvati" ? "notizie" : "fonti")
-                        }
-                        onRetry={() =>
-                          void refresh(
-                            filterCount && eligibleSources.length
-                              ? "selection"
-                              : "all",
-                          )
-                        }
-                      />
+                    </Select>
+                    <Select label="Tipo di fonte" value={kind} change={setKind}>
+                      <option value={ALL}>
+                        <LocalizedText>{"Tutti i tipi"}</LocalizedText>
+                      </option>
+                      {[...new Set(directory.map((s) => s.kind))].map((k) => (
+                        <option key={k} value={k}>
+                          <LocalizedText>{k}</LocalizedText>
+                        </option>
+                      ))}
+                    </Select>
+                    <Select
+                      label="Orientamento dichiarato nel catalogo"
+                      value={ideology}
+                      change={setIdeology}
+                    >
+                      <option value={ALL}>
+                        <LocalizedText>
+                          {"Tutti gli orientamenti"}
+                        </LocalizedText>
+                      </option>
+                      {ideologies.map((i) => (
+                        <option key={i} value={i}>
+                          <LocalizedText>{i}</LocalizedText>
+                        </option>
+                      ))}
+                    </Select>
+                    {view !== "fonti" ? (
+                      <Select label="Ordina per" value={sort} change={setSort}>
+                        <option value="fresh">
+                          <LocalizedText>{"Più recenti"}</LocalizedText>
+                        </option>
+                        <option value="score">
+                          <LocalizedText>{"Punteggio tematico"}</LocalizedText>
+                        </option>
+                        <option value="source">
+                          <LocalizedText>{"Nome della fonte"}</LocalizedText>
+                        </option>
+                      </Select>
                     ) : null}
-                    {filtered.length > visibleCount ? (
-                      <button
-                        className="button button-outline load-more"
-                        onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
-                      >
-                        Altri{" "}
-                        {Math.min(PAGE_SIZE, filtered.length - visibleCount)}{" "}
-                        articoli <ArrowDown size={16} />
-                        <span>
-                          {visibleCount} di {filtered.length}
-                        </span>
-                      </button>
-                    ) : null}
-                    {view === "notizie" ? (
-                      <div className="collection-more">
-                        <p>
-                          {attemptedIds.size} canali già consultati o presenti
-                          in memoria. Il catalogo completo è già disponibile
-                          nell’atlante.
-                        </p>
-                        <button
-                          className="button button-dark"
-                          disabled={
-                            loading ||
-                            !eligibleSources.some(
-                              (source) => !attemptedIds.has(source.id),
-                            )
-                          }
-                          onClick={() => void refresh("more")}
-                        >
-                          Carica altre fonti <ArrowDown size={16} />
-                        </button>
-                        <button
-                          className="text-link"
-                          onClick={() => navigate("fonti")}
-                        >
-                          Esplora tutte le testate <ArrowUpRight size={15} />
-                        </button>
-                        {newsUpdatedAt ? (
-                          <small>
-                            Ultime notizie recuperate:{" "}
-                            {relativeTime(
-                              new Date(newsUpdatedAt).toISOString(),
-                            )}
-                            . Le schede in memoria possono precedere l’ultimo
-                            tentativo.
-                          </small>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {!loading && failedCount > 0 && view === "notizie" ? (
-                      <p className="feed-note">
-                        <CircleHelp size={15} /> {failedCount} canali non hanno
-                        risposto. Le notizie disponibili restano leggibili.{" "}
-                        <button onClick={() => navigate("fonti")}>
-                          Consulta le fonti
-                        </button>
-                      </p>
-                    ) : null}
+                    <button className="text-link" onClick={reset}>
+                      <X size={14} />
+                      <LocalizedText>{" Azzera filtri"}</LocalizedText>
+                    </button>
                   </div>
-                  <aside
-                    className="editorial-sidebar"
-                    aria-label="Per orientarti"
-                  >
-                    <div className="sidebar-section">
-                      <p className="eyebrow">IL FILO DELLE NOTIZIE</p>
-                      <h3>
-                        Segui una domanda.
-                        <br />
-                        <em>Non solo un titolo.</em>
-                      </h3>
-                      <div className="sidebar-topics">
-                        {DOSSIERS.map((d) => (
-                          <button key={d.id} onClick={() => pickTopic(d.id)}>
-                            <span>{d.number}</span>
-                            <strong>{d.title}</strong>
-                            <ArrowUpRight size={15} />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="library-promo">
-                      <BookOpen size={26} strokeWidth={1.3} />
-                      <p className="eyebrow">OLTRE L’ATTUALITÀ</p>
-                      <h3>
-                        Le idee hanno
-                        <br />
-                        una storia.
-                      </h3>
-                      <p>
-                        Dieci punti di partenza, tre percorsi. Da Marx alla
-                        riproduzione sociale.
-                      </p>
+                ) : null}
+                {view !== "fonti" ? (
+                  <div className="topic-tabs" aria-label="Argomenti">
+                    <button
+                      onClick={() => setTopic(ALL)}
+                      aria-pressed={topic === ALL}
+                    >
+                      <LocalizedText>{"Tutti i temi"}</LocalizedText>
+                    </button>
+                    {TOPIC_TAXONOMY.map((t) => (
                       <button
-                        className="text-link"
-                        onClick={() => navigate("teoria")}
+                        key={t.id}
+                        onClick={() => setTopic(t.id)}
+                        aria-pressed={topic === t.id}
                       >
-                        Apri la biblioteca <ArrowRight size={16} />
+                        <LocalizedText>{t.label}</LocalizedText>
                       </button>
-                      <span className="promo-letter" aria-hidden="true">
-                        R
+                    ))}
+                  </div>
+                ) : null}
+                {sourceId !== ALL ? (
+                  <div className="active-source">
+                    <Newspaper size={16} />
+                    <span>
+                      <LocalizedText>{"Fonte:"}</LocalizedText>
+                      <LocalizedText> </LocalizedText>
+                      <strong>
+                        <LocalizedText>
+                          {directory.find((s) => s.id === sourceId)?.name ??
+                            sourceId}
+                        </LocalizedText>
+                      </strong>
+                    </span>
+                    <button
+                      onClick={() => setSourceId(ALL)}
+                      aria-label="Mostra tutte le fonti"
+                    >
+                      <X size={15} />
+                    </button>
+                  </div>
+                ) : null}
+                {storageWarning ? (
+                  <p className="notice" role="status">
+                    <LocalizedText>
+                      {
+                        "Il browser non ha consentito l’accesso ai salvataggi. Puoi continuare a leggere, ma i nuovi preferiti potrebbero non restare dopo la chiusura."
+                      }
+                    </LocalizedText>
+                  </p>
+                ) : null}
+                {refreshNotice ? (
+                  <p className="notice" role="status">
+                    <LocalizedText>{refreshNotice}</LocalizedText>
+                  </p>
+                ) : null}
+                {loading && view !== "salvati" ? (
+                  <div className="sync-progress" role="status">
+                    <div>
+                      <span>
+                        <Loader2 size={13} className="spin" />
+                        <LocalizedText>
+                          {" Le notizie arrivano progressivamente"}
+                        </LocalizedText>
+                      </span>
+                      <span>
+                        <LocalizedText>{progress.done}</LocalizedText>
+                        <LocalizedText>{" / "}</LocalizedText>
+                        <LocalizedText>{progress.total}</LocalizedText>
+                        <LocalizedText>{" canali"}</LocalizedText>
+                        <LocalizedText> </LocalizedText>
+                        <button onClick={stopRefresh}>
+                          <LocalizedText>{"Interrompi"}</LocalizedText>
+                        </button>
                       </span>
                     </div>
-                    <div className="sidebar-section network-note">
-                      <p className="eyebrow">L’OSSERVATORIO</p>
-                      <div>
-                        <strong>{okCount}</strong>
-                        <span>
-                          fonti rappresentate
-                          <br />
-                          nelle notizie recuperate
-                        </span>
+                    <progress
+                      value={progress.done}
+                      max={progress.total || 1}
+                      aria-label="Raccolta dei canali"
+                    />
+                  </div>
+                ) : null}
+                {view === "fonti" ? (
+                  <SourcesDirectory
+                    sources={visibleSources}
+                    onSelect={openSource}
+                  />
+                ) : (
+                  <div className="news-layout">
+                    <div className="news-main">
+                      {topic !== ALL ? (
+                        <div className="topic-intro">
+                          <p className="eyebrow">
+                            <LocalizedText>{"PERCORSO TEMATICO"}</LocalizedText>
+                          </p>
+                          <h3>
+                            <LocalizedText>
+                              {DOSSIERS.find((d) => d.id === topic)?.title ??
+                                TOPIC_TAXONOMY.find((t) => t.id === topic)
+                                  ?.label}
+                            </LocalizedText>
+                          </h3>
+                          <p>
+                            <LocalizedText>
+                              {DOSSIERS.find((d) => d.id === topic)
+                                ?.description ??
+                                "Una selezione automatica dai feed: confronta le voci e risali sempre alla fonte originale."}
+                            </LocalizedText>
+                          </p>
+                        </div>
+                      ) : null}
+                      <div className="news-grid" aria-label="Articoli">
+                        {filtered
+                          .slice(0, visibleCount)
+                          .map((article, index) => (
+                            <ArticleCard
+                              key={article.id}
+                              article={article}
+                              featured={index === 0 && view === "notizie"}
+                              saved={savedIds.has(article.id)}
+                              onSelect={() => setSelectedId(article.id)}
+                              onSave={() => toggleSave(article)}
+                            />
+                          ))}
                       </div>
-                      <p>
-                        {RADAR_CHANNEL_COUNT} canali radar affiancano le fonti
-                        del catalogo. Sono strumenti di ricerca, non editori né
-                        garanzie di attendibilità.
-                      </p>
-                      <button
-                        className="text-link"
-                        onClick={() => navigate("metodo")}
-                      >
-                        Leggi il metodo <ArrowUpRight size={14} />
-                      </button>
-                      {lastRefresh ? (
-                        <small>
-                          Ultimo tentativo: {relativeTime(lastRefresh)}
-                        </small>
+                      {!filtered.length ? (
+                        <EmptyState
+                          loading={loading && view !== "salvati"}
+                          saved={view === "salvati"}
+                          filtered={filterCount > 0 || topic !== ALL}
+                          onReset={reset}
+                          onExplore={() =>
+                            navigate(view === "salvati" ? "notizie" : "fonti")
+                          }
+                          onRetry={() =>
+                            void refresh(
+                              filterCount && eligibleSources.length
+                                ? "selection"
+                                : "all",
+                            )
+                          }
+                        />
+                      ) : null}
+                      {filtered.length > visibleCount ? (
+                        <button
+                          className="button button-outline load-more"
+                          onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+                        >
+                          <LocalizedText>{"Altri"}</LocalizedText>
+                          <LocalizedText> </LocalizedText>
+                          <LocalizedText>
+                            {Math.min(
+                              PAGE_SIZE,
+                              filtered.length - visibleCount,
+                            )}
+                          </LocalizedText>
+                          <LocalizedText> </LocalizedText>
+                          <LocalizedText>{"articoli "}</LocalizedText>
+                          <ArrowDown size={16} />
+                          <span>
+                            <LocalizedText>{visibleCount}</LocalizedText>
+                            <LocalizedText>{" di "}</LocalizedText>
+                            <LocalizedText>{filtered.length}</LocalizedText>
+                          </span>
+                        </button>
+                      ) : null}
+                      {view === "notizie" ? (
+                        <div className="collection-more">
+                          <p>
+                            <LocalizedText>{attemptedIds.size}</LocalizedText>
+                            <LocalizedText>
+                              {
+                                " canali già consultati o presenti in memoria. Il catalogo completo è già disponibile nell’atlante."
+                              }
+                            </LocalizedText>
+                          </p>
+                          <button
+                            className="button button-dark"
+                            disabled={
+                              loading ||
+                              !eligibleSources.some(
+                                (source) => !attemptedIds.has(source.id),
+                              )
+                            }
+                            onClick={() => void refresh("more")}
+                          >
+                            <LocalizedText>
+                              {"Carica altre fonti "}
+                            </LocalizedText>
+                            <ArrowDown size={16} />
+                          </button>
+                          <button
+                            className="text-link"
+                            onClick={() => navigate("fonti")}
+                          >
+                            <LocalizedText>
+                              {"Esplora tutte le testate "}
+                            </LocalizedText>
+                            <ArrowUpRight size={15} />
+                          </button>
+                          {newsUpdatedAt ? (
+                            <small>
+                              <LocalizedText>
+                                {"Ultime notizie recuperate:"}
+                              </LocalizedText>
+                              <LocalizedText> </LocalizedText>
+                              <LocalizedText>
+                                {relativeTime(
+                                  new Date(newsUpdatedAt).toISOString(),
+                                )}
+                              </LocalizedText>
+                              <LocalizedText>
+                                {
+                                  ". Le schede in memoria possono precedere l’ultimo tentativo."
+                                }
+                              </LocalizedText>
+                            </small>
+                          ) : null}
+                        </div>
+                      ) : null}
+                      {!loading && failedCount > 0 && view === "notizie" ? (
+                        <p className="feed-note">
+                          <CircleHelp size={15} />{" "}
+                          <LocalizedText>{failedCount}</LocalizedText>
+                          <LocalizedText>
+                            {
+                              " canali non hanno risposto. Le notizie disponibili restano leggibili."
+                            }
+                          </LocalizedText>
+                          <LocalizedText> </LocalizedText>
+                          <button onClick={() => navigate("fonti")}>
+                            <LocalizedText>{"Consulta le fonti"}</LocalizedText>
+                          </button>
+                        </p>
                       ) : null}
                     </div>
-                  </aside>
-                </div>
-              )}
-            </>
+                    {view === "notizie" ? <WorldWatch /> : null}
+                  </div>
+                )}
+              </>
+            ) : null}
+            {view === "teoria" ? (
+              <LibraryView query={query} setQuery={setQuery} />
+            ) : null}
+            {view === "metodo" ? (
+              <MethodView onSources={() => navigate("fonti")} />
+            ) : null}
+          </section>
+        </main>
+        <footer className="site-footer">
+          <div className="footer-top">
+            <span className="footer-brand">
+              rassegna<span>rossa.</span>
+            </span>
+            <p>
+              <LocalizedText>{"Per capire il mondo,"}</LocalizedText>
+              <br />
+              <LocalizedText>
+                {"mettiamo in relazione le sue voci."}
+              </LocalizedText>
+            </p>
+            <button className="text-link" onClick={() => navigate("metodo")}>
+              <LocalizedText>{"Il progetto e il metodo "}</LocalizedText>
+              <ArrowUpRight size={16} />
+            </button>
+          </div>
+          <div className="footer-bottom">
+            <span>
+              <LocalizedText>
+                {"Aggregatore socialista globale · Notizie, teoria, fonti."}
+              </LocalizedText>
+            </span>
+            <span>
+              <LocalizedText>
+                {
+                  "Ogni contenuto appartiene alla sua fonte. I salvati restano nel tuo browser."
+                }
+              </LocalizedText>
+            </span>
+          </div>
+        </footer>
+        <dialog
+          ref={readerDialog}
+          className="reader-dialog"
+          aria-labelledby="reader-title"
+          onClose={() => setSelectedId(null)}
+          onCancel={() => setSelectedId(null)}
+        >
+          {selectedArticle ? (
+            <ArticleReader
+              key={selectedArticle.id}
+              article={selectedArticle}
+              saved={savedIds.has(selectedArticle.id)}
+              onSave={() => toggleSave(selectedArticle)}
+              onClose={() => readerDialog.current?.close()}
+              related={articles
+                .filter(
+                  (a) =>
+                    a.sourceId === selectedArticle.sourceId &&
+                    a.id !== selectedArticle.id,
+                )
+                .slice(0, 3)}
+              onSelect={setSelectedId}
+            />
           ) : null}
-          {view === "teoria" ? (
-            <LibraryView query={query} setQuery={setQuery} />
-          ) : null}
-          {view === "metodo" ? (
-            <MethodView onSources={() => navigate("fonti")} />
-          ) : null}
-        </section>
-      </main>
-      <footer className="site-footer">
-        <div className="footer-top">
-          <span className="footer-brand">
-            rassegna<span>rossa.</span>
-          </span>
-          <p>
-            Per capire il mondo,
-            <br />
-            mettiamo in relazione le sue voci.
-          </p>
-          <button className="text-link" onClick={() => navigate("metodo")}>
-            Il progetto e il metodo <ArrowUpRight size={16} />
-          </button>
-        </div>
-        <div className="footer-bottom">
-          <span>Aggregatore socialista globale · Notizie, teoria, fonti.</span>
-          <span>
-            Ogni contenuto appartiene alla sua fonte. I salvati restano nel tuo
-            browser.
-          </span>
-        </div>
-      </footer>
-      <dialog
-        ref={readerDialog}
-        className="reader-dialog"
-        aria-labelledby="reader-title"
-        onClose={() => setSelectedId(null)}
-        onCancel={() => setSelectedId(null)}
-      >
-        {selectedArticle ? (
-          <ArticleReader
-            key={selectedArticle.id}
-            article={selectedArticle}
-            saved={savedIds.has(selectedArticle.id)}
-            onSave={() => toggleSave(selectedArticle)}
-            onClose={() => readerDialog.current?.close()}
-            related={articles
-              .filter(
-                (a) =>
-                  a.sourceId === selectedArticle.sourceId &&
-                  a.id !== selectedArticle.id,
-              )
-              .slice(0, 3)}
-            onSelect={setSelectedId}
-          />
-        ) : null}
-      </dialog>
-    </div>
+        </dialog>
+      </div>
+    </LocalizationProvider>
   );
 }
 
@@ -1352,70 +1518,13 @@ function Select({
 }) {
   return (
     <label className="select-field">
-      <span>{label}</span>
+      <span>
+        <LocalizedText>{label}</LocalizedText>
+      </span>
       <select value={value} onChange={(e) => change(e.target.value)}>
-        {children}
+        <LocalizedText>{children}</LocalizedText>
       </select>
     </label>
-  );
-}
-
-function OrbitalGlobe() {
-  return (
-    <svg viewBox="0 0 500 370" className="orbital-globe">
-      <defs>
-        <clipPath id="globe-clip">
-          <circle cx="255" cy="180" r="139" />
-        </clipPath>
-        <pattern
-          id="globe-dots"
-          width="8"
-          height="8"
-          patternUnits="userSpaceOnUse"
-        >
-          <circle cx="2" cy="2" r="1" fill="currentColor" opacity=".28" />
-        </pattern>
-      </defs>
-      <circle cx="255" cy="180" r="139" fill="url(#globe-dots)" />
-      <g fill="none" stroke="currentColor" strokeWidth=".8" opacity=".65">
-        <circle cx="255" cy="180" r="139" />
-        <ellipse cx="255" cy="180" rx="94" ry="139" />
-        <ellipse cx="255" cy="180" rx="44" ry="139" />
-        <ellipse cx="255" cy="180" rx="139" ry="46" />
-        <ellipse cx="255" cy="180" rx="139" ry="96" />
-        <path d="M116 180h278M255 41v278" />
-      </g>
-      <g clipPath="url(#globe-clip)" fill="currentColor" opacity=".85">
-        <path d="m163 86 27-19 31 10 4 24-17 13 3 21-15 13-6 24-23-8-8-31-17-19zm29 95 29 8 13 26-6 30-17 25-7 28-15-16 3-33-15-31zM263 89l24-11 13 16 25-3 9 12 24 1 31 20-11 21-29 3-15-13-20 7-14-17-22 4-5-19-19-1zm7 49 28 2 21 22-5 36-17 31-19-13-7-32-16-20zm73 29 16-10 14 20-4 22-14-5zm5 76 24-9 22 16-5 22-27-3-20-12z" />
-      </g>
-      <g fill="none" stroke="currentColor">
-        <ellipse
-          cx="255"
-          cy="180"
-          rx="221"
-          ry="69"
-          transform="rotate(-28 255 180)"
-          strokeWidth="1.3"
-        />
-        <ellipse
-          cx="255"
-          cy="180"
-          rx="204"
-          ry="91"
-          transform="rotate(34 255 180)"
-          strokeDasharray="3 6"
-          opacity=".6"
-        />
-      </g>
-      <circle cx="100" cy="251" r="5" fill="currentColor" />
-      <circle cx="420" cy="109" r="7" fill="currentColor" />
-      <path
-        d="M100 251h-42v29M420 109h32V79"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth=".8"
-      />
-    </svg>
   );
 }
 
@@ -1449,34 +1558,63 @@ function ArticleCard({
               referrerPolicy="no-referrer"
               onError={() => setImageFailed(true)}
             />
-            <span className="image-category">{article.region}</span>
+            <span className="image-category">
+              <LocalizedText>{article.region}</LocalizedText>
+            </span>
           </div>
         ) : featured ? (
           <div className="article-typographic" aria-hidden="true">
-            <Globe2 size={80} strokeWidth={0.5} />
-            <span>VOCI DAL MONDO</span>
+            <CommunityEmblem />
+            <span>
+              <LocalizedText>{"VOCI DAL MONDO"}</LocalizedText>
+            </span>
           </div>
         ) : null}
         <div className="article-copy">
           <div className="article-meta">
             <span>{article.sourceName}</span>
             <span>
-              {article.publishedAt
-                ? relativeTime(article.publishedAt)
-                : "Data non indicata"}
+              <LocalizedText>
+                {article.publishedAt
+                  ? relativeTime(article.publishedAt)
+                  : "Data non indicata"}
+              </LocalizedText>
             </span>
           </div>
-          <h3>{article.title}</h3>
+          <h3>
+            <LocalizedText priority={2} defer from={article.language}>
+              {article.title}
+            </LocalizedText>
+          </h3>
           <p>
-            {article.excerpt ||
-              "Questo feed non fornisce un estratto. Apri la scheda per leggere l’articolo sul sito della fonte."}
+            <LocalizedText
+              priority={1}
+              defer
+              from={article.excerpt ? article.language : "it"}
+            >
+              {article.excerpt ||
+                "Questo feed non fornisce un estratto. Apri la fonte per leggere l’articolo."}
+            </LocalizedText>
           </p>
         </div>
       </button>
+      <a
+        className="publisher-link"
+        href={safeWebUrl(article.link) ?? undefined}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <LocalizedText>{"Leggi e sostieni la fonte "}</LocalizedText>
+        <ArrowUpRight size={14} />
+      </a>
       <div className="article-bottom">
         <span>
-          {article.country} <i>·</i>{" "}
-          {LANGUAGES[article.language] ?? article.language.toUpperCase()}
+          <LocalizedText>{article.country}</LocalizedText>{" "}
+          <i>
+            <LocalizedText>{"·"}</LocalizedText>
+          </i>
+          <LocalizedText> </LocalizedText>
+          <LanguageName code={article.language} />
         </span>
         <div>
           <button
@@ -1531,39 +1669,49 @@ function EmptyState({
         )}
       </span>
       <p className="eyebrow">
-        {loading
-          ? "COLLEGHIAMO LE FONTI"
-          : saved
-            ? "IL TUO TACCUINO"
-            : "UNO SGUARDO PIÙ AMPIO"}
+        <LocalizedText>
+          {loading
+            ? "COLLEGHIAMO LE FONTI"
+            : saved
+              ? "IL TUO TACCUINO"
+              : "UNO SGUARDO PIÙ AMPIO"}
+        </LocalizedText>
       </p>
       <h3>
-        {loading
-          ? "Le prime voci stanno arrivando."
-          : saved
-            ? "Le letture importanti, tutte qui."
-            : "Nessun articolo in questa selezione."}
+        <LocalizedText>
+          {loading
+            ? "Le prime voci stanno arrivando."
+            : saved
+              ? "Le letture importanti, tutte qui."
+              : "Nessun articolo in questa selezione."}
+        </LocalizedText>
       </h3>
       <p>
-        {loading
-          ? "Ogni fonte ha i suoi tempi. Gli articoli compariranno appena disponibili; nel frattempo puoi esplorare il catalogo e la biblioteca."
-          : saved
-            ? "Usa il segnalibro sulle schede per conservare titolo, estratto e link. I vecchi segnalibri saranno recuperati quando le relative notizie torneranno nei feed."
-            : "Prova un altro tema, una finestra temporale più ampia oppure consulta direttamente le fonti. L’assenza di risultati non significa assenza di notizie."}
+        <LocalizedText>
+          {loading
+            ? "Ogni fonte ha i suoi tempi. Gli articoli compariranno appena disponibili; nel frattempo puoi esplorare il catalogo e la biblioteca."
+            : saved
+              ? "Usa il segnalibro sulle schede per conservare titolo, estratto e link. I vecchi segnalibri saranno recuperati quando le relative notizie torneranno nei feed."
+              : "Prova un altro tema, una finestra temporale più ampia oppure consulta direttamente le fonti. L’assenza di risultati non significa assenza di notizie."}
+        </LocalizedText>
       </p>
       <div className="empty-actions">
         {filtered ? (
           <button className="button button-dark" onClick={onReset}>
-            Azzera filtri <X size={14} />
+            <LocalizedText>{"Azzera filtri "}</LocalizedText>
+            <X size={14} />
           </button>
         ) : null}
         <button className="button button-outline" onClick={onExplore}>
-          {saved ? "Esplora le notizie" : "Esplora le fonti"}
+          <LocalizedText>
+            {saved ? "Esplora le notizie" : "Esplora le fonti"}
+          </LocalizedText>
           <ArrowRight size={15} />
         </button>
         {!saved && !loading ? (
           <button className="text-link" onClick={onRetry}>
-            <RefreshCcw size={14} /> Riprova aggiornamento
+            <RefreshCcw size={14} />
+            <LocalizedText>{" Riprova aggiornamento"}</LocalizedText>
           </button>
         ) : null}
       </div>
@@ -1583,14 +1731,18 @@ function SourcesDirectory({
     <>
       <div className="directory-intro">
         <p>
-          Ogni fonte ha una storia e un punto di vista. Le etichette sono
-          classificazioni del catalogo, non certificazioni editoriali. Le fonti
-          emerse dai radar sono indicate separatamente.
+          <LocalizedText>
+            {
+              "Ogni fonte ha una storia e un punto di vista. Le etichette sono classificazioni del catalogo, non certificazioni editoriali. Le fonti emerse dai radar sono indicate separatamente."
+            }
+          </LocalizedText>
         </p>
         <span>
-          <span className="status-dot status-ok" /> Contenuti disponibili{" "}
-          <span className="status-dot status-wait" /> Non verificato o non
-          disponibile
+          <span className="status-dot status-ok" />
+          <LocalizedText>{" Contenuti disponibili"}</LocalizedText>
+          <LocalizedText> </LocalizedText>
+          <span className="status-dot status-wait" />
+          <LocalizedText>{" Non verificato o non disponibile"}</LocalizedText>
         </span>
       </div>
       <div className="source-grid">
@@ -1598,10 +1750,12 @@ function SourcesDirectory({
           <article className="source-card" key={s.id}>
             <div className="source-card-top">
               <span className="source-monogram" aria-hidden="true">
-                {s.name
-                  .replace(/^(the|il|la|le) /i, "")
-                  .slice(0, 2)
-                  .toUpperCase()}
+                <LocalizedText>
+                  {s.name
+                    .replace(/^(the|il|la|le) /i, "")
+                    .slice(0, 2)
+                    .toUpperCase()}
+                </LocalizedText>
               </span>
               <span
                 className={`source-availability ${(s.status ? s.status.ok : s.count > 0) ? "available" : ""}`}
@@ -1609,32 +1763,47 @@ function SourcesDirectory({
                 <span
                   className={`status-dot ${(s.status ? s.status.ok : s.count > 0) ? "status-ok" : "status-wait"}`}
                 />
-                {s.status && !s.status.ok
-                  ? "Ultimo tentativo fallito"
-                  : s.count
-                    ? `${s.count} articoli`
-                    : s.status?.ok
-                      ? "Contenuti disponibili"
-                      : "Non ancora verificato"}
+                <LocalizedText>
+                  {s.status && !s.status.ok
+                    ? "Ultimo tentativo fallito"
+                    : s.count
+                      ? `${s.count} articoli`
+                      : s.status?.ok
+                        ? "Contenuti disponibili"
+                        : "Non ancora verificato"}
+                </LocalizedText>
               </span>
             </div>
             <span className="source-region">
-              {s.region} / {s.country}
+              <LocalizedText>{s.region}</LocalizedText>
+              <LocalizedText>{" / "}</LocalizedText>
+              <LocalizedText>{s.country}</LocalizedText>
             </span>
-            <h3>{s.name}</h3>
+            <h3>
+              <LocalizedText>{s.name}</LocalizedText>
+            </h3>
             <p>
-              {LANGUAGES[s.language] ?? s.language.toUpperCase()} <i>·</i>{" "}
-              {s.kind}
-              {s.discovered ? " · Emersa dal radar" : ""}
+              <LanguageName code={s.language} />{" "}
+              <i>
+                <LocalizedText>{"·"}</LocalizedText>
+              </i>
+              <LocalizedText> </LocalizedText>
+              <LocalizedText>{s.kind}</LocalizedText>
+              <LocalizedText>
+                {s.discovered ? " · Emersa dal radar" : ""}
+              </LocalizedText>
             </p>
             <div className="source-tags">
               {s.ideologies.slice(0, 3).map((tag) => (
-                <span key={tag}>{tag}</span>
+                <span key={tag}>
+                  <LocalizedText>{tag}</LocalizedText>
+                </span>
               ))}
             </div>
             <div className="source-card-actions">
               <button className="text-link" onClick={() => onSelect(s.id)}>
-                Leggi le notizie <ArrowRight size={15} />
+                <LocalizedText>{"Leggi le notizie "}</LocalizedText>
+                <ArrowRight size={15} />
               </button>
               <a
                 href={safeWebUrl(s.homepage) ?? undefined}
@@ -1650,8 +1819,11 @@ function SourcesDirectory({
       </div>
       {!sources.length ? (
         <p className="notice">
-          Nessuna fonte corrisponde alla ricerca. Prova un altro paese, una
-          lingua diversa o azzera i filtri.
+          <LocalizedText>
+            {
+              "Nessuna fonte corrisponde alla ricerca. Prova un altro paese, una lingua diversa o azzera i filtri."
+            }
+          </LocalizedText>
         </p>
       ) : null}
       {sources.length > limit ? (
@@ -1659,7 +1831,8 @@ function SourcesDirectory({
           className="button button-outline load-more"
           onClick={() => setLimit((n) => n + 36)}
         >
-          Mostra altre fonti <ArrowDown size={15} />
+          <LocalizedText>{"Mostra altre fonti "}</LocalizedText>
+          <ArrowDown size={15} />
         </button>
       ) : null}
     </>
@@ -1686,8 +1859,14 @@ function LibraryView({
     <div className="library-view">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">NON SERVE LEGGERE TUTTO. SERVE INIZIARE.</p>
-          <h2>Tre percorsi, molte domande.</h2>
+          <p className="eyebrow">
+            <LocalizedText>
+              {"NON SERVE LEGGERE TUTTO. SERVE INIZIARE."}
+            </LocalizedText>
+          </p>
+          <h2>
+            <LocalizedText>{"Tre percorsi, molte domande."}</LocalizedText>
+          </h2>
         </div>
         <BookOpen size={24} strokeWidth={1.3} />
       </div>
@@ -1699,24 +1878,41 @@ function LibraryView({
             onClick={() => setPath(path === p.id ? ALL : p.id)}
             aria-pressed={path === p.id}
           >
-            <span className="path-number">0{i + 1}</span>
-            <span className="eyebrow">{p.subtitle}</span>
-            <h3>{p.title}</h3>
-            <p>{p.description}</p>
+            <span className="path-number">
+              <LocalizedText>{"0"}</LocalizedText>
+              <LocalizedText>{i + 1}</LocalizedText>
+            </span>
+            <span className="eyebrow">
+              <LocalizedText>{p.subtitle}</LocalizedText>
+            </span>
+            <h3>
+              <LocalizedText>{p.title}</LocalizedText>
+            </h3>
+            <p>
+              <LocalizedText>{p.description}</LocalizedText>
+            </p>
             <span className="path-link">
-              {p.books.length} letture <ArrowUpRight size={17} />
+              <LocalizedText>{p.books.length}</LocalizedText>
+              <LocalizedText>{" letture "}</LocalizedText>
+              <ArrowUpRight size={17} />
             </span>
           </button>
         ))}
       </div>
       <div className="library-toolbar">
         <div>
-          <p className="eyebrow">TESTI E ORIZZONTI</p>
-          <h2>{active?.title ?? "La biblioteca aperta"}</h2>
+          <p className="eyebrow">
+            <LocalizedText>{"TESTI E ORIZZONTI"}</LocalizedText>
+          </p>
+          <h2>
+            <LocalizedText>
+              {active?.title ?? "La biblioteca aperta"}
+            </LocalizedText>
+          </h2>
         </div>
         <label className="search-box">
           <Search size={17} />
-          <input
+          <LocalizedInput
             aria-label="Cerca nella biblioteca"
             placeholder="Un autore, un testo, un concetto…"
             value={query}
@@ -1725,7 +1921,8 @@ function LibraryView({
         </label>
         {active ? (
           <button className="text-link" onClick={() => setPath(ALL)}>
-            Tutti i testi <X size={15} />
+            <LocalizedText>{"Tutti i testi "}</LocalizedText>
+            <X size={15} />
           </button>
         ) : null}
       </div>
@@ -1736,18 +1933,34 @@ function LibraryView({
               className={`book-cover book-tone-${index % 4}`}
               aria-hidden="true"
             >
-              <span>LA BIBLIOTECA / RASSEGNA ROSSA</span>
-              <strong>{book.title}</strong>
+              <span>
+                <LocalizedText>
+                  {"LA BIBLIOTECA / RASSEGNA ROSSA"}
+                </LocalizedText>
+              </span>
+              <strong>
+                <LocalizedText>{book.title}</LocalizedText>
+              </strong>
               <em>{book.author}</em>
-              <span className="cover-year">{book.period}</span>
+              <span className="cover-year">
+                <LocalizedText>{book.period}</LocalizedText>
+              </span>
             </div>
             <div className="book-info">
-              <p className="eyebrow">{book.lane}</p>
-              <h3>{book.title}</h3>
-              <p className="book-author">
-                {book.author} · {book.period}
+              <p className="eyebrow">
+                <LocalizedText>{book.lane}</LocalizedText>
               </p>
-              <p>{book.summary}</p>
+              <h3>
+                <LocalizedText>{book.title}</LocalizedText>
+              </h3>
+              <p className="book-author">
+                {book.author}
+                <LocalizedText>{" · "}</LocalizedText>
+                <LocalizedText>{book.period}</LocalizedText>
+              </p>
+              <p>
+                <LocalizedText>{book.summary}</LocalizedText>
+              </p>
               <div className="book-links">
                 {book.links.map((link) => (
                   <a
@@ -1756,17 +1969,19 @@ function LibraryView({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {link.label}
+                    <LocalizedText>{link.label}</LocalizedText>
                     <ArrowUpRight size={15} />
                   </a>
                 ))}
               </div>
               <small>
-                {["dipendenza", "femminismo-marxista"].includes(book.id)
-                  ? "Percorso tematico: i link portano a riviste e archivi di approfondimento."
-                  : book.id === "gramsciana"
-                    ? "Il link porta alla Fondazione Gramsci, non al testo integrale dei Quaderni."
-                    : "Testo disponibile presso l’archivio esterno indicato."}
+                <LocalizedText>
+                  {["dipendenza", "femminismo-marxista"].includes(book.id)
+                    ? "Percorso tematico: i link portano a riviste e archivi di approfondimento."
+                    : book.id === "gramsciana"
+                      ? "Il link porta alla Fondazione Gramsci, non al testo integrale dei Quaderni."
+                      : "Testo disponibile presso l’archivio esterno indicato."}
+                </LocalizedText>
               </small>
             </div>
           </article>
@@ -1774,31 +1989,45 @@ function LibraryView({
       </div>
       {!books.length ? (
         <div className="notice">
-          Nessun testo trovato. Prova un altro autore o cancella la ricerca.
+          <LocalizedText>
+            {
+              "Nessun testo trovato. Prova un altro autore o cancella la ricerca."
+            }
+          </LocalizedText>
         </div>
       ) : null}
       <section className="glossary">
         <div>
-          <p className="eyebrow">LE PAROLE PER ORIENTARSI</p>
+          <p className="eyebrow">
+            <LocalizedText>{"LE PAROLE PER ORIENTARSI"}</LocalizedText>
+          </p>
           <h2>
-            Un piccolo lessico,
+            <LocalizedText>{"Un piccolo lessico,"}</LocalizedText>
             <br />
-            <em>una porta d’ingresso.</em>
+            <em>
+              <LocalizedText>{"una porta d’ingresso."}</LocalizedText>
+            </em>
           </h2>
           <p>
-            Definizioni introduttive, non esaustive. I concetti assumono
-            significati diversi nelle diverse tradizioni: i testi sono il luogo
-            per approfondirli.
+            <LocalizedText>
+              {
+                "Definizioni introduttive, non esaustive. I concetti assumono significati diversi nelle diverse tradizioni: i testi sono il luogo per approfondirli."
+              }
+            </LocalizedText>
           </p>
         </div>
         <div>
           {GLOSSARY.map((g) => (
             <details key={g.term}>
               <summary>
-                {g.term}
-                <span>+</span>
+                <LocalizedText>{g.term}</LocalizedText>
+                <span>
+                  <LocalizedText>{"+"}</LocalizedText>
+                </span>
               </summary>
-              <p>{g.definition}</p>
+              <p>
+                <LocalizedText>{g.definition}</LocalizedText>
+              </p>
             </details>
           ))}
         </div>
@@ -1811,18 +2040,22 @@ function MethodView({ onSources }: { onSources: () => void }) {
   return (
     <div className="method-view">
       <div className="method-intro">
-        <p className="eyebrow">DALLE FONTI ALLE DOMANDE</p>
+        <p className="eyebrow">
+          <LocalizedText>{"DALLE FONTI ALLE DOMANDE"}</LocalizedText>
+        </p>
         <h2>
-          Una rassegna per leggere.
+          <LocalizedText>{"Una rassegna per leggere."}</LocalizedText>
           <br />
-          <em>Non un verdetto su cosa pensare.</em>
+          <em>
+            <LocalizedText>{"Non un verdetto su cosa pensare."}</LocalizedText>
+          </em>
         </h2>
         <p>
-          Mettiamo vicine prospettive che spesso restano lontane: il lavoro e la
-          geopolitica, l’attualità e la teoria, le voci locali e le relazioni
-          globali. La selezione ha un orientamento esplicito. Non pretende di
-          rappresentare tutte le posizioni né di sostituire il confronto con le
-          fonti.
+          <LocalizedText>
+            {
+              "Mettiamo vicine prospettive che spesso restano lontane: il lavoro e la geopolitica, l’attualità e la teoria, le voci locali e le relazioni globali. La selezione ha un orientamento esplicito. Non pretende di rappresentare tutte le posizioni né di sostituire il confronto con le fonti."
+            }
+          </LocalizedText>
         </p>
       </div>
       <div className="method-grid">
@@ -1845,7 +2078,7 @@ function MethodView({ onSources }: { onSources: () => void }) {
           {
             n: "04",
             title: "Traduzioni e servizi esterni",
-            text: "La traduzione della scheda invia titolo ed estratto a MyMemory su tua richiesta e può contenere errori. La traduzione della pagina apre Google Translate. Immagini e anteprime possono comportare richieste ai siti degli editori.",
+            text: "La lingua di lettura segue il browser ed è modificabile. Interfaccia, citazioni, titoli ed estratti vengono tradotti automaticamente con MyMemory: il testo pubblico viene inviato al servizio, che applica limiti e può commettere errori. Se non disponibile, mostriamo l’originale con un avviso. La traduzione della pagina apre Google Translate. Immagini e anteprime possono comportare richieste ai siti degli editori.",
           },
           {
             n: "05",
@@ -1859,20 +2092,33 @@ function MethodView({ onSources }: { onSources: () => void }) {
           },
         ].map((item) => (
           <article key={item.n}>
-            <span>{item.n}</span>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
+            <span>
+              <LocalizedText>{item.n}</LocalizedText>
+            </span>
+            <h3>
+              <LocalizedText>{item.title}</LocalizedText>
+            </h3>
+            <p>
+              <LocalizedText>{item.text}</LocalizedText>
+            </p>
           </article>
         ))}
       </div>
       <div className="method-outro">
         <Globe2 size={34} strokeWidth={1} />
         <div>
-          <h3>Parti dalle voci.</h3>
-          <p>Scopri chi pubblica, da dove scrive e con quale prospettiva.</p>
+          <h3>
+            <LocalizedText>{"Parti dalle voci."}</LocalizedText>
+          </h3>
+          <p>
+            <LocalizedText>
+              {"Scopri chi pubblica, da dove scrive e con quale prospettiva."}
+            </LocalizedText>
+          </p>
         </div>
         <button className="button button-dark" onClick={onSources}>
-          Esplora le fonti <ArrowRight size={16} />
+          <LocalizedText>{"Esplora le fonti "}</LocalizedText>
+          <ArrowRight size={16} />
         </button>
       </div>
     </div>
@@ -1894,40 +2140,14 @@ function ArticleReader({
   related: Article[];
   onSelect: (id: string) => void;
 }) {
-  const [translation, setTranslation] = useState<{
-    status: string;
-    text: string;
-  }>({ status: "idle", text: "" });
+  const readingLanguage = useLocale();
   const [embed, setEmbed] = useState(false);
-  const translate = async () => {
-    setTranslation({ status: "loading", text: "" });
-    try {
-      const response = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          text: `${article.title}. ${article.excerpt}`,
-          from: article.language,
-          to: "it",
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok || !result.translatedText)
-        throw new Error(
-          "Traduzione non disponibile. Puoi continuare a leggere il testo originale.",
-        );
-      setTranslation({ status: "ready", text: result.translatedText });
-    } catch {
-      setTranslation({
-        status: "error",
-        text: "La traduzione non è disponibile in questo momento. Riprova oppure apri l’originale.",
-      });
-    }
-  };
   return (
     <div className="article-reader">
       <div className="reader-top">
-        <span className="eyebrow">LA SCHEDA / RASSEGNA ROSSA</span>
+        <span className="eyebrow">
+          <LocalizedText>{"LA SCHEDA / RASSEGNA ROSSA"}</LocalizedText>
+        </span>
         <button
           className="icon-button"
           onClick={onClose}
@@ -1940,21 +2160,35 @@ function ArticleReader({
       <div className="reader-content">
         <div className="reader-meta">
           <span>{article.sourceName}</span>
-          <span>{article.country}</span>
           <span>
-            {article.publishedAt
-              ? relativeTime(article.publishedAt)
-              : "Data non indicata"}
+            <LocalizedText>{article.country}</LocalizedText>
+          </span>
+          <span>
+            <LocalizedText>
+              {article.publishedAt
+                ? relativeTime(article.publishedAt)
+                : "Data non indicata"}
+            </LocalizedText>
           </span>
         </div>
-        <h2 id="reader-title">{article.title}</h2>
+        <h2 id="reader-title">
+          <LocalizedText priority={2} defer from={article.language}>
+            {article.title}
+          </LocalizedText>
+        </h2>
         <p className="reader-byline">
           {article.author ? `${article.author} · ` : ""}
-          {LANGUAGES[article.language] ?? article.language.toUpperCase()}
+          <LanguageName code={article.language} />
         </p>
         <p className="reader-excerpt">
-          {article.excerpt ||
-            "La fonte non fornisce un estratto per questo articolo. Il testo completo è disponibile sul sito dell’editore."}
+          <LocalizedText
+            priority={1}
+            defer
+            from={article.excerpt ? article.language : "it"}
+          >
+            {article.excerpt ||
+              "La fonte non fornisce un estratto. Leggi il testo completo sul sito dell’editore."}
+          </LocalizedText>
         </p>
         <div className="reader-actions">
           <a
@@ -1963,7 +2197,8 @@ function ArticleReader({
             rel="noopener noreferrer"
             className="button button-dark"
           >
-            Leggi sulla fonte <ArrowUpRight size={16} />
+            <LocalizedText>{"Leggi sulla fonte "}</LocalizedText>
+            <ArrowUpRight size={16} />
           </a>
           <button
             className={`button button-outline ${saved ? "is-saved" : ""}`}
@@ -1971,58 +2206,43 @@ function ArticleReader({
             aria-pressed={saved}
           >
             {saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-            {saved ? "Salvato" : "Salva lettura"}
+            <LocalizedText>{saved ? "Salvato" : "Salva lettura"}</LocalizedText>
           </button>
         </div>
         <div className="reader-translation">
-          <div>
-            <Languages size={19} />
-            <strong>Una lingua in più, una distanza in meno.</strong>
-          </div>
+          <strong>
+            <LocalizedText>{"Leggi e sostieni la fonte"}</LocalizedText>
+          </strong>
           <p>
-            Traduci titolo ed estratto in italiano con MyMemory. Il testo viene
-            inviato al servizio esterno e la traduzione può contenere errori.
+            <LocalizedText>
+              {
+                "Qui trovi titolo ed estratto tradotti automaticamente. Apri l’originale per il testo completo, il contesto e per sostenere il lavoro della redazione."
+              }
+            </LocalizedText>
           </p>
-          <button
-            className="text-link"
-            onClick={() => void translate()}
-            disabled={translation.status === "loading"}
-          >
-            {translation.status === "loading" ? (
-              <Loader2 size={15} className="spin" />
-            ) : (
-              <Languages size={15} />
-            )}
-            {translation.status === "loading"
-              ? "Traduzione in corso…"
-              : translation.status === "ready"
-                ? "Traduci di nuovo"
-                : "Traduci la scheda"}
-          </button>
-          {translation.status === "ready" || translation.status === "error" ? (
-            <p
-              className={`translation-result ${translation.status}`}
-              role="status"
-            >
-              {translation.text}
-            </p>
-          ) : null}
           <a
-            href={`https://translate.google.com/translate?sl=${encodeURIComponent(article.language)}&tl=it&u=${encodeURIComponent(safeWebUrl(article.link) ?? "")}`}
+            href={`https://translate.google.com/translate?sl=${encodeURIComponent(article.language)}&tl=${encodeURIComponent(readingLanguage)}&u=${encodeURIComponent(safeWebUrl(article.link) ?? "")}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-link"
           >
-            Apri la pagina con Google Translate <ArrowUpRight size={14} />
+            <LocalizedText>
+              {"Apri la pagina con Google Translate "}
+            </LocalizedText>
+            <ArrowUpRight size={14} />
           </a>
         </div>
         <details className="reader-embed">
           <summary>
-            Anteprima del sito originale <ChevronDown size={16} />
+            <LocalizedText>{"Anteprima del sito originale "}</LocalizedText>
+            <ChevronDown size={16} />
           </summary>
           <p>
-            Caricando l’anteprima contatti il sito della fonte. Alcuni editori
-            bloccano l’incorporamento: in quel caso usa “Leggi sulla fonte”.
+            <LocalizedText>
+              {
+                "Caricando l’anteprima contatti il sito della fonte. Alcuni editori bloccano l’incorporamento: in quel caso usa “Leggi sulla fonte”."
+              }
+            </LocalizedText>
           </p>
           {embed ? (
             <iframe
@@ -2037,25 +2257,38 @@ function ArticleReader({
               className="button button-outline"
               onClick={() => setEmbed(true)}
             >
-              Carica anteprima esterna <ExternalLink size={15} />
+              <LocalizedText>{"Carica anteprima esterna "}</LocalizedText>
+              <ExternalLink size={15} />
             </button>
           )}
         </details>
         {related.length ? (
           <section className="reader-related">
-            <p className="eyebrow">DALLA STESSA FONTE</p>
+            <p className="eyebrow">
+              <LocalizedText>{"DALLA STESSA FONTE"}</LocalizedText>
+            </p>
             {related.map((a) => (
               <button key={a.id} onClick={() => onSelect(a.id)}>
-                <span>{a.title}</span>
+                <span>
+                  <LocalizedText priority={2} from={a.language}>
+                    {a.title}
+                  </LocalizedText>
+                </span>
                 <ArrowUpRight size={17} />
               </button>
             ))}
           </section>
         ) : null}
         <p className="reader-attribution">
-          Titolo ed estratto sono attribuiti a {article.sourceName}. La fonte
-          originale rimane il riferimento per contenuto completo, aggiornamenti
-          e correzioni.
+          <LocalizedText>
+            {"Titolo ed estratto sono attribuiti a "}
+          </LocalizedText>
+          {article.sourceName}
+          <LocalizedText>
+            {
+              ". La fonte originale rimane il riferimento per contenuto completo, aggiornamenti e correzioni."
+            }
+          </LocalizedText>
         </p>
       </div>
     </div>

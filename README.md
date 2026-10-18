@@ -1,6 +1,6 @@
 # Rassegna Rossa
 
-Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto il mondo. Riunisce feed RSS/Atom, canali radar tematici e una biblioteca di teoria politica in un'interfaccia in italiano.
+Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto il mondo. Riunisce feed RSS/Atom, canali radar tematici e una biblioteca di teoria politica in un’interfaccia multilingue.
 
 ## Funzioni attuali
 
@@ -9,11 +9,14 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Catalogo di 86 testate e canali, distinto dai 136 radar di ricerca.
 - Priorità alle testate e ai titoli nella lingua del browser, modificabile senza geolocalizzazione.
 - Prima raccolta di 16 canali con risposte indipendenti, cache locale e caricamento esplicito di altre fonti.
-- Traduzione di titoli e descrizioni tramite MyMemory; collegamento alla traduzione della pagina originale.
+- Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e avviso se MyMemory non è disponibile.
+- Fonti consigliate coerenti con la lingua scelta, comprese le lingue con soli radar.
+- Osservatorio indipendente delle ultime sei ore: otto canali regionali, filtri, attività oraria e punteggio spiegabile di freschezza e presenza su più testate.
+- Emblema originale dedicato a conoscenza e condivisione; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Schede salvate nel browser tramite `localStorage`: titolo, estratto e link ritrovabili anche dopo una nuova visita.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
 - Sei percorsi tematici e una pagina trasparente su metodo, attribuzione e limiti.
-- Lettore in una finestra dedicata, con traduzione su richiesta e anteprima esterna facoltativa.
+- Lettore in una finestra dedicata, con invito a leggere e sostenere l’editore, traduzione automatica e anteprima esterna facoltativa.
 
 Le etichette e i punteggi sono euristiche del catalogo, non verifiche di attendibilità. I contenuti restano attribuiti e collegati agli editori originali.
 
@@ -45,6 +48,11 @@ npm test
 | `app/data/editorial.ts` | Percorsi tematici, itinerari e glossario |
 | `app/lib/reading.ts` | Filtri, fusione degli articoli, URL e ripristino dei salvati |
 | `app/lib/source-selection.ts` | Scelta della lingua e raccolta limitata dei canali |
+| `app/components/Localization.tsx` | Traduzioni React, coda, cache e scelta della lingua |
+| `app/components/WorldWatch.tsx` | Osservatorio mondiale indipendente e relativi controlli |
+| `app/lib/pulse.ts` | Finestra mobile di sei ore, raggruppamento e ranking |
+| `app/api/pulse/route.ts` | Raccolta da destinazioni regionali fisse |
+| `app/data/quotes.ts` | Citazioni, provenienza e rotazione |
 | `app/lib/youtube.ts` | Lettura dei titoli pubblici dalla scheda video dei canali configurati |
 | `app/api/sources/route.ts` | Catalogo e filtri disponibili |
 | `app/api/articles/route.ts` | Raccolta concorrente, deduplicazione e ordinamento |

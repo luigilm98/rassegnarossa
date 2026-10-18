@@ -35,7 +35,10 @@ test("server-renders the aggregator shell", async () => {
   assert.match(html, /<html lang="it">/i);
   assert.match(html, /<title>Rassegna Rossa<\/title>/i);
   assert.match(html, /Aggregatore socialista globale/);
-  assert.match(html, /prospettiva/);
+  assert.match(html, /Tesi su Feuerbach/);
+  assert.match(html, /community-emblem/);
+  assert.match(html, /OSSERVATORIO MONDIALE/);
+  assert.doesNotMatch(html, /Il mondo, da un’altra/);
   assert.match(html, /Atlante delle fonti/);
   assert.match(html, /Biblioteca/);
   assert.match(html, /Salvati/);
@@ -263,6 +266,191 @@ test("configured YouTube listings provide titles without inventing publication d
       "https://www.youtube.com/watch?v=Sample00001",
     );
     assert.deepEqual(calls, ["https://www.youtube.com/@dazibao/videos"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("world observatory limits dates and remote destinations and reports partial failures", async () => {
+  const { default: worker } = await import("../dist/server/index.js");
+  const env = {
+    ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
+  };
+  const ctx = { waitUntil() {}, passThroughOnException() {} };
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    const item = (id, date) =>
+      `<item><title>${id}</title><link>https://example.org/${id}</link><guid>${id}</guid>${date ? `<pubDate>${date}</pubDate>` : ""}<source url="https://example.org">Fixture Publisher</source></item>`;
+    return new Response(
+      `<rss><channel>${item("new", new Date(Date.now() - 60000).toUTCString())}${item("old", new Date(Date.now() - 7 * 3600000).toUTCString())}${item("future", new Date(Date.now() + 3600000).toUTCString())}${item("undated", null)}</channel></rss>`,
+    );
+  };
+  try {
+    for (const area of [
+      "europe",
+      "north",
+      "latin",
+      "africa",
+      "asia",
+      "east",
+      "mena",
+      "pacific",
+    ]) {
+      const response = await worker.fetch(
+        new Request(`http://localhost/api/pulse?area=${area}`),
+        env,
+        ctx,
+      );
+      assert.equal(response.status, 200);
+      const data = await response.json();
+      assert.equal(data.ok, true);
+      assert.equal(data.articles.length, 1);
+      assert.equal(data.articles[0].title, "new");
+      assert.equal(
+        data.articles[0].sourceName,
+        area === "pacific" ? "Green Left" : "Fixture Publisher",
+      );
+    }
+    assert.equal(calls.length, 8);
+    assert.ok(
+      calls
+        .filter((url) => url.includes("news.google.com"))
+        .every((url) => new URL(url).searchParams.get("q").includes("when:6h")),
+    );
+    const denied = await worker.fetch(
+      new Request("http://localhost/api/pulse?area=https://example.net"),
+      env,
+      ctx,
+    );
+    assert.equal(denied.status, 400);
+    assert.equal(calls.length, 8);
+    const realNow = Date.now;
+    globalThis.fetch = async () => new Response("Unavailable", { status: 503 });
+    Date.now = () => realNow() + 180_000;
+    try {
+      const partial = await worker.fetch(
+        new Request("http://localhost/api/pulse?area=europe"),
+        env,
+        ctx,
+      );
+      const data = await partial.json();
+      assert.equal(data.ok, false);
+      assert.deepEqual(data.articles, []);
+      assert.ok(data.error);
+    } finally {
+      Date.now = realNow;
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("automatic translation rejects malformed input, preserves Unicode and never displays quota errors as translations", async () => {
+  const { default: worker } = await import("../dist/server/index.js");
+  const env = {
+    ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
+  };
+  const ctx = { waitUntil() {}, passThroughOnException() {} };
+  const request = (body) =>
+    new Request("http://localhost/api/translate", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "content-type": "application/json" },
+    });
+  for (const body of [
+    { text: 5 },
+    { text: "ciao", from: "auto", to: "en" },
+    { text: "ciao", from: [], to: "en" },
+  ])
+    assert.equal((await worker.fetch(request(body), env, ctx)).status, 400);
+  assert.equal(
+    (
+      await worker.fetch(
+        request({ text: "x".repeat(2201), from: "it", to: "en" }),
+        env,
+        ctx,
+      )
+    ).status,
+    413,
+  );
+  assert.equal(
+    (
+      await worker.fetch(
+        new Request("http://localhost/api/translate", {
+          method: "POST",
+          body: "{",
+        }),
+        env,
+        ctx,
+      )
+    ).status,
+    400,
+  );
+  const originalFetch = globalThis.fetch;
+  const queries = [];
+  globalThis.fetch = async (url) => {
+    const q = new URL(url).searchParams.get("q");
+    queries.push(q);
+    return Response.json({
+      responseStatus: 200,
+      responseData: { translatedText: "Translated text" },
+    });
+  };
+  try {
+    const response = await worker.fetch(
+      request({ text: "知识共享".repeat(100), from: "zh", to: "fr" }),
+      env,
+      ctx,
+    );
+    assert.equal(response.status, 200);
+    assert.ok(queries.length > 1);
+    assert.ok(
+      queries.every(
+        (q) => new TextEncoder().encode(q).length <= 460 && !q.includes("�"),
+      ),
+    );
+    const before = queries.length;
+    await worker.fetch(
+      request({ text: "知识共享".repeat(100), from: "zh", to: "fr" }),
+      env,
+      ctx,
+    );
+    assert.equal(queries.length, before);
+    const sentence = "Workers share knowledge and build a collective library. "
+      .repeat(15)
+      .trim();
+    globalThis.fetch = async (url) =>
+      Response.json({
+        responseStatus: 200,
+        responseData: { translatedText: new URL(url).searchParams.get("q") },
+      });
+    const chunks = await worker.fetch(
+      request({ text: sentence, from: "en", to: "fr" }),
+      env,
+      ctx,
+    );
+    assert.equal((await chunks.json()).translatedText, sentence);
+    globalThis.fetch = async () =>
+      Response.json({
+        responseStatus: 429,
+        quotaFinished: true,
+        responseData: { translatedText: "QUOTA EXCEEDED" },
+      });
+    const quota = await worker.fetch(
+      request({ text: "Fixture quota test", from: "en", to: "es" }),
+      env,
+      ctx,
+    );
+    assert.equal(quota.status, 502);
+    assert.equal((await quota.json()).translatedText, undefined);
+    const identity = await worker.fetch(
+      request({ text: "Ancora leggibile", from: "it", to: "it" }),
+      env,
+      ctx,
+    );
+    assert.equal(identity.status, 200);
   } finally {
     globalThis.fetch = originalFetch;
   }

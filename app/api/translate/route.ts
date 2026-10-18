@@ -6,21 +6,51 @@ type TranslationPayload = {
   to?: string;
 };
 
-const translationCache = new Map<string, { expiresAt: number; value: string }>();
+const translationCache = new Map<
+  string,
+  { expiresAt: number; value: string }
+>();
 const TRANSLATION_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_TEXT_CHARS = 2200;
 const CHUNK_CHARS = 460;
+let unavailableUntil = 0;
 
 export async function POST(request: Request) {
   try {
-    const payload = (await request.json()) as TranslationPayload;
-    const text = normalizeText(payload.text ?? "").slice(0, MAX_TEXT_CHARS);
+    let payload: TranslationPayload;
+    try {
+      payload = await request.json();
+    } catch {
+      return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    }
+    if (
+      !payload ||
+      typeof payload.text !== "string" ||
+      (payload.from !== undefined && typeof payload.from !== "string") ||
+      (payload.to !== undefined && typeof payload.to !== "string")
+    )
+      return Response.json(
+        { error: "Invalid translation input" },
+        { status: 400 },
+      );
+    const text = normalizeText(payload.text);
+    if (text.length > MAX_TEXT_CHARS)
+      return Response.json({ error: "Text too long" }, { status: 413 });
     const from = normalizeLanguage(payload.from ?? "auto");
     const to = normalizeLanguage(payload.to ?? "it");
 
     if (!text) {
       return Response.json({ error: "Text is required" }, { status: 400 });
     }
+
+    if (
+      !/^[a-z]{2,3}(?:-[A-Za-z]{2,4})?$/.test(from) ||
+      !/^[a-z]{2,3}(?:-[A-Za-z]{2,4})?$/.test(to)
+    )
+      return Response.json(
+        { error: "An explicit source and target language are required" },
+        { status: 400 },
+      );
 
     if (from === to) {
       return Response.json({ translatedText: text, provider: "identity" });
@@ -35,13 +65,23 @@ export async function POST(request: Request) {
       });
     }
 
+    if (Date.now() < unavailableUntil)
+      return Response.json(
+        { error: "Translation temporarily unavailable" },
+        { status: 503 },
+      );
     const chunks = chunkText(text, CHUNK_CHARS);
     const translatedChunks = [];
     for (const chunk of chunks) {
       translatedChunks.push(await translateChunk(chunk, from, to));
     }
-    const translatedText = translatedChunks.join(" ").replace(/\s+/g, " ").trim();
+    const translatedText = translatedChunks
+      .join(["zh", "ja"].includes(to.split("-")[0]) ? "" : " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
+    if (translationCache.size >= 2048)
+      translationCache.delete(translationCache.keys().next().value!);
     translationCache.set(cacheKey, {
       expiresAt: Date.now() + TRANSLATION_TTL_MS,
       value: translatedText,
@@ -62,7 +102,7 @@ export async function POST(request: Request) {
 }
 
 async function translateChunk(text: string, from: string, to: string) {
-  const langpair = `${from === "auto" ? "en" : from}|${to}`;
+  const langpair = `${from}|${to}`;
   const endpoint = new URL("https://api.mymemory.translated.net/get");
   endpoint.searchParams.set("q", text);
   endpoint.searchParams.set("langpair", langpair);
@@ -80,16 +120,25 @@ async function translateChunk(text: string, from: string, to: string) {
   }
 
   const data = (await response.json()) as {
+    responseStatus?: number | string;
+    quotaFinished?: boolean;
     responseData?: { translatedText?: string };
     matches?: { translation?: string; quality?: string }[];
   };
+
+  if (Number(data.responseStatus ?? 200) !== 200 || data.quotaFinished) {
+    unavailableUntil = Date.now() + 60_000;
+    throw new Error("Translation provider limit or error");
+  }
 
   const translated = data.responseData?.translatedText?.trim();
   if (translated) {
     return decodeEntities(translated);
   }
 
-  const fallback = data.matches?.find((match) => match.translation)?.translation;
+  const fallback = data.matches?.find(
+    (match) => match.translation,
+  )?.translation;
   if (fallback) {
     return decodeEntities(fallback);
   }
@@ -98,7 +147,10 @@ async function translateChunk(text: string, from: string, to: string) {
 }
 
 function normalizeText(value: string) {
-  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function normalizeLanguage(language: string) {
@@ -114,39 +166,36 @@ function normalizeLanguage(language: string) {
   return map[lower] ?? lower.split("-")[0] ?? "en";
 }
 
-function chunkText(text: string, maxLength: number) {
-  const sentences = text.match(/[^.!?]+[.!?]?/g) ?? [text];
+function chunkText(text: string, maxBytes: number) {
   const chunks: string[] = [];
+  const encoder = new TextEncoder();
   let current = "";
-
-  for (const sentence of sentences) {
-    if (`${current} ${sentence}`.trim().length > maxLength && current) {
+  for (const word of text.match(/\S+\s*/gu) ?? []) {
+    if (encoder.encode(current + word).length <= maxBytes) {
+      current += word;
+      continue;
+    }
+    if (current) {
       chunks.push(current.trim());
-      current = sentence;
-    } else {
-      current = `${current} ${sentence}`.trim();
+      current = "";
+    }
+    for (const char of word) {
+      if (encoder.encode(current + char).length > maxBytes) {
+        chunks.push(current.trim());
+        current = "";
+      }
+      current += char;
     }
   }
-
-  if (current) {
-    chunks.push(current.trim());
-  }
-
-  return chunks.flatMap((chunk) => {
-    if (chunk.length <= maxLength) {
-      return [chunk];
-    }
-    const pieces: string[] = [];
-    for (let index = 0; index < chunk.length; index += maxLength) {
-      pieces.push(chunk.slice(index, index + maxLength));
-    }
-    return pieces;
-  });
+  if (current.trim()) chunks.push(current.trim());
+  return chunks;
 }
 
 function decodeEntities(value: string) {
   return value
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/&#(\d+);/g, (_, code: string) =>
+      String.fromCodePoint(Number(code)),
+    )
     .replace(/&#x([0-9a-f]+);/gi, (_, code: string) =>
       String.fromCodePoint(parseInt(code, 16)),
     )
