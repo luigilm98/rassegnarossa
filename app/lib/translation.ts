@@ -1,3 +1,13 @@
+/** Canonical provider language: regional editions of the same language need no translation. */
+export function normalizeLanguage(language: string): string {
+  const lower = language.trim().replace(/_/g, "-").toLowerCase();
+  const chinese: Record<string, string> = {
+    zh: "zh", "zh-cn": "zh", "zh-sg": "zh", "zh-hans": "zh",
+    "zh-tw": "zh-TW", "zh-hk": "zh-TW", "zh-mo": "zh-TW", "zh-hant": "zh-TW",
+  };
+  return chinese[lower] ?? lower.split("-")[0];
+}
+
 /** MyMemory accepts public, credential-free CORS requests. */
 export function chunkTranslationText(text: string, maxBytes = 460): string[] {
   const chunks: string[] = [];
@@ -29,6 +39,8 @@ export async function translatePublicText(
   to: string,
   fetcher: typeof fetch = fetch,
 ): Promise<string> {
+  from = normalizeLanguage(from);
+  to = normalizeLanguage(to);
   if (
     text.length > 2200 ||
     !/^[a-z]{2,3}(?:-[A-Za-z]{2,4})?$/.test(from) ||
@@ -78,6 +90,8 @@ export async function translateGoogleText(
   to: string,
   fetcher: typeof fetch = fetch,
 ): Promise<string> {
+  from = normalizeLanguage(from);
+  to = normalizeLanguage(to);
   if (text.length > 2200 || !/^[a-z]{2,3}(?:-[A-Za-z]{2,4})?$/.test(from) || !/^[a-z]{2,3}(?:-[A-Za-z]{2,4})?$/.test(to))
     throw new Error("Invalid translation input");
   if (from === to) return text;

@@ -21,7 +21,11 @@ export function createPublisherResolver(catalog: SourceDefinition[]) {
     const languages = [...new Set(matches.map(source => source.language))];
     return {
       country: countries.length === 1 ? countries[0] : article.kind !== "radar" ? article.country || null : null,
-      language: languages.length === 1 ? languages[0] : article.language,
+      // Native feed/item metadata is authoritative, including multilingual publishers.
+      // Radar language describes the search edition, so known publisher metadata corrects it.
+      language: article.kind !== "radar" && article.language
+        ? article.language
+        : languages.length === 1 ? languages[0] : article.language,
     };
   };
 }

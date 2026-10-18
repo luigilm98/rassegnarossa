@@ -1183,11 +1183,10 @@ export function AggregatorApp() {
                       <div className="news-grid" aria-label="Articoli">
                         {orderedArticles
                           .slice(0, visibleCount)
-                          .map((article, index) => (
+                          .map((article) => (
                             <ArticleCard
                               key={`${orderVersion}:${article.id}`}
                               article={article}
-                              featured={index === 0 && view === "notizie"}
                               saved={savedIds.has(article.id)}
                               onSelect={() => setSelectedId(article.id)}
                               onSave={() => toggleSave(article)}
@@ -1347,13 +1346,11 @@ function Select({
 
 function ArticleCard({
   article,
-  featured = false,
   saved,
   onSelect,
   onSave,
 }: {
   article: Article;
-  featured?: boolean;
   saved: boolean;
   onSelect: () => void;
   onSave: () => void;
@@ -1361,27 +1358,26 @@ function ArticleCard({
   const [imageFailed, setImageFailed] = useState(false);
   const [image] = useState(() => safeWebUrl(article.image));
   return (
-    <article className={`article-card ${featured ? "featured" : ""}`}>
+    <article className="article-card">
       <button className="article-open" onClick={onSelect}>
-        {image ? (
-          <div className={`article-image ${imageFailed ? "image-unavailable" : ""}`}>
+        <div className={`article-image ${!image || imageFailed ? "image-unavailable" : ""}`}>
+          {image ? (
             <img
               src={image}
               alt=""
               width={640}
               height={360}
-              loading={featured ? "eager" : "lazy"}
-              fetchPriority={featured ? "high" : "auto"}
+              loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
               style={{ opacity: imageFailed ? 0 : undefined }}
               onError={() => setImageFailed(true)}
             />
-            <span className="image-category">
-              <LocalizedText>{article.region}</LocalizedText>
-            </span>
-          </div>
-        ) : null}
+          ) : null}
+          <span className="image-category">
+            <LocalizedText>{article.region}</LocalizedText>
+          </span>
+        </div>
         <div className="article-copy">
           <div className="article-meta">
             <span>{article.sourceName}</span>

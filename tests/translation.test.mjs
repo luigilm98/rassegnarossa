@@ -111,3 +111,20 @@ test("a rate-limited translation provider falls back to the other provider witho
   await assert.rejects(translateGoogleText("News", "en", "it", async () => Response.json(value)));
  assert.equal(await translateGoogleText("Notizie", "it", "it", async () => { throw new Error("Must not fetch"); }), "Notizie");
 });
+
+test("every catalog language bypasses both providers when source and reading language coincide", async () => {
+ const { SOURCE_CATALOG } = await import("../app/data/catalog.ts");
+ const languages = new Set(SOURCE_CATALOG.map(source => source.language));
+ const noNetwork = async () => { assert.fail("same-language text must never reach a translation provider"); };
+ const original = "Titolo originale — 你好 — Привет";
+ for (const language of languages) {
+  for (const translate of [translateGoogleText, translatePublicText, translateAvailableText]) {
+   assert.equal(await translate(original, language, language, noNetwork), original, language);
+  }
+ }
+ for (const [from, to] of [["it-IT", "it"], ["EN_us", "en"], ["pt-BR", "pt-PT"], ["fr-CA", "fr"], ["es-419", "es"], ["zh-Hans", "zh-CN"], ["zh-Hant", "zh-TW"]]) {
+  for (const translate of [translateGoogleText, translatePublicText, translateAvailableText]) {
+   assert.equal(await translate(original, from, to, noNetwork), original, `${from}/${to}`);
+  }
+ }
+});

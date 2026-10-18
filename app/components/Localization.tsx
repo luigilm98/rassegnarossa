@@ -10,7 +10,7 @@ import {
   type InputHTMLAttributes,
 } from "react";
 
-import { translateAvailableText } from "@/app/lib/translation";
+import { translateAvailableText, normalizeLanguage } from "@/app/lib/translation";
 import { createTranslationQueue } from "@/app/lib/translation-queue";
 
 let useDirectUntil = 0;
@@ -155,6 +155,8 @@ const translationQueue = createTranslationQueue(async (task) => {
   }
 });
 function translate(text: string, from: string, to: string, priority = 0) {
+  from = normalizeLanguage(from);
+  to = normalizeLanguage(to);
   if (from === to) return Promise.resolve(text);
   hydrateCache();
   const key = keyFor(text, from, to);
@@ -169,8 +171,8 @@ export function LocalizationProvider({
   children: ReactNode;
 }) {
   useEffect(() => {
-    currentReadingLanguage = language;
-    translationQueue.keepTarget(language);
+    currentReadingLanguage = normalizeLanguage(language);
+    translationQueue.keepTarget(currentReadingLanguage);
     failedKeys.clear();
     failed = false;
     emit();
@@ -184,7 +186,7 @@ export function LocalizationProvider({
 /** Each text node stays owned by React; no DOM rewriting or third-party scripts. */
 export function LocalizedText({
   children,
-  from = "it",
+  from: originalLanguage = "it",
   priority = 0,
   defer = false,
 }: {
@@ -193,7 +195,8 @@ export function LocalizedText({
   priority?: number;
   defer?: boolean;
 }) {
-  const to = useLocale();
+  const to = normalizeLanguage(useLocale());
+  const from = normalizeLanguage(originalLanguage);
   const anchor = useRef<HTMLSpanElement>(null);
   const [visible, setVisible] = useState(!defer);
   useEffect(() => {

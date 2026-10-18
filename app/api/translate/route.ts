@@ -1,4 +1,4 @@
-import { chunkTranslationText, translateGoogleText } from "@/app/lib/translation";
+import { chunkTranslationText, translateGoogleText, normalizeLanguage } from "@/app/lib/translation";
 export const dynamic = "force-dynamic";
 
 type TranslationPayload = {
@@ -157,18 +157,6 @@ function normalizeText(value: string) {
     .trim();
 }
 
-function normalizeLanguage(language: string) {
-  const lower = language.toLowerCase();
-  const map: Record<string, string> = {
-    "pt-br": "pt",
-    "pt-pt": "pt",
-    "es-419": "es",
-    "zh-cn": "zh-CN",
-    "zh-tw": "zh-TW",
-    auto: "auto",
-  };
-  return map[lower] ?? lower.split("-")[0] ?? "en";
-}
 
 function decodeEntities(value: string) {
   return value
