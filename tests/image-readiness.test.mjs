@@ -43,12 +43,14 @@ test("cached images decode too, while cached broken images and decode failures s
  assert.equal(failures, 2);
 });
 
-test("a stalled image gets a bounded error fallback and cancellation cleans up without turning a late load into an error", async () => {
+test("the preparation timeout lets a slow image load later, and cancellation cleans up without errors", async () => {
  const stalled = new ImageAsset();
  let failures = 0;
  stalled.addEventListener("error", () => { failures++; });
  await prepareImage(stalled, signal(), 10);
- assert.equal(failures, 1);
+ assert.equal(failures, 0);
+ stalled.dispatchEvent(new Event("load"));
+ assert.equal(failures, 0);
  const image = new ImageAsset();
  const controller = new AbortController();
  let decodes = 0;
@@ -60,4 +62,11 @@ test("a stalled image gets a bounded error fallback and cancellation cleans up w
  assert.equal(decodes, 0);
  const aborted = new AbortController(); aborted.abort();
  await prepareImage(new ImageAsset(), aborted.signal);
+});
+
+test("article image candidates accept newly recovered photos and safe fallbacks without retaining an initial empty URL", async () => {
+ const {articleImages}=await import("../app/lib/article-images.ts");
+ assert.deepEqual(articleImages(null),[]);
+ assert.deepEqual(articleImages("https://publisher.example/new.jpg"),["https://publisher.example/new.jpg"]);
+ assert.deepEqual(articleImages("https://publisher.example/broken.jpg",["https://publisher.example/recovered.jpg","javascript:alert(1)","https://user:password@publisher.example/private.jpg",null]),["https://publisher.example/broken.jpg","https://publisher.example/recovered.jpg"]);
 });

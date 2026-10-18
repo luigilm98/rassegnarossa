@@ -1,7 +1,7 @@
 import { SOURCE_CATALOG } from "@/app/data/catalog";
-import { parseSourceHighlights, type SourceHighlight } from "@/app/lib/source-highlights";
+import { parseSourcePage, type SourceHighlight, type SourceImage } from "@/app/lib/source-highlights";
 export const dynamic = "force-dynamic";
-const cache = new Map<string, { until: number; highlights: SourceHighlight[]; ok: boolean }>();
+const cache = new Map<string, { until: number; highlights: SourceHighlight[]; images: SourceImage[]; ok: boolean }>();
 export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get("sourceId");
   const source = SOURCE_CATALOG.find(item => item.id === id && item.kind !== "radar" && !/youtube\.com/.test(item.homepage));
@@ -28,9 +28,9 @@ export async function GET(request: Request) {
         }
         html += decoder.decode();
       } finally { await reader.cancel().catch(() => {}); }
-      value = { until: Date.now() + 600_000, highlights: parseSourceHighlights(html, source.homepage), ok: true };
-    } catch { value = { until: Date.now() + 60_000, highlights: [], ok: false }; }
+      value = { until: Date.now() + 600_000, ...parseSourcePage(html, source.homepage), ok: true };
+    } catch { value = { until: Date.now() + 60_000, highlights: [], images: [], ok: false }; }
     cache.set(key, value);
   }
-  return Response.json({ sourceId: source.id, highlights: value.highlights, ok: value.ok, observedAt: new Date(value.until - (value.ok ? 600_000 : 60_000)).toISOString() }, { headers: { "cache-control": value.ok ? "public, max-age=120" : "no-store" } });
+  return Response.json({ sourceId: source.id, highlights: value.highlights, images: value.images, ok: value.ok, observedAt: new Date(value.until - (value.ok ? 600_000 : 60_000)).toISOString() }, { headers: { "cache-control": value.ok ? "public, max-age=120" : "no-store" } });
 }

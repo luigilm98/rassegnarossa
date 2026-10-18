@@ -28,7 +28,7 @@ export function createPublicNewsStore(db: NewsDatabase | undefined, sourceIds: R
       canonical.searchParams.set("limitPerSource", "24");
     } else if (url.pathname === "/api/pulse") canonical.searchParams.set("area", url.searchParams.get("area") ?? "europe");
     else canonical.searchParams.set("sourceId", url.searchParams.get("sourceId")!);
-    return canonical.pathname + canonical.search;
+    return "images-v2:" + canonical.pathname + canonical.search;
   };
   return {
     async match(request) {

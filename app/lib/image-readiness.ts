@@ -3,7 +3,8 @@ export function prepareImage(image: HTMLImageElement, signal: AbortSignal, timeo
   return new Promise(resolve => {
     let done = false;
     let decoding = false;
-    const timer = setTimeout(failed, timeoutMs);
+    // An expired preparation budget is not a failed download. Let late photos paint normally.
+    const timer = setTimeout(finish, timeoutMs);
     function finish() {
       if (done) return;
       done = true;

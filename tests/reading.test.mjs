@@ -126,3 +126,12 @@ test('reading paths point to existing works and preserve all library entries', a
   assert.deepEqual(new Set(READING_PATHS.flatMap(path => path.books)), ids);
   for (const dossier of DOSSIERS) assert.ok(topics.has(dossier.id), `Missing topic ${dossier.id}`);
 });
+
+test("a text-only refresh preserves the recovered photo for the same story while allowing a newer publisher image", () => {
+ const known=article({image:"https://example.org/recovered.jpg"});
+ const refreshed=mergeArticles([known],[article({title:"Updated title",image:null})]);
+ assert.equal(refreshed[0].title,"Updated title");
+ assert.equal(refreshed[0].image,known.image);
+ assert.equal(mergeArticles(refreshed,[article({image:"https://example.org/new.jpg"})])[0].image,"https://example.org/new.jpg");
+ assert.equal(mergeArticles([known],[article({link:"https://example.org/different",image:null})])[0].image,null);
+});

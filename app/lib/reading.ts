@@ -61,7 +61,13 @@ export function mergeArticles(
   incoming: ReadingArticle[],
 ): ReadingArticle[] {
   const merged = new Map(current.map((article) => [article.id, article]));
-  for (const article of incoming) merged.set(article.id, article);
+  for (const article of incoming) {
+    const previous = merged.get(article.id);
+    // A text-only RSS refresh must not erase a photo already recovered for this exact story.
+    merged.set(article.id, !article.image && previous?.image && previous.link === article.link
+      ? { ...article, image: previous.image, imageFallbacks: previous.imageFallbacks }
+      : article);
+  }
   return Array.from(merged.values()).sort(
     (a, b) =>
       (Date.parse(b.publishedAt ?? "") || 0) -

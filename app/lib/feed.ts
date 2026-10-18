@@ -26,6 +26,7 @@ export type ArticleRecord = {
   categories: string[];
   topics: string[];
   image: string | null;
+  imageFallbacks?: string[];
   score: number;
 };
 

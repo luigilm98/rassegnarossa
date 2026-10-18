@@ -60,3 +60,21 @@ test("only configured publishers which have supplied articles enter the extra qu
  assert.deepEqual(highlightSources(catalog, records).map(source => source.id), ["one"]);
  assert.deepEqual(highlightSources(catalog, []), []);
 });
+
+test("publisher photos match exact article links, support responsive lazy images and exclude logos, ambiguous cards and external links", async () => {
+ const {parseSourcePage,applySourceImages}=await import("../app/lib/source-highlights.ts");
+ const page=parseSourcePage(`<header><a href="/"><img src="/logo.jpg"></a></header>
+ <article><a href="/story-one?utm_source=front"><img data-src="/full.jpg" data-srcset="/small.jpg 320w, /card.jpg 640w, /large.jpg 1600w"></a><h2><a href="/story-one?utm_source=front">A real headline</a></h2></article>
+ <article><img data-lazy-src="/second.jpg"><h2><a href="/story-two">Another headline</a></h2></article>
+ <div><img src="/unrelated.jpg"><a href="/a">One</a><a href="/b">Two</a></div>
+ <a href="https://other.example/news"><img src="/external.jpg"></a>
+ <nav><a href="/navigation"><img src="/nav.jpg"></a></nav>`,"https://publisher.example/");
+ assert.deepEqual(page.images,[{link:"https://publisher.example/story-one?utm_source=front",image:"https://publisher.example/card.jpg"},{link:"https://publisher.example/story-two",image:"https://publisher.example/second.jpg"}]);
+ const unchanged={link:"https://publisher.example/no-photo",image:null};
+ const old={link:"https://publisher.example/story-two",image:"https://publisher.example/original.jpg"};
+ const result=applySourceImages([{link:"https://publisher.example/story-one",image:null},old,unchanged],page.images);
+ assert.equal(result[0].image,"https://publisher.example/card.jpg");
+ assert.deepEqual(result[1].imageFallbacks,["https://publisher.example/second.jpg"]);
+ assert.equal(result[1].image,old.image);
+ assert.equal(result[2],unchanged);
+});

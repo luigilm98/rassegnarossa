@@ -54,13 +54,14 @@ import type { SourceStatus } from "@/app/lib/feed";
 import { createBatchedSink } from "@/app/lib/batched-sink";
 import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
-import { InitialLoadBoundary, usePagePreparation } from "./InitialLoadBoundary";
+import { ArticleImage } from "./ArticleImage";
+import { InitialLoadBoundary } from "./InitialLoadBoundary";
 import { WorldWatch } from "./WorldWatch";
 import { useStableNews } from "./StableNews";
 import { useCloudBookmarks, type RestoredCollection } from "./CloudBookmarks";
 import { createPublisherResolver } from "@/app/lib/publisher";
 import { useSourceHighlights } from "./SourceHighlights";
-import { highlightLinkKey, rankSourceHighlights } from "@/app/lib/source-highlights";
+import { applySourceImages, highlightLinkKey, rankSourceHighlights } from "@/app/lib/source-highlights";
 import {
   LocalizationProvider,
   LocalizedText,
@@ -179,7 +180,8 @@ export function AggregatorApp() {
   const [sourceId, setSourceId] = useState(ALL);
   const [days, setDays] = useState("30");
   const [sort, setSort] = useState("featured");
-  const sourceHighlights = useSourceHighlights(articles, view === "notizie" && (sort === "featured" || sort === "popular"));
+  const sourceHighlights = useSourceHighlights(articles, view === "notizie" || view === "salvati");
+  const displayArticles = useMemo(() => applySourceImages(articles, sourceHighlights.images), [articles, sourceHighlights.images]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [orderVersion, setOrderVersion] = useState(0);
@@ -510,7 +512,7 @@ export function AggregatorApp() {
           "rassegna-rossa.feed-cache",
           JSON.stringify({
             updatedAt: newsUpdatedAt,
-            articles: rankEditorial(articles).slice(0, 1200),
+            articles: rankEditorial(displayArticles).slice(0, 1200),
           }),
         );
       } catch {
@@ -518,7 +520,7 @@ export function AggregatorApp() {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [articles, newsUpdatedAt, storageReady]);
+  }, [displayArticles, newsUpdatedAt, storageReady]);
 
   const chooseReadingLanguage = (value: string) => {
     setReadingChoice(value);
@@ -577,15 +579,15 @@ export function AggregatorApp() {
   }, []);
 
   const allArticles = useMemo(
-    () => mergeArticles(savedArticles, articles),
-    [savedArticles, articles],
+    () => mergeArticles(savedArticles, displayArticles),
+    [savedArticles, displayArticles],
   );
   const matched = useMemo(
     () =>
       filterArticles(
         view === "salvati"
           ? allArticles.filter((a) => savedIds.has(a.id))
-          : articles,
+          : displayArticles,
         {
           query,
           region,
@@ -601,7 +603,7 @@ export function AggregatorApp() {
     [
       view,
       allArticles,
-      articles,
+      displayArticles,
       savedIds,
       query,
       region,
@@ -1242,7 +1244,7 @@ export function AggregatorApp() {
                         </p>
                       ) : null}
                     </div>
-                    {view === "notizie" ? <WorldWatch networkArticles={articles} /> : null}
+                    {view === "notizie" ? <WorldWatch networkArticles={displayArticles} /> : null}
                   </div>
                 )}
               </>
@@ -1359,30 +1361,10 @@ const ArticleCard = memo(function ArticleCard({
   onSelect: (id: string) => void;
   onSave: (article: Article) => void;
 }) {
-  const { preparing } = usePagePreparation();
-  const [imageFailed, setImageFailed] = useState(false);
-  const [image] = useState(() => safeWebUrl(article.image));
   return (
     <article className="article-card">
       <button className="article-open" onClick={() => onSelect(article.id)}>
-        <div className={`article-image ${!image || imageFailed ? "image-unavailable" : ""}`}>
-          {image ? (
-            <img
-              src={image}
-              alt=""
-              width={640}
-              height={360}
-              loading={preparing ? "eager" : "lazy"}
-              decoding="async"
-              referrerPolicy="no-referrer"
-              style={{ opacity: imageFailed ? 0 : undefined }}
-              onError={() => setImageFailed(true)}
-            />
-          ) : null}
-          <span className="image-category">
-            <LocalizedText>{article.region}</LocalizedText>
-          </span>
-        </div>
+        <ArticleImage image={article.image} fallbacks={article.imageFallbacks} region={article.region} />
         <div className="article-copy">
           <div className="article-meta">
             <span>{article.sourceName}</span>

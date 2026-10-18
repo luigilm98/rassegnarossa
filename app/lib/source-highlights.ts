@@ -1,5 +1,6 @@
 import type { ArticleRecord } from "./feed";
 export type Placement = "featured" | "opening" | "popular";
+export type SourceImage = { link: string; image: string };
 export type SourceHighlight = { link: string; placement: Placement; rank: number };
 type Node = { tag: string; attrs: Record<string, string>; parent?: Node; children: Node[]; text: string; blocked: boolean };
 const VOID = new Set("area base br col embed hr img input link meta param source track wbr".split(" "));
@@ -24,7 +25,7 @@ export function highlightLinkKey(link: string): string {
   } catch { return ""; }
 }
 /** Static public HTML only. No scripts, numeric view guesses or visitor-supplied URLs. */
-export function parseSourceHighlights(html: string, homepage: string): SourceHighlight[] {
+export function parseSourcePage(html: string, homepage: string): { highlights: SourceHighlight[]; images: SourceImage[] } {
   const clean = html.slice(0, 1_200_000).replace(/<!--[^]*?-->/g, "").replace(/<(script|style|noscript|template|svg)\b[^>]*>[^]*?<\/\1\s*>/gi, "");
   const root: Node = { tag: "root", attrs: {}, children: [], text: "", blocked: false };
   const stack = [root], nodes: Node[] = [];
@@ -90,7 +91,49 @@ export function parseSourceHighlights(html: string, homepage: string): SourceHig
   // First actual headline links are an opening-position signal, never a readership claim.
   for (const node of nodes.filter(node => !node.blocked && /^h[123]$/.test(node.tag)))
     for (const anchor of descendants(node)) add(anchor, "opening", 5);
-  return results;
+  const images: SourceImage[] = [];
+  const pictured = new Set<string>();
+  const safeImage = (value: string) => {
+    try { const url = new URL(value, homepage); return /^https?:$/.test(url.protocol) && !url.username && !url.password ? url.href : null; }
+    catch { return null; }
+  };
+  for (const node of nodes) {
+    if (node.blocked || node.tag !== "img" || node.attrs.width === "1" || node.attrs.height === "1") continue;
+    const sizes = (node.attrs["data-srcset"] ?? node.attrs.srcset ?? "").split(",").flatMap(candidate => {
+      const match = candidate.trim().match(/^(\S+)\s+(\d+)w$/);
+      const image = match && safeImage(match[1]);
+      return image && Number(match![2]) >= 480 ? [{ image, width: Number(match![2]) }] : [];
+    }).sort((a, b) => a.width - b.width);
+    const image = (sizes.find(size => size.width >= 640) ?? sizes.at(-1))?.image ??
+      [node.attrs["data-src"], node.attrs["data-lazy-src"], node.attrs["data-original"], node.attrs.src].flatMap(value => value && safeImage(value) ? [safeImage(value)!] : [])[0];
+    if (!image) continue;
+    let parent = node.parent, href: string | null = null;
+    for (let depth = 0; parent && depth < 6; depth++, parent = parent.parent) {
+      if (parent.tag === "a") { href = link(parent); break; }
+      if (["body", "main", "root"].includes(parent.tag)) break;
+      const anchors = descendants(parent).filter(child => child.tag === "a");
+      const links = [...new Set(anchors.flatMap(anchor => { const value = link(anchor); return value ? [value] : []; }))];
+      // A photo is associated only with an unambiguous story, never a whole section.
+      if (links.length === 1) { href = links[0]; break; }
+      if (parent.tag === "article") break;
+    }
+    const key = href && highlightLinkKey(href);
+    if (href && key && !pictured.has(key)) { images.push({ link: href, image }); pictured.add(key); }
+    if (images.length >= 120) break;
+  }
+  return { highlights: results, images };
+}
+export function parseSourceHighlights(html: string, homepage: string): SourceHighlight[] {
+  return parseSourcePage(html, homepage).highlights;
+}
+/** Match photos to exact collected article links; never assign publisher logos or unrelated pictures. */
+export function applySourceImages<T extends { link: string; image: string | null; imageFallbacks?: string[] }>(articles: T[], photos: SourceImage[]): T[] {
+  const byLink = new Map(photos.map(photo => [highlightLinkKey(photo.link), photo.image]));
+  return articles.map(article => {
+    const image = byLink.get(highlightLinkKey(article.link));
+    if (!image || image === article.image) return article;
+    return article.image ? { ...article, imageFallbacks: [...new Set([...(article.imageFallbacks ?? []), image])].slice(0, 4) } : { ...article, image };
+  });
 }
 export function rankSourceHighlights(articles: ArticleRecord[], highlights: SourceHighlight[], mode: "featured" | "popular"): ArticleRecord[] {
   const scores = new Map<string, number>();
