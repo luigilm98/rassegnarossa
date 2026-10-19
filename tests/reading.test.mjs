@@ -158,3 +158,10 @@ test('expanded library exposes Mao and other authors through real, distinct lang
  assert.equal(bookEdition('mao-pratica','pt').language,'pt');
  assert.ok(THEORY_LIBRARY.filter(book=>book.author==='Mao Zedong').length>=25);
 });
+
+test('lightweight saved-book IDs remain in sync with the lazily loaded complete catalogue',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const ids=JSON.parse(await readFile(new URL('../app/data/book-ids.json',import.meta.url),'utf8'));
+ const {THEORY_LIBRARY}=await import('../app/data/library.ts');
+ assert.deepEqual(ids,THEORY_LIBRARY.map(book=>book.id));
+});

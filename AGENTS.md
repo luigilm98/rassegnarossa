@@ -9,7 +9,7 @@ Leggere `README.md`, `docs/ARCHITECTURE.md`, `CONTRIBUTING.md` e il codice perti
 ## Principi
 
 1. Saper evitare lavoro inutile: riusare o semplificare prima di aggiungere framework, dipendenze e documenti.
-2. Possedere un modello spiegabile: browser → API → fonti esterne; cache temporanee nel server; preferiti solo nel browser.
+2. Possedere un modello spiegabile: browser → API → fonti esterne; cache dei soli dati pubblici; raccolte private persistenti in D1 per account.
 3. Ispezionare contratti e funzioni interessate, con attenzione maggiore a URL remoti, parsing, HTML, credenziali e persistenza.
 4. Preferire verifiche integrate del comportamento a test che ripetono l'implementazione. Nei nuovi comportamenti coprire successo, input errato, risposta vuota e rete indisponibile quando pertinenti.
 5. Rendere esplicite le scelte difficili da invertire: identificatori delle fonti, chiavi localStorage, contratti API e hosting. Descrivere compatibilità e rollback.

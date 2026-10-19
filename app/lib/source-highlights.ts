@@ -1,4 +1,5 @@
 import type { ArticleRecord } from "./feed";
+import { createBoundedCache } from "./bounded-cache.ts";
 export type Placement = "featured" | "opening" | "popular";
 export type SourceImage = { link: string; image: string; fallbacks?: string[] };
 export type SourceHighlight = { link: string; placement: Placement; rank: number };
@@ -12,7 +13,10 @@ const decode = (text: string) => text.replace(/&(?:amp|quot|apos|lt|gt|#39|#\d+|
   const code = entity[2].toLowerCase() === "x" ? parseInt(entity.slice(3), 16) : parseInt(entity.slice(2), 10);
   return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : "";
 });
+const linkKeys = createBoundedCache<string, string>(8192, 2_000_000, (value, key) => (value.length + key.length) * 2);
 export function highlightLinkKey(link: string): string {
+  const cached = linkKeys.get(link);
+  if (cached !== undefined) return cached;
   try {
     const url = new URL(link);
     url.hash = "";
@@ -21,7 +25,9 @@ export function highlightLinkKey(link: string): string {
       if (/^utm_|^(fbclid|gclid)$/i.test(key)) url.searchParams.delete(key);
     url.searchParams.sort();
     if (url.pathname !== "/") url.pathname = url.pathname.replace(/\/$/, "");
-    return url.href;
+    const key = url.href;
+    linkKeys.set(link, key);
+    return key;
   } catch { return ""; }
 }
 /** Static public HTML only. No scripts, numeric view guesses or visitor-supplied URLs. */
@@ -130,16 +136,20 @@ export function parseSourceHighlights(html: string, homepage: string): SourceHig
 }
 /** Match photos to exact collected article links; never assign publisher logos or unrelated pictures. */
 export function applySourceImages<T extends { link: string; image: string | null; imageFallbacks?: string[] }>(articles: T[], photos: SourceImage[]): T[] {
+  if (!photos.length || !articles.length) return articles;
   const byLink = new Map(photos.map(photo => [highlightLinkKey(photo.link), photo]));
-  return articles.map(article => {
+  let changed = false;
+  const result = articles.map(article => {
     const photo = byLink.get(highlightLinkKey(article.link));
     if (!photo) return article;
     const alternates = Array.isArray(photo.fallbacks) ? photo.fallbacks : [];
     const image = article.image || photo.image;
     const fallbacks = [...new Set([...(Array.isArray(article.imageFallbacks) ? article.imageFallbacks : []), photo.image, ...alternates])].filter(value => value !== image).slice(0, 4);
     if (image === article.image && JSON.stringify(fallbacks) === JSON.stringify(article.imageFallbacks ?? [])) return article;
+    changed = true;
     return { ...article, image, ...(fallbacks.length ? { imageFallbacks: fallbacks } : {}) };
   });
+  return changed ? result : articles;
 }
 export function rankSourceHighlights(articles: ArticleRecord[], highlights: SourceHighlight[], mode: "featured" | "popular"): ArticleRecord[] {
   const scores = new Map<string, number>();

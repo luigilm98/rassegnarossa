@@ -13,7 +13,7 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Lingua di lettura e lingua delle fonti in analisi hanno controlli sempre visibili e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
 - Tutte le 266 fonti e ricerche partecipano automaticamente: sei richieste parallele per le fonti dirette e due per i radar, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
 - Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e Google Translate e MyMemory come servizi alternativi, senza fermare la coda al primo errore.
-- Apertura della rassegna dopo la preparazione completa della prima pagina: cache riutilizzabile, titoli/traduzioni e immagini delle 24 schede iniziali preparati senza attendere il resto del catalogo; testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
+- Apertura con preparazione di titoli e immagini entro un budget assoluto di sei secondi: cache riutilizzabile, dati disponibili subito dopo la preparazione e recuperi successivi senza spostare i riquadri; testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
 - Ordine selezionabile: in evidenza dalle fonti, ultimi articoli, più letti sulle fonti, priorità politica e formativa.
 - Le selezioni delle testate provengono dal loro HTML pubblico, separatamente dai feed. Nessun contatore di letture interno. “Più letti” usa soltanto classifiche pubblicate dalle fonti; se mancano, l’interfaccia lo segnala.
 - Osservatorio delle ultime sei ore: notizie da tutta la rete raccolta e da otto canali regionali aggiuntivi, filtri, attività oraria e collegamenti diretti alle testate, senza punteggi nelle schede.
@@ -91,7 +91,7 @@ Stack: React, TypeScript, vinext, Vite e Cloudflare Workers. Il progetto conserv
 
 GitHub contiene i sorgenti e avvia i controlli automatici su `main` e nelle pull request. Il servizio pubblicato è ospitato su Sites: un push su GitHub **non aggiorna automaticamente** quel sito. GitHub Pages non esegue le API server necessarie a feed e traduzioni. Vedere [la procedura di deploy](docs/ARCHITECTURE.md#pubblicazione).
 
-Le cache dei feed rimangono temporanee; le raccolte personali degli utenti autenticati sono persistenti in D1 e separate per account. L’accesso è necessario per recuperarle dopo la cancellazione completa dei dati del browser. Feed, ricerca radar e traduzioni dipendono da servizi esterni, dai loro limiti e dai loro cambiamenti. La suite attuale non copre in modo esaustivo parser, accessibilità, rete o browser. Non sono inclusi credenziali, dati di produzione o dipendenze installate. Questo repository non aggiunge una licenza: verificare i diritti prima di redistribuire codice o contenuti di terzi.
+Le cache dei feed rimangono temporanee; le raccolte personali degli utenti autenticati sono persistenti in D1 e separate per account. L’accesso è necessario per recuperarle dopo la cancellazione completa dei dati del browser. Feed, ricerca radar e traduzioni dipendono da servizi esterni, dai loro limiti e dai loro cambiamenti. La suite non copre in modo esaustivo accessibilità, rete o browser. Non sono inclusi credenziali, dati di produzione o dipendenze installate. Questo repository non aggiunge una licenza: verificare i diritti prima di redistribuire codice o contenuti di terzi.
 
 I sorgenti pubblici non includono identificativi di hosting specifici del proprietario.
 

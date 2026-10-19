@@ -1,17 +1,9 @@
 import type { SourceDefinition } from "../data/catalog";
 import { parseSourcePage, type SourceHighlight, type SourceImage } from "./source-highlights";
-const cache = new Map<string, { until: number; highlights: SourceHighlight[]; images: SourceImage[]; ok: boolean }>();
-const pending = new Map<string, Promise<PublisherPage>>();
+import { createBoundedCache } from "./bounded-cache";
+const cache = createBoundedCache<string, PublisherPage>(128, 8_000_000, entry => JSON.stringify(entry).length * 2);
 export type PublisherPage = { until: number; highlights: SourceHighlight[]; images: SourceImage[]; ok: boolean };
-export function fetchPublisherPage(source: Pick<SourceDefinition, "homepage">, sharePending = true): Promise<PublisherPage> {
-  if (!sharePending) return loadPublisherPage(source);
-  const existing = pending.get(source.homepage);
-  if (existing) return existing;
-  const task = loadPublisherPage(source).finally(() => pending.delete(source.homepage));
-  pending.set(source.homepage, task);
-  return task;
-}
-async function loadPublisherPage(source: Pick<SourceDefinition, "homepage">): Promise<PublisherPage> {
+export async function fetchPublisherPage(source: Pick<SourceDefinition, "homepage">): Promise<PublisherPage> {
   const key = source.homepage;
   let value = cache.get(key);
   if (!value || value.until <= Date.now()) {

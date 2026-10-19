@@ -4,7 +4,6 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
-  BookOpen,
   Bookmark,
   BookmarkCheck,
   ChevronDown,
@@ -20,7 +19,10 @@ import {
   X,
 } from "lucide-react";
 import {
+  lazy,
+  Suspense,
   memo,
+  useDeferredValue,
   useCallback,
   useEffect,
   useMemo,
@@ -34,8 +36,8 @@ import {
   REGION_ORDER,
   type SourceDefinition,
 } from "@/app/data/catalog";
-import { THEORY_LIBRARY, BOOK_LANGUAGES } from "@/app/data/library";
-import { DOSSIERS, READING_PATHS, GLOSSARY } from "@/app/data/editorial";
+import BOOK_IDS from "@/app/data/book-ids.json" with { type: "json" };
+import { DOSSIERS } from "@/app/data/editorial";
 import {
   filterArticles,
   validateArticles,
@@ -87,6 +89,9 @@ type DirectorySource = SourceDefinition & {
   discovered?: boolean;
 };
 const ALL = "all";
+const validBookIds = new Set(BOOK_IDS);
+const LibraryView = lazy(() => import("./LibraryView").then(module => ({ default: module.LibraryView })));
+const SavedBooks = lazy(() => import("./LibraryView").then(module => ({ default: module.SavedBooks })));
 const publisherFor = createPublisherResolver(SOURCE_CATALOG);
 const PAGE_SIZE = 24;
 const NAV: { id: View; label: string }[] = [
@@ -172,6 +177,7 @@ export function AggregatorApp() {
   const [storageReady, setStorageReady] = useState(false);
   const [storageWarning, setStorageWarning] = useState(false);
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [region, setRegion] = useState(ALL);
   const [language, setLanguage] = useState(ALL);
   const [kind, setKind] = useState(ALL);
@@ -199,7 +205,6 @@ export function AggregatorApp() {
     done: 0,
     total: SOURCE_CATALOG.length,
   });
-  const [lastRefresh, setLastRefresh] = useState<string | null>(null);
   const [dateLabel, setDateLabel] = useState("L’informazione, oltre i confini");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [preferredLanguage, setPreferredLanguage] = useState("it");
@@ -214,8 +219,7 @@ export function AggregatorApp() {
     const removedBooks = new Set(snapshot.removed.filter(item => item.kind === "book").map(item => item.key));
     setSavedArticles(current => mergeArticles(snapshot.replace ? [] : current, snapshot.articles).filter(article => !removedArticles.has(article.id)));
     setSavedIds(current => new Set([...(snapshot.replace ? [] : current), ...snapshot.articles.map(article => article.id)].filter(id => !removedArticles.has(id))));
-    const validBooks = new Set(THEORY_LIBRARY.map(book => book.id));
-    setSavedBooks(current => new Set([...(snapshot.replace ? [] : current), ...snapshot.books].filter(id => validBooks.has(id) && !removedBooks.has(id))));
+    setSavedBooks(current => new Set([...(snapshot.replace ? [] : current), ...snapshot.books].filter(id => validBookIds.has(id) && !removedBooks.has(id))));
   }, []);
   const cloud = useCloudBookmarks({ ready: storageReady, articles: savedArticles, books: useMemo(() => [...savedBooks], [savedBooks]), onRestore: restoreCollection });
   const toggleBook = (id: string) => {
@@ -259,9 +263,10 @@ export function AggregatorApp() {
       if (!claimed) {
         setSavedArticles(restored);
         const books = JSON.parse(localStorage.getItem("rassegna-rossa.saved-books") ?? "[]");
-        if (Array.isArray(books)) setSavedBooks(new Set(books.filter(id => THEORY_LIBRARY.some(book => book.id === id))));
+        if (Array.isArray(books)) setSavedBooks(new Set(books.filter(id => validBookIds.has(id))));
       }
-      if (new URLSearchParams(window.location.search).get("view") === "salvati") setView("salvati");
+      const requestedView = new URLSearchParams(window.location.search).get("view");
+      if (NAV.some(item => item.id === requestedView)) setView(requestedView as View);
     } catch {
       setStorageWarning(true);
     }
@@ -326,7 +331,6 @@ export function AggregatorApp() {
     setRefreshNotice(
       "Raccolta interrotta. Le notizie già recuperate restano disponibili.",
     );
-    setLastRefresh(new Date().toISOString());
   };
 
   const refresh = useCallback(
@@ -390,7 +394,7 @@ export function AggregatorApp() {
       setProgress({ done: 0, total: targets.length });
       const firstScreenDeadline = setTimeout(() => {
         if (run === refreshNumber.current) { setLoading(false); setInitialWindowReady(true); }
-      }, 8000);
+      }, 3000);
       try {
         let completed = 0;
         const sink = createBatchedSink<{ payload?: FeedPayload; done?: number }>(updates => {
@@ -438,8 +442,7 @@ export function AggregatorApp() {
           setCollecting(false);
           setLoading(false);
           setInitialWindowReady(true);
-          setLastRefresh(new Date().toISOString());
-        }
+              }
       }
     },
     [],
@@ -589,7 +592,7 @@ export function AggregatorApp() {
           ? allArticles.filter((a) => savedIds.has(a.id))
           : displayArticles,
         {
-          query,
+          query: deferredQuery,
           region,
           language,
           kind,
@@ -605,7 +608,7 @@ export function AggregatorApp() {
       allArticles,
       displayArticles,
       savedIds,
-      query,
+      deferredQuery,
       region,
       language,
       kind,
@@ -635,7 +638,7 @@ export function AggregatorApp() {
       ? rankEditorial(selected, preferredLanguage)
       : selected;
   }, [matched, editorialAxis, view, sort, preferredLanguage, sourceHighlights.highlights]);
-  const orderedArticles = useStableNews(filtered, JSON.stringify([view, query, region, language, kind, ideology, topic, sourceId, days, sort, editorialAxis, orderVersion]));
+  const orderedArticles = useStableNews(filtered, JSON.stringify([view, deferredQuery, region, language, kind, ideology, topic, sourceId, days, sort, editorialAxis, orderVersion]));
   const newerOrderAvailable = orderedArticles.some((article, index) => filtered[index]?.id !== article.id);
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
@@ -1178,13 +1181,7 @@ export function AggregatorApp() {
                           </p>
                         </div>
                       ) : null}
-                      {view === "salvati" && savedBooks.size ? <section className="saved-books" aria-label="Libri salvati">
-                        <h3><LocalizedText>Libri salvati</LocalizedText></h3>
-                        {THEORY_LIBRARY.filter(book => savedBooks.has(book.id) && `${book.title} ${book.author}`.toLowerCase().includes(query.toLowerCase())).map(book => <article key={book.id}>
-                          <div><strong><LocalizedText>{book.title}</LocalizedText></strong><p>{book.author}</p><a href={book.editions?.length ? `/read?${new URLSearchParams({book:book.id, edition:book.editions.find(item=>item.language === "it")?.language ?? book.editions[0].language})}` : book.links[0].url}><LocalizedText>Apri il testo</LocalizedText><ArrowUpRight size={14} /></a></div>
-                          <button className="save-button is-saved" onClick={() => toggleBook(book.id)} aria-label={`Rimuovi libro dai salvati: ${book.title}`}><BookmarkCheck size={18} /></button>
-                        </article>)}
-                      </section> : null}
+                      {view === "salvati" && savedBooks.size ? <Suspense fallback={<p role="status"><LocalizedText>Apertura dei libri salvati…</LocalizedText></p>}><SavedBooks savedBooks={savedBooks} query={query} onToggleBook={toggleBook} /></Suspense> : null}
                       <div className="news-grid" aria-label="Articoli">
                         {orderedArticles
                           .slice(0, visibleCount)
@@ -1250,7 +1247,7 @@ export function AggregatorApp() {
               </>
             ) : null}
             {view === "teoria" ? (
-              <LibraryView query={query} setQuery={setQuery} savedBooks={savedBooks} onToggleBook={toggleBook} />
+              <Suspense fallback={<p className="reader-message" role="status"><LocalizedText>Apertura della biblioteca…</LocalizedText></p>}><LibraryView query={query} setQuery={setQuery} savedBooks={savedBooks} onToggleBook={toggleBook} /></Suspense>
             ) : null}
             {view === "metodo" ? (
               <MethodView onSources={() => navigate("fonti")} />
@@ -1679,226 +1676,6 @@ function SourcesDirectory({
           </LocalizedText>
         </p>
       ) : null}
-    </div>
-  );
-}
-
-function LibraryView({
-  query,
-  setQuery,
-  savedBooks,
-  onToggleBook,
-}: {
-  query: string;
-  setQuery: (s: string) => void;
-  savedBooks: Set<string>;
-  onToggleBook: (id: string) => void;
-}) {
-  const readingLanguage = useLocale();
-  const [bookLanguage, setBookLanguage] = useState("all");
-  const availableLanguages = [...new Set(THEORY_LIBRARY.flatMap(book => book.editions?.map(edition => edition.language) ?? []))].sort((a,b) => (BOOK_LANGUAGES[a] ?? a).localeCompare(BOOK_LANGUAGES[b] ?? b));
-  const readingLink = (book: typeof THEORY_LIBRARY[number]) => {
-    const preferred = bookLanguage === "all" ? readingLanguage : bookLanguage;
-    const edition = book.editions?.find(item => item.language === preferred) ?? book.editions?.find(item => item.language === "en") ?? book.editions?.[0];
-    return edition ? `/read?${new URLSearchParams({ book: book.id, edition: edition.language })}` : book.links[0]?.url;
-  };
-  const [path, setPath] = useState("all");
-  const active = READING_PATHS.find((p) => p.id === path);
-  const books = THEORY_LIBRARY.filter(
-    (book) =>
-      Boolean(book.editions?.length) &&
-      (bookLanguage === "all" || book.editions?.some(edition => edition.language === bookLanguage)) &&
-      (!active || active.books.includes(book.id)) &&
-      `${book.title} ${book.author} ${book.summary} ${book.tags.join(" ")}`
-        .toLowerCase()
-        .includes(query.trim().toLowerCase()),
-  );
-  return (
-    <div className="library-view">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">
-            <LocalizedText>
-              {"NON SERVE LEGGERE TUTTO. SERVE INIZIARE."}
-            </LocalizedText>
-          </p>
-          <h2>
-            <LocalizedText>{"Leggere, cooperare, cambiare."}</LocalizedText>
-          </h2>
-        </div>
-        <BookOpen size={24} strokeWidth={1.3} />
-      </div>
-      <div className="reading-paths">
-        {READING_PATHS.map((p, i) => (
-          <button
-            className={`reading-path ${path === p.id ? "active" : ""}`}
-            key={p.id}
-            onClick={() => setPath(path === p.id ? ALL : p.id)}
-            aria-pressed={path === p.id}
-          >
-            <span className="path-number">
-              <LocalizedText>{"0"}</LocalizedText>
-              <LocalizedText>{i + 1}</LocalizedText>
-            </span>
-            <span className="eyebrow">
-              <LocalizedText>{p.subtitle}</LocalizedText>
-            </span>
-            <h3>
-              <LocalizedText>{p.title}</LocalizedText>
-            </h3>
-            <p>
-              <LocalizedText>{p.description}</LocalizedText>
-            </p>
-            <span className="path-link">
-              <LocalizedText>{p.books.length}</LocalizedText>
-              <LocalizedText>{" letture "}</LocalizedText>
-              <ArrowUpRight size={17} />
-            </span>
-          </button>
-        ))}
-      </div>
-      <div className="library-toolbar">
-        <div>
-          <p className="eyebrow">
-            <LocalizedText>{"TESTI E ORIZZONTI"}</LocalizedText>
-          </p>
-          <h2>
-            <LocalizedText>
-              {active?.title ?? "La biblioteca aperta"}
-            </LocalizedText>
-          </h2>
-        </div>
-        <label className="search-box">
-          <Search size={17} />
-          <LocalizedInput
-            aria-label="Cerca nella biblioteca"
-            placeholder="Un autore, un testo, un concetto…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </label>
-        {active ? (
-          <button className="text-link" onClick={() => setPath(ALL)}>
-            <LocalizedText>{"Tutti i testi "}</LocalizedText>
-            <X size={15} />
-          </button>
-        ) : null}
-      </div>
-      <div className="library-language-bar">
-        <label><LocalizedText>Lingua delle edizioni</LocalizedText><select value={bookLanguage} onChange={event => setBookLanguage(event.target.value)} aria-label="Lingua delle edizioni dei libri"><option value="all">Tutte le lingue</option>{availableLanguages.map(code => <option key={code} value={code}>{BOOK_LANGUAGES[code] ?? code}</option>)}</select></label>
-        <p><strong>{books.length}</strong> <LocalizedText>libri e saggi gratuiti</LocalizedText> · {availableLanguages.length} <LocalizedText>lingue disponibili</LocalizedText></p>
-        <small><LocalizedText>Accedi per leggere nel sito e ritrovare la tua ultima pagina su ogni dispositivo.</LocalizedText></small>
-      </div>
-      <div className="book-grid">
-        {books.map((book, index) => (
-          <article className="book-card" key={book.id}>
-            <a href={readingLink(book)}
-              className={`book-cover book-tone-${index % 4}`}
-              aria-label={`Leggi ${book.title}`}
-            >
-              <span>
-                <LocalizedText>
-                  {"LA BIBLIOTECA / RASSEGNA ROSSA"}
-                </LocalizedText>
-              </span>
-              <strong>
-                <LocalizedText>{book.title}</LocalizedText>
-              </strong>
-              <em>{book.author}</em>
-              <span className="cover-year">
-                <LocalizedText>{book.period}</LocalizedText>
-              </span>
-            </a>
-            <div className="book-info">
-              <p className="eyebrow">
-                <LocalizedText>{book.lane}</LocalizedText>
-              </p>
-              <h3><a href={readingLink(book)}><LocalizedText>{book.title}</LocalizedText></a></h3>
-              <p className="book-author">
-                {book.author}
-                <LocalizedText>{" · "}</LocalizedText>
-                <LocalizedText>{book.period}</LocalizedText>
-              </p>
-              <p>
-                <LocalizedText>{book.summary}</LocalizedText>
-              </p>
-              <button className={`text-link book-save ${savedBooks.has(book.id) ? "is-saved" : ""}`} onClick={() => onToggleBook(book.id)} aria-pressed={savedBooks.has(book.id)}>
-                {savedBooks.has(book.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}<LocalizedText>{savedBooks.has(book.id) ? "Libro salvato" : "Salva libro"}</LocalizedText>
-              </button>
-              <a className="book-read-link" href={readingLink(book)}><BookOpen size={17}/><LocalizedText>Leggi online</LocalizedText><ArrowUpRight size={17}/></a>
-              <p className="book-edition-count">{book.editions?.length} <LocalizedText>edizioni linguistiche</LocalizedText> · <LocalizedText>{book.level === "base" ? "Per iniziare" : book.level === "avanzato" ? "Approfondimento" : "Lettura intermedia"}</LocalizedText></p>
-              <div className="book-links">
-                {book.links.map((link) => (
-                  <a
-                    href={link.url}
-                    key={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <LocalizedText>{link.label}</LocalizedText>
-                    <ArrowUpRight size={15} />
-                  </a>
-                ))}
-              </div>
-              <small>
-                <LocalizedText>
-                  {["dipendenza", "femminismo-marxista"].includes(book.id)
-                    ? "Percorso tematico: i link portano a riviste e archivi di approfondimento."
-                    : book.id === "gramsciana"
-                      ? "Il link porta alla Fondazione Gramsci, non al testo integrale dei Quaderni."
-                      : "Testo disponibile presso l’archivio esterno indicato."}
-                </LocalizedText>
-              </small>
-            </div>
-          </article>
-        ))}
-      </div>
-      {!books.length ? (
-        <div className="notice">
-          <LocalizedText>
-            {
-              "Nessun testo trovato. Prova un altro autore o cancella la ricerca."
-            }
-          </LocalizedText>
-        </div>
-      ) : null}
-      <details className="library-resources"><summary><LocalizedText>Archivi e percorsi di approfondimento</LocalizedText></summary>{THEORY_LIBRARY.filter(book => !book.editions?.length).map(book => <p key={book.id}><strong>{book.title}</strong> — {book.links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer">{link.label} ↗ </a>)}</p>)}</details>
-      <section className="glossary">
-        <div>
-          <p className="eyebrow">
-            <LocalizedText>{"LE PAROLE PER ORIENTARSI"}</LocalizedText>
-          </p>
-          <h2>
-            <LocalizedText>{"Un piccolo lessico,"}</LocalizedText>
-            <br />
-            <em>
-              <LocalizedText>{"una porta d’ingresso."}</LocalizedText>
-            </em>
-          </h2>
-          <p>
-            <LocalizedText>
-              {
-                "Definizioni introduttive, non esaustive. I concetti assumono significati diversi nelle diverse tradizioni: i testi sono il luogo per approfondirli."
-              }
-            </LocalizedText>
-          </p>
-        </div>
-        <div>
-          {GLOSSARY.map((g) => (
-            <details key={g.term}>
-              <summary>
-                <LocalizedText>{g.term}</LocalizedText>
-                <span>
-                  <LocalizedText>{"+"}</LocalizedText>
-                </span>
-              </summary>
-              <p>
-                <LocalizedText>{g.definition}</LocalizedText>
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

@@ -34,6 +34,11 @@ export function InitialLoadBoundary({ children, collecting, progress, language }
   }, []);
   const context = useMemo(() => ({ preparing: !revealed, begin }), [revealed, begin]);
   useEffect(() => {
+    // One absolute opening budget: arrivals and unavailable providers cannot reset it.
+    const deadline = setTimeout(() => setRevealed(true), 6000);
+    return () => clearTimeout(deadline);
+  }, []);
+  useEffect(() => {
     if (revealed) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";

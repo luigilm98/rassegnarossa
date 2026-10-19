@@ -25,14 +25,14 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
   const publisherHost = new URL(source.homepage).hostname.replace(/^www\./, "");
   // Legacy/local cards may predate the retained feed. Limit their page lookup to this configured publisher.
   if (params.getAll("articleLink").length > 1 || (rawLink !== null && (!suppliedLink || rawLink.length > 2048 || suppliedLink.pathname === "/"))) return fail(400);
+  const key = `${source.id}:${id}:${suppliedLink?.href ?? ""}`;
+  const cached = cache.get(key);
+  if (cached && cached.until > Date.now()) return responseFor(cached);
   const stored = await find?.(source.id, id).catch(() => undefined);
   // Regional editions can use another host. Only a matching server-observed record
   // may authorize that host; a client-supplied URL never expands the allowlist.
   if (source.kind !== "radar" && suppliedLink && suppliedLink.hostname.replace(/^www\./, "") !== publisherHost && suppliedLink.href !== stored?.link) return fail(400);
   const selectedSource = source;
-  const key = `${source.id}:${id}:${suppliedLink?.href ?? ""}`;
-  const cached = cache.get(key);
-  if (cached && cached.until > Date.now()) return responseFor(cached);
   // A request must never await a resolver owned by a different Worker invocation.
   if (active >= 12) return new Response(null, { status: 503, headers: { "cache-control": "no-store", "retry-after": "1" } });
   const task = (async () => {
@@ -78,7 +78,7 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
     const originalUrls = articleImages(article.image, "imageFallbacks" in article ? article.imageFallbacks : undefined);
     const known = await download(originalUrls);
     if (known) return known;
-    const page = await fetchPublisherPage(source, false);
+    const page = await fetchPublisherPage(source);
     const enriched = applySourceImages([article as import("@/app/lib/feed").ArticleRecord], page.images)[0];
     const homepagePhoto = await download(articleImages(enriched.image, enriched.imageFallbacks).filter(url => !originalUrls.includes(url)));
     if (homepagePhoto) return homepagePhoto;

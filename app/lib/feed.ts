@@ -1,4 +1,5 @@
 import { parseYouTubeListing } from "./youtube";
+import { createBoundedCache } from "./bounded-cache";
 import { createPublisherResolver } from "./publisher";
 import {
   SOURCE_CATALOG,
@@ -54,7 +55,7 @@ type CacheEntry = {
   result: SourceFetchResult;
 };
 
-const feedCache = new Map<string, CacheEntry>();
+const feedCache = createBoundedCache<string, CacheEntry>(512, 16_000_000, entry => JSON.stringify(entry).length * 2);
 const discoveryCache = new Map<string, { expiresAt: number; urls: string[] }>();
 
 const FEED_TTL_MS = 10 * 60 * 1000;
@@ -72,15 +73,9 @@ export function getSources(ids?: string[]) {
   return SOURCE_CATALOG.filter((source) => wanted.has(source.id));
 }
 
-const pendingSources = new Map<string, Promise<SourceFetchResult>>();
 const radarBackoff = new Map<string, number>();
 export function fetchSource(source: SourceDefinition, limit = 10): Promise<SourceFetchResult> {
-  const key = `${source.id}:${limit}`;
-  const current = pendingSources.get(key);
-  if (current) return current;
-  const task = fetchSourceResult(source, limit).finally(() => pendingSources.delete(key));
-  pendingSources.set(key, task);
-  return task;
+  return fetchSourceResult(source, limit);
 }
 
 async function fetchSourceResult(

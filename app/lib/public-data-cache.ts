@@ -6,7 +6,8 @@ const POLICIES: Record<string, readonly string[]> = {
 };
 const FRESH_MS = 120000;
 const RETAIN_MS = 600000;
-const inFlight = new Map<string, Promise<Response>>();
+// Background revalidation may be skipped, but no request awaits another invocation's I/O.
+const refreshing = new Set<string>();
 
 export function publicDataKey(request: Request): Request | null {
   const url = new URL(request.url);
@@ -33,24 +34,17 @@ export async function publicDataResponse(request: Request, {
   const key = publicDataKey(request);
   if (!key || !cache) return load();
   const refresh = async () => {
-    let task = inFlight.get(key.url);
-    if (!task) {
-      task = (async () => {
-        const response = await load();
-        const control = response.headers.get("cache-control") ?? "";
-        if (response.ok && /\bpublic\b/i.test(control) && !/no-store|private/i.test(control) &&
-          !response.headers.has("set-cookie") && !/cookie|authorization|\*/i.test(response.headers.get("vary") ?? "") && /application\/json/i.test(response.headers.get("content-type") ?? "")) {
-          const headers = new Headers(response.headers);
-          headers.set("cache-control", `public, max-age=${RETAIN_MS / 1000}`);
-          headers.set("x-rassegna-cached-at", String(clock()));
-          try { await cache.put(key, new Response(response.clone().body, { status: response.status, headers })); }
-          catch { /* Cache failure never prevents reading public news. */ }
-        }
-        return response;
-      })().finally(() => inFlight.delete(key.url));
-      inFlight.set(key.url, task);
+    const response = await load();
+    const control = response.headers.get("cache-control") ?? "";
+    if (response.ok && /\bpublic\b/i.test(control) && !/no-store|private/i.test(control) &&
+      !response.headers.has("set-cookie") && !/cookie|authorization|\*/i.test(response.headers.get("vary") ?? "") && /application\/json/i.test(response.headers.get("content-type") ?? "")) {
+      const headers = new Headers(response.headers);
+      headers.set("cache-control", `public, max-age=${RETAIN_MS / 1000}`);
+      headers.set("x-rassegna-cached-at", String(clock()));
+      try { await cache.put(key, new Response(response.clone().body, { status: response.status, headers })); }
+      catch { /* Cache failure never prevents reading public news. */ }
     }
-    return (await task).clone();
+    return response;
   };
   try {
     const cached = await cache.match(key);
@@ -58,7 +52,10 @@ export async function publicDataResponse(request: Request, {
       const stamp = Number(cached.headers.get("x-rassegna-cached-at"));
       const age = clock() - stamp;
       if (stamp > 0 && age >= 0 && age < RETAIN_MS) {
-        if (age >= FRESH_MS) waitUntil(refresh().catch(() => {}));
+        if (age >= FRESH_MS && !refreshing.has(key.url)) {
+          refreshing.add(key.url);
+          waitUntil(refresh().catch(() => {}).finally(() => refreshing.delete(key.url)));
+        }
         const headers = new Headers(cached.headers);
         headers.set("cache-control", "public, max-age=30, stale-while-revalidate=120");
         headers.set("x-rassegna-cache", age < FRESH_MS ? "hit" : "stale");

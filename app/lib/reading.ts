@@ -61,19 +61,30 @@ export function mergeArticles(
   incoming: ReadingArticle[],
 ): ReadingArticle[] {
   const merged = new Map(current.map((article) => [article.id, article]));
+  let changed = false;
   for (const article of incoming) {
     const previous = merged.get(article.id);
     // A text-only RSS refresh must not erase a photo already recovered for this exact story.
-    merged.set(article.id, !article.image && previous?.image && previous.link === article.link
+    const candidate = !article.image && previous?.image && previous.link === article.link
       ? { ...article, image: previous.image, imageFallbacks: previous.imageFallbacks }
-      : article);
+      : article;
+    const same = previous && Object.keys(candidate).length === Object.keys(previous).length &&
+      Object.entries(candidate).every(([key, value]) => {
+        const before = previous[key as keyof ReadingArticle];
+        return value === before || (Array.isArray(value) && Array.isArray(before) && value.length === before.length && value.every((item, index) => item === before[index]));
+      });
+    if (!same) { merged.set(article.id, candidate); changed = true; }
   }
-  return Array.from(merged.values()).sort(
+  if (!changed && sortedCollections.has(current)) return current;
+  const result = Array.from(merged.values()).sort(
     (a, b) =>
       (Date.parse(b.publishedAt ?? "") || 0) -
         (Date.parse(a.publishedAt ?? "") || 0) || b.score - a.score,
   );
+  sortedCollections.add(result);
+  return result;
 }
+const sortedCollections = new WeakSet<ReadingArticle[]>();
 
 export function filterArticles(
   articles: ReadingArticle[],

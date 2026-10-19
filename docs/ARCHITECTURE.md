@@ -1,197 +1,82 @@
 # Architettura e pubblicazione
 
-## Flusso attuale
+## Componenti e confini
 
-Il catalogo è disponibile già nella pagina. Il client raccoglie le notizie tramite `/api/articles`, con richieste indipendenti per ciascuna fonte. Il server seleziona le fonti dal catalogo, scopre i feed RSS/Atom, analizza gli elementi, attribuisce argomenti e punteggi euristici, deduplica per link e ordina i risultati. L'interfaccia applica ricerca e filtri e conserva gli articoli salvati in `localStorage`.
+React e TypeScript gestiscono l’interfaccia; vinext e Vite compilano il Worker Cloudflare. `worker/index.ts` instrada le API private prima delle cache pubbliche. `.openai/hosting.json` mantiene il binding D1 `DB`; R2 non è utilizzato.
 
-`/api/articles` limita ogni richiesta a 14 fonti, usa concorrenza 6 e restituisce al massimo 2.500 articoli. Il client include automaticamente tutto il catalogo in una coda finita: due code indipendenti: sei richieste concorrenti per le fonti dirette e due per i radar, una fonte per richiesta e fino a 24 articoli per fonte. La preferenza del browser può anticipare sei fonti; il resto alterna aree e lingue, senza escludere alcuna fonte. Il client consente quattordici secondi per una fonte diretta e diciotto per un radar e un guasto non blocca la coda. Il ciclo completo può richiedere alcuni minuti se molte fonti sono lente; la pagina mostra le prime risposte senza aspettare la fine e il suo stato iniziale di attesa termina entro otto secondi. La copertura è leggibile in un riepilogo espandibile. Filtri e lettura restano disponibili. Il visitatore può interrompere il ciclo. Un nuovo ciclo parte ogni dieci minuti a pagina visibile, se quello precedente è concluso. Non esiste più il caricamento manuale di pagine di fonti; aprire una singola testata non interrompe il ciclo completo.
+- `AggregatorApp.tsx`: raccolta delle notizie, filtri, navigazione, ordinamenti e schede.
+- `LibraryView.tsx`: biblioteca, percorsi, glossario e libri salvati; scaricato su richiesta.
+- `BookReader.tsx`: lettore `/read`, indipendente dalla raccolta delle notizie.
+- `Localization.tsx`: lingua di lettura, traduzioni e relativi limiti.
+- `WorldWatch.tsx`: osservatorio delle ultime sei ore.
+- `CloudBookmarks.ts`: sincronizzazione della raccolta privata e importazione delle copie locali.
+- `app/data`: catalogo delle fonti e contenuti editoriali tracciati in Git.
 
-Le cache dei feed durano 10 minuti, quelle di scoperta un’ora; gli errori per un minuto. I feed dichiarati vengono contattati direttamente, senza aprire prima la homepage. La lettura è limitata a due indirizzi conosciuti e a un budget di dieci secondi per fonte diretta e quattordici per radar, salvo il margine dedicato all’osservatorio delle sei ore. Le risposte riuscite possono usare la cache edge per due minuti; la disponibilità dipende dal runtime.
+`book-ids.json` è l’indice leggero usato per validare i salvataggi senza scaricare tutte le edizioni. Il test lo confronta con il catalogo completo. I dati di biblioteca e i relativi componenti rimangono in un chunk separato dal caricamento delle notizie.
 
-`POST /api/translate` prova Google Translate e, in caso di errore, MyMemory; limita l'input a 2.200 caratteri e suddivide le richieste in blocchi. La cache dura 24 ore in memoria. La lingua sorgente deve essere esplicita: `auto` è rifiutato per evitare di scambiare un testo per inglese. Gli input non validi sono rifiutati e le risposte di quota del provider non diventano mai traduzioni. I blocchi rispettano i byte UTF-8, i confini delle parole quando possibile e i caratteri Unicode. La cache server contiene al massimo 2.048 traduzioni; gli errori di quota attivano una pausa di un minuto. I collegamenti alla traduzione di pagine aprono Google Translate.
+## Raccolta e consultazione
 
-## Confini e dipendenze
+Il catalogo comprende 130 testate, canali e risorse e 136 ricerche radar. Tutti partecipano automaticamente: sei richieste concorrenti per le fonti dirette e due per i radar, fino a 24 articoli per fonte. Non esistono pagine di fonti da caricare manualmente. L’atlante conserva tutte le voci e separa editori configurati, radar ed editori scoperti; le sezioni chiuse non montano centinaia di componenti.
 
-- UI: React/TypeScript in `app/components`, stile in `app/globals.css`.
-- API e rendering: vinext su Cloudflare Workers, compilati con Vite.
-- Dati editoriali: catalogo e biblioteca tracciati in Git.
-- Preferiti: copie locali facoltative e raccolte private in D1 per utenti autenticati tramite Sites.
-- Fonti esterne: homepage, RSS/Atom, ricerca radar, Google Translate, MyMemory e traduzione delle pagine.
-- `db/`, Drizzle ed esempi D1 sono predisposizioni dello starter. `.openai/hosting.json` dichiara `d1: "DB"` e `r2: null`.
-- Gli helper di autenticazione inclusi sono infrastruttura; non implicano account o autorizzazioni implementati per i preferiti.
+`/api/articles` ammette al massimo 14 fonti e 2.500 articoli per risposta. I feed dichiarati evitano la scoperta della homepage. Si provano al massimo due indirizzi, con budget finiti; YouTube usa il JSON pubblico della scheda video senza eseguire script o inventare date. Dazibao e OttolinaTV rimangono raggiungibili anche se il feed non risponde.
 
-Una fonte irraggiungibile non dimostra assenza di notizie. Parsing XML, ranking e classificazioni restano euristici. Il programma non archivia una copia autorevole degli articoli.
+Il client dà 14 secondi alle fonti dirette e 18 ai radar. Gli errori sono indipendenti. Un RSS valido ma vuoto è disponibile con zero risultati; un errore temporaneo può conservare l’ultima copia riuscita, segnalata come `stale`, senza cambiare le date. Un’edizione Google bloccata attende cinque minuti prima di altre ricerche correlate. La raccolta completa può richiedere minuti: non blocca ricerca, filtri o lettura. Può essere interrotta e riparte ogni dieci minuti a pagina visibile se il ciclo precedente è concluso.
+
+Gli aggiornamenti ravvicinati sono raggruppati. Le schede invariate mantengono gli stessi oggetti e non provocano un nuovo ordinamento o rendering. La ricerca usa un valore differito per mantenere reattiva la digitazione. Una copia locale conserva fino a 1.200 schede per un giorno; può fallire senza cancellare i preferiti.
+
+## Apertura e stabilità
+
+La prima pagina prepara immagini, titoli e font, ma ha un budget assoluto di sei secondi dal montaggio, indipendente dagli arrivi successivi. La prima attesa dei feed termina entro tre secondi. Scaduto il budget viene mostrato ciò che è disponibile; le operazioni continuano nei propri limiti e gli errori dei provider restano visibili. Non viene promessa la disponibilità di ogni foto o traduzione entro quel tempo.
+
+Le schede mantengono riquadro 16:9, tre righe di titolo ed estratto e ordine stabile durante gli aggiornamenti. Filtri, cambio ordinamento e “Aggiorna ordine” applicano la nuova graduatoria. Il titolo completo rimane nella scheda di lettura. La verifica automatica non misura il CLS su ogni dispositivo.
+
+## Cache e isolamento Workers
+
+Le invocazioni server condividono esclusivamente dati già completati, mai Promise, Response o stream ancora in corso. Ogni richiesta a freddo possiede il proprio I/O. Un aggiornamento pubblico in background può essere saltato quando già attivo, senza attendere il lavoro di un altro visitatore. Questo evita errori Workers di stream bloccati e di I/O appartenente a un’altra richiesta.
+
+- Feed: dieci minuti, errori un minuto; limite di 512 elementi e circa 16 MB.
+- Scoperta dei feed: un’ora, solo destinazioni del catalogo.
+- Homepage: dieci minuti, errori un minuto; 128 elementi e circa 8 MB.
+- Normalizzazione dei link: 8.192 elementi e circa 2 MB.
+- Byte fotografici: 64 immagini e 8 MB, per dieci minuti.
+- Documenti dei libri: 16 elementi e circa 8 MB, per un’ora.
+
+`public_news_cache` in D1 conserva solo risposte pubbliche di notizie, osservatorio e selezioni. Le chiavi sono finite e canoniche: non includono identità o cookie. La cache è fresca per due minuti e utilizzabile con rinnovo in background fino a dieci. Risposte private, errori, `no-store`, cookie e variazioni di autenticazione non vengono archiviate. Le API di segnalibri e la richiesta di traduzione non entrano in questa cache.
+
+## Lingue, ordinamenti e osservatorio
+
+`rassegna-rossa.reading-language` determina traduzione e lingua dell’interfaccia; `rassegna-rossa.source-language` filtra la lingua originale delle fonti. Sono controlli distinti. La vecchia preferenza viene migrata; non vengono usati GPS o servizi IP. La stessa lingua di partenza e di lettura evita entrambi i provider, comprese le varianti regionali normalizzate.
+
+La coda browser traduce tre testi alla volta, deduplica e dà precedenza ai titoli; gli estratti e le schede lontane dallo schermo non occupano tutta la preparazione iniziale. Le schede della biblioteca traducono quando sono vicine al viewport. Le etichette inglesi principali sono integrate. La cache locale conserva 800 traduzioni per 24 ore. Il server prova Google Translate e poi MyMemory, con input massimo di 2.200 caratteri, blocchi UTF-8 e pause dopo quote. Il client può provare gli endpoint pubblici senza credenziali o referrer. Errori e quote non diventano testi tradotti; l’originale e il comando per riprovare restano disponibili.
+
+Gli ordinamenti sono: evidenza delle fonti, ultimi articoli, più letti pubblicati dalle fonti e priorità politica/formativa. `/api/highlights` consulta solo homepage configurate, con tre richieste client parallele, dieci secondi di timeout client, 4,5 secondi server e 1,2 MB di HTML. La coda riparte all’arrivo di nuove fonti o al completamento dei lavori; non interroga il DOM o la rete ogni secondo. I risultati sono raggruppati e un errore conserva i metadati precedenti.
+
+Il parser riconosce sezioni pubbliche di evidenza e classifiche; i primi titoli nel corpo sono un segnale euristico di apertura. Nessun conteggio di letture interno o indice SEO inventato. “Più letti” usa classifiche esplicite incrociate con i feed; se mancano, lo segnala e ripiega sull’ordine cronologico. Le date e i periodi delle classifiche dipendono dagli editori.
+
+L’osservatorio raccoglie otto canali regionali e le notizie della rete in una finestra di sei ore. Le schede mostrano titolo tradotto, nome della testata e paese dell’editore, non macroregioni. Per editori sconosciuti compare “Paese non verificato”. Le etichette e i punteggi sono euristici, non verifiche di verità.
+
+## Immagini e contenuti esterni
+
+Il browser usa otto download diretti e quattro recuperi fotografici. Mostra la prima immagine decodificata; dopo 1,2 secondi una foto lenta corre in parallelo al recupero same-origin. Il proxy ha un limite numerico di 12 operazioni: se pieno risponde subito con 503 e Retry-After. Non contiene code di resolver tra invocazioni.
+
+`/api/article-image` verifica fonte e articolo. L’archivio pubblico conserva fino a 160 riferimenti per fonte per sette giorni, separati dai dati personali. Un dominio regionale diverso dalla homepage è autorizzato solo dal riferimento esatto già osservato dal server. URL inventati, destinazioni locali, IP letterali, credenziali e porte non standard restano rifiutati; i redirect vengono verificati. Sono ammessi raster fino a 4 MB, senza cookie del visitatore.
+
+I radar conservano la provenienza del feed. Il recupero può risolvere collegamenti pubblici Google o corrispondenze esatte del titolo nella homepage/RSS dell’editore osservato. Blocchi, consenso, quote e assenza di foto terminano il tentativo; non si assegnano copertine generiche. L’anteprima esterna degli articoli è facoltativa e avvisa che contatterà l’editore. Nessuno script dei feed viene eseguito nell’interfaccia.
+
+## Raccolta personale e libri
+
+L’identità arriva dagli header attendibili Sites, mai da un ID inviato dal client. `/api/bookmarks`, `/api/reading-progress` e `/api/library/read` richiedono accesso e usano `private, no-store`. D1 conserva `bookmarks` e `reading_progress`, separati per proprietario. Le copie locali non sostituiscono l’archivio dell’account. Importazione, rimozioni, outbox, cambio account e ripresa della lettura sono verificati con fixture isolate, senza leggere dati privati di produzione.
+
+Le migrazioni già applicate sono immutabili. Il lettore sceglie edizioni reali del catalogo, scarica HTML con limiti e redirect confinati e restituisce stringhe React inerti. Decodifica le entità HTML5 senza reinserire markup. Capitolo, pagina e scorrimento persistono per account ed edizione; gli aggiornamenti più vecchi non sostituiscono i più recenti. Per catalogo, fonti, diritti e limiti vedere [LIBRARY.md](LIBRARY.md).
 
 ## Verifica
 
-`npm test` compila il Worker e verifica la homepage, le API senza dipendenze di rete, filtri, fusione degli articoli, validazione degli URL e recupero dei salvati. GitHub Actions esegue lo stesso comando su push a `main` e nelle pull request, senza credenziali di produzione. Non effettua prove complete dei feed né test browser.
+`npm test` compila e verifica rendering, API, ordinamenti, immagini, cache, traduzioni e persistenza con risposte controllate. Include l’isolamento delle richieste a freddo e un controllo del grafo del bundle: il catalogo completo dei libri deve restare fuori dall’avvio delle notizie. `npm run typecheck` verifica TypeScript. Entrambi vengono eseguiti in GitHub Actions su `main` e nelle pull request.
+
+Le prove automatiche non sostituiscono test visivi in un browser autenticato, non garantiscono la disponibilità dei provider e non misurano il caricamento su ogni telefono. Le prove di rete reali e i benchmark locali vanno distinti dai tempi percepiti dall’utente.
 
 ## Pubblicazione
 
-Il repository GitHub e il sito Sites hanno cicli di pubblicazione distinti. Gli identificativi del progetto e l’indirizzo associato al proprietario sono omessi dal repository pubblico. Nel checkout privato usato per pubblicare, la configurazione Sites deve contenere il `project_id` corretto. Non committare quel valore nel repository pubblico.
+GitHub e Sites hanno cicli distinti. Il repository pubblico omette gli identificativi di hosting e le credenziali; il checkout privato mantiene il `project_id` del sito. Con il plugin Sites: aprire il repository corretto, verificare/buildare, sincronizzare i sorgenti, salvare e pubblicare la versione, conservando identità e pubblico. Verificare lo stato terminale del deploy.
 
-Per aggiornare quel sito, usare il plugin Sites: aprire il repository sorgente del medesimo progetto, trasferire le modifiche GitHub desiderate, eseguire le verifiche/build previste, sincronizzare i sorgenti e salvare/pubblicare la versione tramite il flusso Sites. Conservare identità e modalità di accesso e verificare l'esito del deploy. Il solo push GitHub non avvia questa procedura.
-
-Non è configurato un deploy automatico da GitHub a Sites. Non copiare credenziali temporanee Sites nei workflow. GitHub Pages serve file statici e non può eseguire le API di questa applicazione. L'eventuale migrazione a un altro hosting richiede un runtime compatibile con il Worker, una configurazione dedicata, credenziali appropriate e verifiche di API e asset; non basta caricare `dist/client`.
-
-Per il rollback del codice usare un commit di revert. Per il sito ripubblicare una versione Sites verificata; un revert su GitHub da solo non modifica la produzione.
-
-
-## Organizzazione editoriale e lettura
-
-La rassegna, l’atlante delle fonti, la biblioteca, il taccuino e la pagina sul metodo sono viste distinte. Il catalogo è disponibile subito nel client; i feed arrivano progressivamente e l’aggiornamento può essere interrotto. Un fallimento non riavvia automaticamente l’intera raccolta. I filtri sono locali, con controlli avanzati espandibili e caricamento progressivo delle schede per evitare liste enormi nel DOM.
-
-Il lettore usa un dialog nativo con chiusura da tastiera e ritorno del focus. Il testo completo si apre presso la fonte. Gli iframe esterni richiedono un’azione esplicita. Le traduzioni di testo sono automatiche nella lingua di lettura: testi pubblici dell’interfaccia, citazioni, titoli ed estratti vengono inviati a MyMemory; non viene inviata la raccolta dei preferiti né una cronologia di lettura. Le immagini delle schede sono caricate dai relativi URL senza referrer; non tutte le fonti le forniscono.
-
-`rassegna-rossa.saved` mantiene gli ID storici e `rassegna-rossa.saved-articles` conserva le schede. Il ripristino valida i dati e accetta solo link HTTP(S) senza credenziali incorporate. Vecchi ID diventano schede persistenti quando il relativo articolo viene ritrovato nel feed. Non è un archivio integrale degli articoli. Gli utenti autenticati sincronizzano schede e riferimenti ai libri nel proprio account.
-
-Percorsi e glossario sono contenuti introduttivi redatti nel progetto; le copertine tipografiche sono decorative. I link della biblioteca distinguono testi integrali e portali di approfondimento. Non sono aggiunte notizie dimostrative ai feed reali.
-
-
-## Lingua, fonti visibili e cache del browser
-
-La lingua di lettura segue il browser oppure `rassegna-rossa.reading-language`. Determina esclusivamente la traduzione e le impostazioni locali della pagina. La lingua originale delle fonti in analisi è un controllo distinto, salvato in `rassegna-rossa.source-language`, con valore iniziale “tutte”. Restringe la vista senza cambiare la traduzione e senza interrompere la raccolta dell’intero catalogo. La vecchia chiave `rassegna-rossa.language` viene migrata soltanto come preferenza di lettura. Non vengono usati GPS o servizi IP. Il periodo iniziale è di 30 giorni; aprendo una fonte vengono mostrati tutti gli articoli recuperati.
-
-`rassegna-rossa.feed-cache` conserva fino a 1.200 schede scelte nell’ordine editoriale. La copia locale compare immediatamente, ma non sostituisce la raccolta automatica delle altre fonti. Il ripristino accetta copie fino a un giorno; salvare la cache può fallire per limiti di spazio senza cancellare i preferiti. Non è una cronologia delle aperture personali.
-
-OttolinaTV, Dazibao e la rubrica Dazibao di OttolinaTV sono raggiungibili direttamente dalla rassegna, anche senza articoli recuperati. I canali YouTube configurati possono leggere i titoli dalla sezione pubblica dei video: il parser usa JSON senza eseguire script, accetta solo il tab selezionato ed evita di inventare date esatte da etichette relative. Se il formato cambia o il sito blocca la richiesta, rimane il link alla fonte originale.
-
-Fonti aggiunte in questa revisione: Dazibao (`youtube.com/@dazibao`), Pagine Esteri (`pagineesteri.it/feed/`), Radio Onda d’Urto (`radiondadurto.org/feed/`) e Radio Onda Rossa (feed completo pubblicato nella pagina “Segui”). Verificare periodicamente questi indirizzi: un controllo riuscito non garantisce disponibilità futura.
-
-
-## Traduzione automatica e osservatorio delle sei ore
-
-`LocalizedText` mantiene il testo sotto il controllo di React, senza riscrivere il DOM e senza caricare script di traduzione esterni. La coda usa tre richieste concorrenti, deduplica i testi e dà precedenza ai titoli; le schede vengono tradotte quando entrano vicino alla zona visibile. Le etichette inglesi più comuni sono già disponibili e i nomi delle lingue usano `Intl.DisplayNames`. `rassegna-rossa.translations` conserva fino a 800 traduzioni per 24 ore; non sincronizza dati con un account. Se il proxy del sito fallisce, per un minuto il client prova direttamente gli endpoint pubblici di Google Translate e MyMemory, senza credenziali né referrer. Google ha un budget complessivo di otto secondi e blocchi UTF-8 da 1.600 byte; MyMemory dodici secondi e blocchi da 460 byte. Questo evita di dipendere esclusivamente dall’IP condiviso del server. Se entrambi falliscono per un testo, viene mostrato l’originale con avviso e nuovo tentativo esplicito; gli altri testi continuano a essere tradotti. Cambiare lingua elimina le richieste ancora in coda per quella precedente. Il circuito di quota di MyMemory non impedisce un risultato riuscito da Google. L’endpoint web pubblico di Google non è l’API Cloud Translation autenticata: formato, disponibilità, CORS e limiti possono cambiare senza garanzie. Durante la verifica HTTP MyMemory ha restituito una traduzione italiana; Google ha risposto 429 dall’IP condiviso di test. La verifica delle risposte simulate non equivale a garantire tutti i browser o l’assenza di quote esterne. I nomi degli editori e degli autori rimangono attribuzioni originali. La qualità e la disponibilità delle traduzioni dipendono dal servizio esterno. Si traducono solo titolo ed estratto disponibili nel feed; il testo completo resta presso l’editore.
-
-L’osservatorio usa `/api/pulse?area=<chiave>` con otto chiavi fisse: sette edizioni radar (Regno Unito, Stati Uniti, Brasile, Sud Africa, India, Cina ed Egitto) e Green Left per l’Oceania. Sette testate dirette affiancano i radar: Morning Star, Truthout, Prensa Latina, ROAPE, Viet Nam News, China Daily e Peoples Dispatch. Le due richieste di ciascuna area procedono in parallelo: il fallimento del radar non elimina le notizie della testata. Non accetta destinazioni arbitrarie. I radar combinano lavoro, conflitti e relazioni internazionali nella finestra `when:6h`. Le aree indicano l’edizione consultata: non sono una localizzazione verificata degli eventi. Il client raccoglie tre aree in parallelo, con timeout individuale di dodici secondi, senza interrompere le ultime aree con un timeout globale più corto della coda. Alle risposte regionali aggiunge progressivamente tutti gli articoli della raccolta principale, prima dei filtri di lingua, fonte o argomento. La raccolta regionale rimane autonoma: un suo errore non elimina le notizie già disponibili dalla rete completa. Mostra fino a dodici notizie, senza punteggi o spiegazioni dei criteri nelle schede. Aggiorna la finestra ogni minuto e ripete la raccolta ogni cinque minuti a pagina visibile; la cache feed dedicata dura due minuti. I feed dell’osservatorio hanno un margine di 8,5 secondi per richiesta e nove secondi complessivi: i controlli dal vivo hanno mostrato risposte intorno a 6–7 secondi. Gli altri feed mantengono il budget precedente. Errori e conteggio dei canali disponibili rimangono visibili.
-
-Sono esclusi articoli senza data valida, futuri o anteriori a sei ore. Il ranking elimina link duplicati e raggruppa titoli molto simili nella medesima lingua: almeno quattro termini condivisi e sovrapposizione del 72%. Non riconosce in modo affidabile tutte le notizie sullo stesso evento, soprattutto in lingue diverse. Il segnale somma freschezza (0–50) e presenza su più testate distinte (15 punti per testata aggiuntiva, fino a 50). Il campione e il punteggio non rappresentano tutte le notizie del mondo né una verifica della loro importanza o verità. I filtri per periodo, area e argomento restringono i risultati. Le fonti originali sono sempre raggiungibili.
-
-Le quattro citazioni rimandano al testo in Marxists Internet Archive; le traduzioni redazionali italiane sono dichiarate. Un indice nella sessione evita di ripetere la medesima citazione al ricaricamento successivo. Se lo storage di sessione non è disponibile, la scelta casuale può ripetersi.
-
-
-## Priorità politica e formativa
-
-La modalità politica e formativa della colonna principale usa `rankEditorial`, indipendente dalla graduatoria cronologica dell’osservatorio. Quattro assi pubblici cercano segnali nel titolo, nell’estratto e nelle categorie effettive del feed: organizzazione collettiva; formazione e teoria; competenze, alfabetizzazione critica e strumenti; analisi dei rapporti di potere. Quest’ultimo asse richiede anche un indicatore di analisi o approfondimento: menzionare la destra o un partito non è sufficiente.
-
-Ogni termine riconosciuto nel titolo pesa due unità, nel resto una. Il contributo per asse è limitato a tre unità; competenze e strumenti valgono nove punti per unità, gli altri assi sette. Il contributo sostanziale è limitato a 90; la freschezza aggiunge fino a dieci punti nella prima settimana. I materiali con segnali editoriali precedono quelli di sola cronaca; in ciascun insieme l’apertura alterna le testate, fino a due articoli per editore quando sono disponibili abbastanza alternative. Tutti gli altri articoli distinti rimangono accessibili. Non entrano nel calcolo clic, popolarità, profili personali o una presunta certificazione di verità. La lingua preferita rompe soltanto le parità di punteggio. I filtri per asse sono espliciti e l’ordinamento cronologico rimane selezionabile.
-
-Il criterio è lessicale e può riconoscere male utilità, contesto, ironia e qualità; non equivale a leggere integralmente un articolo. I dettagli della classificazione sono documentati qui, senza riquadri aggiuntivi su ogni scheda. La deduplicazione elimina link equivalenti con parametri di tracciamento e titoli della medesima testata con la stessa data; non unifica edizioni con date differenti.
-
-## Estensione del catalogo
-
-Sono aggiunte 43 destinazioni RSS/Atom verificate il 18 ottobre 2026, per un totale di 129 testate, canali e risorse e 136 radar. Le nuove voci comprendono analisi, organizzazione, critica dei media, diritti digitali e ricerca; non sono tutte testate comuniste. Per evitare attribuzioni politiche non documentate, le loro etichette ideologiche rimangono vuote. New Frame è esplicitamente un archivio; il feed di Organizing Upgrade rimanda a Convergence, che viene nominato correttamente. La disponibilità osservata durante il controllo non garantisce accessibilità futura o da ogni rete.
-
-L’atlante raccoglie tutte le voci in sezioni per area, separando radar ed editori da essi scoperti. Le sezioni si aprono senza scaricare nuove fonti; le righe chiuse non montano centinaia di componenti e richieste di traduzione. Non sono previsti pulsanti “carica altre fonti”.
-
-
-## Prima pagina e ordinamenti delle testate
-
-La home parte dalla rassegna, senza una copertina introduttiva: marchio e navigazione compatti, lingua di lettura, ricerca e ordinamento. La citazione rotante rimane a fine pagina. La lingua originale delle fonti resta sempre visibile nella barra principale, distinta dalla lingua di lettura. Un pannello “Filtri” raccoglie area, periodo da sei ore a tutte le date, fonte, argomento, approfondimento, tipo e orientamento. Anche i controlli dell’osservatorio sono richiudibili. Le schede conservano titolo/estratto, apertura della fonte e segnalibro, senza spiegazioni di ranking ripetute.
-
-L’ordine iniziale “In evidenza dalle fonti” consulta `/api/highlights?sourceId=<id>`: solo destinazioni del catalogo, nessun URL arbitrario del visitatore. Il client attiva al massimo tre richieste parallele, solo per editori che hanno già fornito articoli; esclude radar e YouTube e deduplica le homepage. Le prime risposte RSS non aspettano questa coda. Ogni richiesta client dura al massimo sei secondi; lato server quattro secondi e mezzo, con lettura limitata a 1,2 MB. La cache delle selezioni dura dieci minuti, quella degli errori un minuto. Una nuova consultazione avviene ogni dieci minuti a pagina visibile. Nessuna dipendenza o risorsa persistente è aggiunta.
-
-Il parser non esegue script: esclude navigazione, piè di pagina, moduli e contenuti nascosti. Riconosce contenitori e intestazioni pubbliche di notizie in evidenza e classifiche di lettura in più lingue. In mancanza di una sezione esplicita, i primi cinque collegamenti a titoli nel corpo della pagina sono un segnale euristico di apertura; non equivalgono alla posizione visiva effettiva su ogni schermo. I collegamenti vengono incrociati con articoli realmente raccolti dai feed, normalizzando solo varianti www, slash finale e parametri di tracciamento. Non si inventano titoli, date, letture o indici SEO. La priorità politica e formativa ordina gli articoli senza segnale di apertura, e rimane selezionabile autonomamente; “Ultimi articoli” usa le date dei feed.
-
-“Più letti sulle fonti” riconosce esclusivamente sezioni esplicite come “Più letti”, “Most read” o plugin di classifiche, non semplici trend o l’ordine cronologico del feed. Mostra i corrispondenti articoli disponibili rispettando il rango nella classifica di ciascuna testata: non confronta numeri assoluti di lettori fra editori diversi. Se nessun articolo filtrato ha una classifica disponibile, segnala il limite e mostra l’ordine cronologico. Il periodo di ogni classifica dipende dalla fonte; non viene dichiarata arbitrariamente una finestra comune. Pagine caricate soltanto via JavaScript, paywall, anti-bot, markup cambiato o articoli fuori dal feed possono impedire il riconoscimento. Il sito non raccoglie un conteggio interno di aperture, identificativi dei lettori o cronologie per questa funzione.
-
-
-## Stabilità della pagina e provenienza delle testate
-
-La scritta del marchio usa “rassegna” rossa e “rossa” nera, in testata e a piè di pagina. L’osservatorio mostra data/ora, titolo tradotto nella lingua di lettura, nome e paese della testata; non mostra macroregioni sulle singole notizie. Il paese si filtra nel pannello richiudibile. Per editori noti, dominio e identificativo del catalogo determinano paese e lingua: una notizia de L’Humanité trovata in un radar britannico rimane francese. L’edizione consultata non prova la nazionalità di un editore sconosciuto: in quel caso compare “Paese non verificato”. I titoli delle dodici notizie dell’osservatorio hanno priorità di traduzione superiore agli estratti e non aspettano lo scorrimento.
-
-Le schede già mostrate mantengono il proprio ordine: nuovi dati e selezioni delle homepage vengono raccolti senza spostarle. Filtri e ordinamento scelti dall’utente, oppure “Aggiorna ordine”, applicano la nuova graduatoria. Le immagini mantengono il loro riquadro anche dopo errori di caricamento; l’immagine iniziale di una scheda resta stabile fino all’aggiornamento esplicito. Tutte le schede usano lo stesso formato: riquadro immagine 16:9 riservato anche senza foto, titolo su tre righe ed estratto su tre righe. Non esiste una scheda di apertura ingrandita. Le immagini sono lazy. Titoli ed estratti hanno spazi riservati e limiti di righe; il titolo completo rimane disponibile nella scheda di lettura. Le verifiche automatiche non misurano il CLS effettivo su ogni dispositivo.
-
-## Diagnosi e recupero dei feed
-
-Il controllo HTTP del 18 ottobre 2026 ha distinto 129 voci dirette e 26 edizioni radar rappresentative: 102 feed diretti hanno restituito RSS/Atom; tutte le edizioni Google controllate hanno risposto 503 o timeout dalla rete di test. Questo non equivale a 150 giornali fuori servizio né garantisce lo stesso risultato in ogni rete. Sono stati verificati e sostituiti cinque indirizzi RSS: L’Antidiplomatico, Collettiva, junge Welt, nd e Red Flag. È aggiunto il feed giapponese diretto di Shimbun Akahata, dichiarato dalla testata in https://www.jcp.or.jp/akahata/rss.html e verificato con 18 elementi. Il totale è ora 130 fonti dirette e 136 ricerche radar.
-
-Le richieste identiche in corso condividono il medesimo recupero server. Un RSS valido senza elementi è disponibile con zero risultati, anziché guasto. Un errore temporaneo conserva l’ultima copia recuperata quando presente nella cache dell’isolate, con stato `stale`; le date originali restano invariate. Per una medesima edizione Google, blocchi HTTP e timeout attivano cinque minuti di attesa sulle altre ricerche, evitando di ripetere subito richieste allo stesso servizio non disponibile. L’osservatorio delle sei ore mantiene la propria raccolta indipendente. Il conteggio in pagina distingue feed di fonti dirette e ricerche radar. I tentativi di alternative pubbliche non hanno restituito un feed utilizzabile durante il controllo e non vengono presentati come recupero riuscito. La disponibilità futura dei servizi esterni non è garantita.
-
-## Archivio personale persistente
-
-D1, binding logico `DB`, conserva la tabella `bookmarks`: proprietario, tipo, identificativo dell’elemento, snapshot JSON della scheda, stato di rimozione e data. Non vengono archiviati i testi integrali di articoli o libri. I libri fanno riferimento agli identificativi della biblioteca. La migrazione è schema-only e viene applicata da Sites prima del Worker. `/api/bookmarks` è gestito nel Worker, con binding esplicito e risposta privata `no-store`.
-
-La lettura del sito rimane pubblica. L’archivio richiede l’identità di Sites, letta esclusivamente dall’header autenticato `oai-authenticated-user-id`; senza identità l’API risponde 401 e offre il normale percorso Sites di accesso con ChatGPT. Ogni lettura e scrittura SQL è vincolata all’utente autenticato, mai a un ID inviato nel JSON. Non sono salvati email o profili di lettura. Le scritture richiedono JSON, rifiutano origini esterne, hanno un limite di 128 KB e un massimo di 25 modifiche per chiamata. Le query sono parametrizzate, la validazione precede l’intero batch e nessuno schema viene creato durante le richieste. L’API restituisce pagine private da 500 righe, comprese le rimozioni; il client prosegue fino al termine senza troncare la raccolta ai primi elementi.
-
-La vista “Salvati” mostra stato dell’archivio, eventuali modifiche ancora in attesa e accesso necessario; la biblioteca permette di salvare e rimuovere libri. Al primo accesso le vecchie schede locali vengono importate automaticamente. Le rimozioni mantengono tombstone, così una vecchia copia di un altro dispositivo non le reintroduce. Il client conserva una coda di modifiche non confermate, suddivisa per account e inviata in batch entro 100 KB; dopo errori riprova alla riconnessione, al ritorno nella finestra o con l’azione esplicita. Le risposte vecchie non annullano modifiche già confermate nella sessione. Le cache personali rivendicate da un account non sono mostrate prima della verifica dell’identità e non sono importate in un account differente.
-
-Solo lo stato “salvati nel tuo account” conferma la copia persistente. Senza accesso, oppure con modifiche offline non ancora confermate, la copia può dipendere dal dispositivo. Dopo aver cancellato dati e cookie del browser occorre accedere nuovamente allo stesso account ChatGPT per recuperare l’archivio. La sincronizzazione protegge dalla cancellazione della cache locale, non equivale a un backup indipendente dell’intero database o degli editori esterni. La suite verifica accesso obbligatorio, isolamento fra utenti, recupero senza stato del browser, rimozioni e validazione su SQLite reale; non esegue l’accesso interattivo completo in un browser.
-
-
-La lingua esplicita delle schede native prevale sulla lingua generale del dominio, anche per editori multilingue. Il recupero della lingua dal catalogo resta una correzione per le edizioni radar. Client e API condividono la normalizzazione dei codici (per esempio `it-IT` → `it`, `en-US` → `en`); a lingua identica mostrano immediatamente il testo originale e non consultano cache, coda o provider di traduzione. Le varianti cinese semplificato/tradizionale restano distinte. Il filtro delle fonti e la lingua di lettura conservano preferenze indipendenti.
-
-
-## Preparazione della prima pagina
-
-`InitialLoadBoundary` mantiene l’edizione montata, nascosta e `inert` durante la preparazione. La versione precedente legava l’apertura a tutte le 266 richieste, alle homepage e a tutte le etichette tradotte: una fonte o un provider lento prolungava l’attesa dell’intero sito. Ora la prima pagina può prepararsi dalla cache locale oppure appena disponibili 24 schede filtrate. Senza un’edizione completa, il limite iniziale di otto secondi consente di preparare i dati disponibili e mostrare correttamente lo stato di raccolta ancora in corso. Le fonti restanti continuano nelle code indipendenti: nessuna viene eliminata o demandata a un pulsante. La preferenza delle fonti salvata determina la priorità iniziale di rete, separata dalla lingua di lettura. Biblioteca e atlante non attendono la raccolta delle notizie; i salvati attendono la verifica iniziale dell’account.
-
-Prima dell’apertura si caricano e decodificano le immagini delle schede montate, anticipando il lazy loading; errori e timeout di dodici secondi mantengono il riquadro. I titoli ed estratti con priorità positiva partecipano alla barriera delle traduzioni; le etichette accessorie vengono tradotte senza bloccare l’apertura. I font hanno 1,5 secondi prima del fallback CSS; i titoli usano Georgia locale. `MutationObserver` e le notifiche di completamento sostituiscono la scansione dell’intero DOM ogni 100 ms. Dopo 140 ms di disponibilità stabile si apre l’edizione, una sola volta. Le nuove schede e le nuove immagini restano incluse nella preparazione se arrivano prima dell’apertura. Gli aggiornamenti successivi conservano ordine e riquadri e non oscurano la pagina.
-
-L’osservatorio riusa fino a dieci minuti di cache locale pubblica, sempre filtrata dalla finestra reale di sei ore. La raccolta regionale continua indipendentemente. Per l’apertura basta avere notizie già disponibili dalla rete o dalla cache; in loro assenza si attende il primo risultato regionale, anche negativo, senza subordinare la pagina a tutte le otto aree. La raccolta completa rimane visibile negli stati del pannello. Le homepage delle testate aggiornano le selezioni in background senza bloccare l’edizione.
-
-## Pipeline e cache delle API pubbliche
-
-`createBatchedSink` pubblica immediatamente il primo risultato e raggruppa le risposte successive in finestre di 120 ms, con flush finale e controllo della generazione di raccolta: nessun risultato viene perso e una risposta di una raccolta superata non aggiorna lo stato. Articoli, stati e progresso si applicano insieme. La validazione degli array di rete riusa `validateArticles`, senza serializzare e riparsare JSON già decodificato. Schede e osservatorio sono memoizzati; le callback delle schede rimangono stabili durante gli aggiornamenti delle altre fonti. Il burst sintetico di 266 risposte produce due pubblicazioni anziché 266, conservando tutti gli elementi; non è una stima dei render in ogni rete reale.
-
-`publicDataResponse`, nel Worker, centralizza la cache condivisa server di `/api/articles`, `/api/pulse` e `/api/highlights`. Ammette solo GET e parametri pubblici previsti; ordina e deduplica gli ID per chiavi equivalenti. Risultati pubblici JSON riusciti rimangono freschi due minuti. Fino a dieci minuti possono essere serviti subito mentre `ctx.waitUntil` rinnova la copia. Richieste simultanee per la stessa chiave condividono il lavoro nell’isolate. Le intestazioni `x-rassegna-cache`, `x-rassegna-cached-at` e `Age` rendono verificabile il riuso, senza cambiare date dei feed o `generatedAt`. Non si conservano risposte private, cookie, variazioni per identità, errori o `no-store`. Dopo dieci minuti è necessario un nuovo recupero. La cache è opzionale: errori o ambienti senza Cache API ricadono sugli endpoint originali. `/api/bookmarks` e il POST di traduzione rimangono esclusi; nessuna modifica ai dati D1 personali. La nuova tabella separata `public_news_cache` conserva le risposte pubbliche anche fra processi e visite differenti; Cache API resta disponibile come alternativa negli ambienti senza D1. Le chiavi persistenti sono limitate alle singole fonti del catalogo con limite 24, alle otto aree e alle homepage configurate; combinazioni arbitrarie e limiti diversi non vengono archiviati. Ogni risposta ha un massimo di 512 KB e una scadenza di dieci minuti. Le migrazioni precedenti rimangono immutate; una nuova migrazione aggiunge soltanto questa tabella. Le tre API pubbliche vengono eseguite direttamente dal Worker senza passare dal rendering della pagina.
-
-La traduzione mantiene tre richieste parallele e i due provider. Tre fallimenti completi consecutivi attivano un circuito di trenta secondi per quella sola coppia linguistica; gli altri idiomi proseguono e un successo azzera il conteggio. I testi non traducibili restano originali con avviso, anziché ripetere decine di tentativi equivalenti in una lunga coda. Il pulsante di riprova azzera il circuito. La cache esistente e il bypass per lingue identiche sono preservati.
-
-## Indicizzazione dell’osservatorio e verifica
-
-Il raggruppamento tokenizza ogni titolo una volta e indicizza le parole per lingua e rappresentante del gruppo. Considera soltanto candidati con almeno quattro parole condivise, mantenendo soglia del 72%, primo gruppo compatibile, confronto con il rappresentante, deduplicazione dei link e punteggi originali. Un campione deterministico sintetico di 1.500 articoli in cinque lingue ha prodotto gli stessi 862 gruppi, coperture e punteggi della versione precedente: 1.178 ms contro 33 ms nel runtime di verifica. Questa misura riguarda il calcolo locale del raggruppamento, non il caricamento complessivo del sito. La latenza esterna dei feed, delle fotografie e dei provider continua a incidere sulle visite senza cache.
-
-Per le fotografie il parser sceglie, quando pubblicata, una variante `srcset` vicina a 640 pixel e recupera anche HTML escapato e attributi `data-src`. Distingue `media:thumbnail` dalle risorse video in `media:content`, evitando richieste di immagini verso URL MP4. Non introduce proxy di URL arbitrari o nuovi servizi di immagini: tutti gli indirizzi provengono dai feed degli editori.
-
-La suite controlla compatibilità dei gruppi, richieste concorrenti, cache fresca/scaduta, rinnovo in background, isolamento degli endpoint personali, circuiti per lingua, flush dei batch e gestione delle immagini. I controlli SSR non sostituiscono misure di caricamento e stabilità su uno smartphone reale.
-
-
-## Recupero delle fotografie
-
-La scadenza del budget di preparazione sblocca la pagina senza simulare un errore dell’immagine: una foto lenta può completare il caricamento e comparire nel riquadro fisso. Solo errori reali o decodifica fallita selezionano il fallback. `ArticleImage` legge i nuovi URL dalle proprietà, invece di congelare un valore iniziale nullo; dopo errori reali prova fino a quattro alternative pubblicate dalla fonte. Le dimensioni del riquadro restano invariate.
-
-Alcuni RSS non contengono foto: nel campione dal vivo Ottolina, il manifesto e Contropiano hanno restituito rispettivamente 12, 24 e 10 articoli senza alcuna immagine. Il recupero delle homepage già usato per gli ordinamenti ora produce anche associazioni articolo/foto (`parseSourcePage`), senza richieste aggiuntive alle pagine dei singoli articoli. Considera solo immagini collegate a un URL preciso della medesima testata, ignora navigazione e intestazioni, scarta contenitori ambigui e supporta srcset e attributi lazy. Non assegna il logo del giornale come foto di una notizia. Le informazioni si applicano con `applySourceImages`, anche se ordinate per data, e vengono conservate nella cache pubblica locale. Il recupero non blocca l’apertura e continua nella stessa coda limitata delle homepage. Una nuova versione delle chiavi della cache server evita riuso di risposte prive del nuovo campo `images`; non vengono modificate migrazioni o raccolte personali.
-
-La verifica HTTP sulle homepage ha trovato foto corrispondenti per 12/12 notizie di Ottolina, 8/10 di Contropiano e 8/24 del manifesto. Gli articoli più vecchi fuori dalla homepage possono continuare a non avere una foto disponibile; non si inventano immagini sostitutive. Queste corrispondenze non equivalgono a una verifica visiva in ogni browser.
-
-Le associazioni delle homepage conservano anche gli URL alternativi realmente presenti (immagine originale e altri formati srcset). Dopo un errore HTTP della miniatura la scheda prova questi indirizzi. La richiesta client della homepage ha dieci secondi per includere anche la latenza dell’hosting; il budget di recupero server rimane 4,5 secondi. Dopo un primo fallimento transitorio è previsto un tentativo a trenta secondi, poi torna l’intervallo di dieci minuti, mantenendo tre richieste concorrenti e senza bloccare l’apertura.
-
-
-## Consegna completa delle immagini agli articoli
-
-Le richieste del browser a `/api/articles` usano `includeImages=1`: il server prepara feed e metadati della homepage in parallelo e include subito le foto abbinate nella risposta e nella cache D1. `fetchPublisherPage` è condiviso con `/api/highlights` e deduplica le richieste in corso. Non dipende più esclusivamente dall’arrivo successivo della coda di selezioni nel browser. Il contratto senza `includeImages` resta compatibile.
-
-Per una scheda visibile senza immagini, o con tutti gli URL diretti falliti, `ArticleImage` usa `/api/article-image?sourceId=…&articleId=…`. Non accetta URL del visitatore: verifica la fonte nel catalogo, cerca l’ID nei 24 articoli del relativo feed, prova le foto pubblicate e, se necessario, legge i meta Open Graph/Twitter della pagina originale sul dominio della testata. Restituisce i byte dell’immagine dallo stesso sito, così il browser non dipende esclusivamente da un caricamento diretto dal CDN esterno. La pagina originale è letta con un limite di 300 KB, nessuna esecuzione JavaScript e redirect confinati al dominio della testata. Le destinazioni immagine richiedono HTTPS pubblico, senza credenziali, porte non standard, IP letterali o host locali; ogni redirect viene verificato. Sono accettati solo formati raster con un massimo di 4 MB. Non vengono inoltrati cookie o identità del visitatore.
-
-Il recupero aggiuntivo parte vicino al viewport e mantiene il riquadro fisso. Il server esegue al massimo tre recuperi pesanti simultanei, deduplica richieste identiche e mantiene una cache binaria limitata a 8 MB e 64 elementi per dieci minuti nell’isolate. La raccolta dei feed, l’archivio personale e le migrazioni non cambiano. Fonti radar non riconducibili a un ID nativo, articoli fuori dall’ultimo feed e risorse non accessibili possono non avere una foto recuperabile. Il controllo integrato verifica che l’API arricchita contenga la foto e che l’endpoint same-origin restituisca byte PNG reali, anche quando la foto è disponibile soltanto sulla pagina del singolo articolo.
-
-## Copertine oltre la rotazione del feed
-
-Il recupero immagini non deve richiedere che una scheda già mostrata sia ancora negli ultimi 24 elementi del feed. La cache pubblica conserva separatamente, per ciascuna fonte configurata, fino a 160 riferimenti essenziali (ID, link e URL fotografici) per sette giorni nella tabella già esistente. Non contiene salvataggi o identità personali. I riferimenti vengono aggiornati dalle risposte server e consultati prima di ricontattare il feed; un guasto dello storage non impedisce la raccolta delle notizie.
-
-Per le schede locali precedenti a questo archivio, il client può specificare `articleLink`: l'endpoint ammette esclusivamente HTTPS pubblico sul dominio esatto della homepage configurata, senza credenziali o porte diverse da 443, con percorso non radice e lunghezza massima di 2.048 caratteri. Ogni redirect della pagina resta confinato alla stessa testata. URL di domini esterni, locali, IP letterali e parametri duplicati sono rifiutati prima di fare richieste. La chiave della cache include il link per evitare collisioni tra pagine. Il recupero estrae soltanto immagini pubblicate nei metadati della testata e applica anche ai redirect delle immagini le protezioni esistenti. Non esegue JavaScript o richieste autenticate. Questo amplia il contratto precedente per compatibilità con le schede già presenti nel browser, senza introdurre un proxy di pagine su host arbitrari.
-
-Vicino al viewport le schede native preferiscono la consegna same-origin dei byte fotografici, con gli URL diretti come alternativa in caso di fallimento. Fuori dal viewport il recupero non parte. I riquadri mantengono dimensioni fisse.
-
-## Richieste fotografiche concorrenti nel runtime Workers
-
-Un carico di 24 richieste concorrenti ha riprodotto risposte 500: il runtime segnalava richieste sospese senza possibilità di risposta. La coda globale di resolver nel proxy apparteneva a richieste diverse e non è compatibile con l'isolamento del ciclo di vita Workers. Il proxy non condivide più promesse in corso o semafori asincroni fra invocazioni; conserva soltanto byte già scaricati. Il recupero delle homepage da questo endpoint non riusa promesse aperte da altre richieste. Un limite numerico di 12 recuperi attivi risponde subito con 503 e Retry-After quando pieno, senza lasciare richieste sospese.
-
-La coda è nel browser: otto download diretti e quattro recuperi indipendenti. Una foto diretta veloce evita il proxy; dopo 1,2 secondi, oppure subito dopo un errore, il recupero procede in parallelo e viene mostrata la prima immagine decodificata. Un errore transitorio del proxy consente un secondo tentativo. Tutte le schede iniziali iniziano la preparazione anche fuori dallo schermo; le successive anticipano il caricamento di 1.800 pixel e non subiscono un secondo ritardo di lazy loading. Il budget iniziale resta finito; eventuali fotografie tardive mantengono il loro spazio fisso.
-
-## Biblioteca multilingue e ripresa della lettura
-
-Il catalogo delle edizioni si trova in `app/data/open-books.json`, con gli archivi tematici storici separati in `library-resources.json`. Il lettore `/read` evita di avviare la raccolta dei feed. Le API private per documenti e segnalibri sono gestite dal Worker prima della cache pubblica. La nuova tabella `reading_progress` è indipendente dalle raccolte già salvate. Specifiche, fonti e limiti sono in [LIBRARY.md](LIBRARY.md).
-
-## Fotografie dai radar
-
-Gli articoli conservano `feedSourceId` anche quando la fonte visualizzata è il giornale scoperto dal radar. I riferimenti osservati dal server, compresi titolo e homepage dell’editore, restano nell’archivio pubblico limitato; una scheda non può introdurre da sola un host da interrogare. La cache API usa la versione 5 per rinnovare i vecchi record senza provenienza.
-
-Il recupero accetta anche i radar: può risolvere un URL storico Google News, o usare il meccanismo pubblico non documentato di risoluzione dei link opachi. Quest’ultimo può fallire: un controllo dal vivo ha ricevuto una pagina Google 503. Quote, consenso e blocchi terminano il tentativo, senza cookie artificiali o aggiramenti; un breve circuito limita le ripetizioni dopo 429/503. In alternativa il titolo deve corrispondere esattamente a un collegamento nella homepage o nel feed RSS/Atom della testata osservata. L’URL originale resta confinato a quel dominio e ai suoi sottodomini. Nessuna immagine generica viene attribuita a una notizia. Vecchi radar non più presenti nei feed, blocchi degli editori o assenza di una foto possono ancora lasciare una scheda senza immagine.
-
-Le prove concorrenti sul sito hanno riprodotto i 500 delle versioni precedenti e verificato 24 download su 24 dopo la rimozione della coda globale. Questo risultato riguarda il campione di fonti native, non dimostra copertura totale dei radar né una verifica visiva di tutte le schede.
-
-## Edizioni regionali delle fotografie
-
-Il parametro `articleLink` su un dominio diverso dalla homepage è ammesso solo quando coincide esattamente con il riferimento dell’articolo già osservato e conservato dal server per quella fonte e quell’ID. In quel caso la ricerca dei metadati resta confinata al dominio dell’edizione regionale. URL inventati, altri articoli e destinazioni locali continuano a essere rifiutati. Questo evita i 400 sulle schede CGTN regionali senza aprire il proxy a destinazioni arbitrarie.
+Un push GitHub non pubblica Sites. Non copiare credenziali Sites nei workflow. GitHub Pages non esegue le API Worker. Un hosting alternativo richiede runtime, binding e verifiche compatibili. Per rollback del codice usare un revert; per il sito ripubblicare una versione Sites verificata. Un revert GitHub da solo non cambia la produzione.

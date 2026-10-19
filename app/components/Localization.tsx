@@ -248,14 +248,14 @@ export function LocalizedText({
   useEffect(() => {
     let live = true;
     if (
-      ((preparing && priority > 0) || visible) &&
+      ((preparing && priority >= 2) || visible) &&
       text.trim() &&
       /\p{L}/u.test(text) &&
       from !== to &&
       !builtin &&
       text.length <= 2200
     ) {
-      const finish = preparing && priority > 0 ? begin() : () => {};
+      const finish = preparing && priority >= 2 ? begin() : () => {};
       void translate(text, from, to, priority).then((value) => {
         if (live && value !== null) setResult({ key, value });
       }).finally(finish);

@@ -586,7 +586,7 @@ test("rate-limited Google requests back off while other article translations con
  } finally { globalThis.fetch = originalFetch; Date.now = realNow; }
 });
 
-test("an empty but valid RSS feed is available, simultaneous requests share one fetch, and temporary failures retain the last successful copy", async () => {
+test("valid empty feeds remain available, cold requests own their fetch, completed copies are reused and temporary failures retain articles", async () => {
  const {default:worker}=await import("../dist/server/index.js");
  const env={ASSETS:{fetch:async()=>new Response("Not found",{status:404})}};
  const ctx={waitUntil(){},passThroughOnException(){}};
@@ -599,7 +599,8 @@ test("an empty but valid RSS feed is available, simultaneous requests share one 
   let calls=0;
   globalThis.fetch=async()=>{calls++;await new Promise(resolve=>setTimeout(resolve,5));return new Response(`<rss><channel><item><title>A retained public article</title><link>https://example.org/retained</link><pubDate>${new Date(realNow()).toUTCString()}</pubDate></item></channel></rss>`)};
   const values=await Promise.all([get("consortium-news"),get("consortium-news")]);
-  assert.equal(calls,1);assert.equal((await values[0].json()).articles.length,1);
+  assert.equal(calls,2);assert.equal((await values[0].json()).articles.length,1);
+  assert.equal((await(await get("consortium-news")).json()).articles.length,1);assert.equal(calls,2);
   Date.now=()=>realNow()+660_000;
   globalThis.fetch=async()=>{throw new Error("Network offline")};
   const stale=await(await get("consortium-news")).json();
