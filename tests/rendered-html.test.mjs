@@ -33,14 +33,14 @@ test("server-renders the aggregator shell", async () => {
 
   const html = await response.text();
   assert.match(html, /<html lang="it">/i);
-  assert.match(html, /<title>Rassegna Rossa<\/title>/i);
+  assert.match(html, /<title>Internazionale Rossa<\/title>/i);
   assert.match(html, /class="initial-loading"[^>]*role="status"[^>]*aria-busy="true"/);
   assert.match(html, /class="edition-preparing"[^>]*inert=""[^>]*aria-hidden="true"/);
   assert.match(html, /Prepariamo la rassegna/);
   assert.match(html, /Aggregatore socialista globale/);
   assert.match(html, /Tesi su Feuerbach/);
   assert.match(html, /community-emblem/);
-  assert.match(html, /rassegna<span class="wordmark-black">rossa<\/span>/);
+  assert.match(html, /internazionale<span class="wordmark-black"> rossa<\/span>/);
   assert.match(html, /OSSERVATORIO MONDIALE/);
   const observatory = html.match(/<aside class="world-watch"[\s\S]*?<\/aside>/)?.[0];
   assert.ok(observatory);
@@ -88,7 +88,7 @@ test("keeps the product detached from the starter preview", async () => {
   ]);
 
   assert.match(page, /<AggregatorApp \/>/);
-  assert.match(layout, /title:\s*"Rassegna Rossa"/);
+  assert.match(layout, /title:\s*"Internazionale Rossa"/);
   assert.match(layout, /lang="it"/);
   assert.match(packageJson, /"lucide-react"/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);

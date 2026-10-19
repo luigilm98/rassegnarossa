@@ -63,7 +63,7 @@ const REQUEST_TIMEOUT_MS = 8000;
 const DISCOVERY_TTL_MS = 60 * 60 * 1000;
 const MAX_FEED_CHARS = 1_800_000;
 const USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) RassegnaRossa/1.0";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) InternazionaleRossa/1.0";
 
 export function getSources(ids?: string[]) {
   if (!ids?.length) {

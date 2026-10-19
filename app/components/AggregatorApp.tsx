@@ -163,7 +163,7 @@ const HEADINGS = {
       </>
     ),
     description:
-      "Rassegna Rossa è uno strumento per orientarsi nell’informazione socialista, comunista, sindacale e anticoloniale. Qui spieghiamo come funziona e quali sono i suoi limiti.",
+      "Internazionale Rossa è uno strumento per orientarsi nell’informazione socialista, comunista, sindacale e anticoloniale. Qui spieghiamo come funziona e quali sono i suoi limiti.",
   },
 };
 
@@ -796,13 +796,13 @@ export function AggregatorApp() {
             <button
               className="wordmark"
               onClick={() => navigate("notizie")}
-              aria-label="Rassegna Rossa, pagina iniziale"
+              aria-label="Internazionale Rossa, pagina iniziale"
             >
               <span className="brand-symbol" aria-hidden="true">
                 <CommunityEmblem compact />
               </span>
               <span>
-                rassegna<span className="wordmark-black">rossa</span>
+                internazionale<span className="wordmark-black"> rossa</span>
                 <span className="brand-period">
                   <LocalizedText>{"."}</LocalizedText>
                 </span>
@@ -1281,7 +1281,7 @@ export function AggregatorApp() {
         <footer className="site-footer">
           <div className="footer-top">
             <span className="footer-brand">
-              rassegna<span>rossa.</span>
+              internazionale<span> rossa.</span>
             </span>
             <p>
               <LocalizedText>{"Per capire il mondo,"}</LocalizedText>
@@ -1807,7 +1807,7 @@ function ArticleReader({
     <div className="article-reader">
       <div className="reader-top">
         <span className="eyebrow">
-          <LocalizedText>{"LA SCHEDA / RASSEGNA ROSSA"}</LocalizedText>
+          <LocalizedText>{"LA SCHEDA / INTERNAZIONALE ROSSA"}</LocalizedText>
         </span>
         <button
           className="icon-button"

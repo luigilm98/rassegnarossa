@@ -9,7 +9,7 @@ export async function fetchPublisherPage(source: Pick<SourceDefinition, "homepag
   if (!value || value.until <= Date.now()) {
     try {
       const response = await fetch(source.homepage, {
-        headers: { accept: "text/html", "user-agent": "RassegnaRossa/1.0 (public source highlights)" },
+        headers: { accept: "text/html", "user-agent": "InternazionaleRossa/1.0 (public source highlights)" },
         signal: AbortSignal.timeout(4500), redirect: "follow",
       });
       if (!response.ok || !response.headers.get("content-type")?.includes("text/html")) throw new Error("Publisher unavailable");

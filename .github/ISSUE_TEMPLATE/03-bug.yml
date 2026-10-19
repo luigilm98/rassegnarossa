@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a broken page, missing image, slow load or reading problem. Segnala un problema del
+  sito.
+title: '[Bug] '
+body:
+- type: markdown
+  attributes:
+    value: 'Write in any language. No coding required. / Scrivi nella tua lingua: non serve programmare.
+
+
+      Italiano · English · Español · Français · Deutsch · Português · all other languages welcome.
+
+
+      This proposal is public: omit private data and redact screenshots. / La proposta è pubblica: ometti
+      dati personali e oscura gli screenshot.'
+- type: textarea
+  id: problem
+  attributes:
+    label: What happened? / Che cosa succede?
+    description: Describe what you see and what you expected. Indica cosa vedi e cosa ti aspettavi.
+  validations:
+    required: true
+- type: textarea
+  id: steps
+  attributes:
+    label: How to reproduce / Come riprodurre
+    description: If possible, list the actions and the page involved. Se possibile, indica azioni e pagina.
+    placeholder: 'Example: open a book, choose a chapter, then… / Esempio: apro un libro, scelgo un capitolo,
+      poi…'
+  validations:
+    required: false
+- type: input
+  id: device
+  attributes:
+    label: Device and browser / Dispositivo e browser
+    description: 'Optional: phone/computer, browser, reading language. Facoltativo: telefono/computer,
+      browser, lingua di lettura.'
+- type: textarea
+  id: evidence
+  attributes:
+    label: Additional details / Altri dettagli
+    description: 'Optional: redacted screenshot or public page URL. Never post account data, tokens or
+      private reading history. Facoltativo: screenshot oscurato o link pubblico; niente dati dell’account
+      o cronologia privata.'
+  validations:
+    required: false

@@ -1,6 +1,17 @@
-# Rassegna Rossa
+# Internazionale Rossa
 
 Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto il mondo. Riunisce feed RSS/Atom, canali radar tematici e una biblioteca di teoria politica in un’interfaccia multilingue.
+
+## Partecipa / Contribute
+
+**[Proponi una modifica · Suggest a change](CONTRIBUTING.md)**
+
+Non serve saper programmare. Nel repository apri **Issues → New issue**, scegli il modulo e descrivi cosa vuoi migliorare. Puoi proporre modifiche alle pagine, correzioni, fonti, libri, traduzioni o segnalare un problema. Scrivi nella lingua che preferisci; basta un account GitHub gratuito.
+
+**Everyone can contribute, in any language.** Open **Issues → New issue**, choose a form and explain your idea. No coding is required. To edit a page or a text yourself, use GitHub’s pencil button and submit a pull request. Proposals are reviewed before publication.
+
+[Italiano](CONTRIBUTING.md#italiano) · [English](CONTRIBUTING.md#english) · [Español](CONTRIBUTING.md#español) · [Français](CONTRIBUTING.md#français) · [Deutsch](CONTRIBUTING.md#deutsch) · [Português](CONTRIBUTING.md#português)
+
 
 ## Funzioni attuali
 
@@ -17,7 +28,7 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Ordine selezionabile: in evidenza dalle fonti, ultimi articoli, più letti sulle fonti, priorità politica e formativa.
 - Le selezioni delle testate provengono dal loro HTML pubblico, separatamente dai feed. Nessun contatore di letture interno. “Più letti” usa soltanto classifiche pubblicate dalle fonti; se mancano, l’interfaccia lo segnala.
 - Osservatorio delle ultime sei ore: notizie da tutta la rete raccolta e da otto canali regionali aggiuntivi, filtri, attività oraria e collegamenti diretti alle testate, senza punteggi nelle schede.
-- Marchio essenziale con libro aperto e stella, “rassegna” rossa e “rossa” nera, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
+- Marchio essenziale con libro aperto e stella, “internazionale” rossa e “rossa” nera, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Raccolta personale di articoli e libri: accesso con ChatGPT e copia privata persistente sul server; importazione dei salvataggi locali esistenti. Senza accesso resta una copia sul dispositivo, indicata come tale.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
 - Vetrina “Le conquiste del socialismo”: 33 schede documentate in 20 paesi, filtri per paese e tema e otto dossier estesi: Italia, Comune, Cina, Rivoluzione culturale, Francia, NHS britannico, Vienna Rossa e Cuba. Capitoli, cronologie, confronti prima/dopo, 39 riferimenti documentari e letture guidate; link diretti ai dossier.

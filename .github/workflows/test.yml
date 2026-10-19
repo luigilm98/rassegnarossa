@@ -1,4 +1,4 @@
-name: Verify Rassegna Rossa
+name: Verify Internazionale Rossa
 
 on:
   push:

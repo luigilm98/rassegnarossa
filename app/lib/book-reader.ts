@@ -7,7 +7,7 @@ const cache = new Map<string, { size: number; until: number; value: { html: stri
 async function load(url:string, language:string) {
  const old=cache.get(url);if(old&&old.until>Date.now())return old.value;
  const parsed=publicPhotoUrl(url);if(!parsed)throw Error("Invalid catalogue URL");
- const response=await fetchPublicPhotoResource(parsed,AbortSignal.timeout(16000),{accept:"text/html","user-agent":"RassegnaRossa/1.0 (attributed open book reader)"},fetch,parsed.hostname.replace(/^www\./,""));
+ const response=await fetchPublicPhotoResource(parsed,AbortSignal.timeout(16000),{accept:"text/html","user-agent":"InternazionaleRossa/1.0 (attributed open book reader)"},fetch,parsed.hostname.replace(/^www\./,""));
  if(!response.ok||!response.headers.get("content-type")?.includes("text/html")){await response.body?.cancel();throw Error("Edizione non raggiungibile");}
  const bytes=await readLimited(response,3_500_000);
  const html=decodeBookHtml(bytes,response.headers.get("content-type")??"",language);

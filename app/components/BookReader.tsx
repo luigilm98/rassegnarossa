@@ -113,7 +113,7 @@ function Reader({language,ready}:{language:string;ready:boolean}) {
  return <main className="book-reader">
   <header className="book-reader-header">
    <a href="/?view=teoria" onClick={()=>queueSave(true)}><ArrowLeft size={18}/><LocalizedText>Biblioteca</LocalizedText></a>
-   <div><span className="eyebrow"><LocalizedText>Lettura personale</LocalizedText></span><h1>{book?.title??"Rassegna Rossa"}</h1><p>{book?.author}</p></div>
+   <div><span className="eyebrow"><LocalizedText>Lettura personale</LocalizedText></span><h1>{book?.title??"Internazionale Rossa"}</h1><p>{book?.author}</p></div>
    <BookOpen size={24}/>
   </header>
   {!auth?<section className="reader-message"><h2><LocalizedText>Accedi per leggere e ritrovare il tuo segnalibro</LocalizedText></h2><p><LocalizedText>La posizione di lettura e gli articoli salvati rimangono nel tuo account, anche su un altro dispositivo.</LocalizedText></p><a className="primary-button" href={signIn} target="_top"><LocalizedText>Accedi con ChatGPT</LocalizedText></a></section>:null}

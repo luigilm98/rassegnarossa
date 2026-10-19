@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rassegna Rossa",
+  title: "Internazionale Rossa",
   description:
     "Aggregatore live di fonti socialiste, comuniste, sindacali e anticoloniali da tutto il mondo.",
   manifest: "/manifest.webmanifest",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
   },
   openGraph: {
-    title: "Rassegna Rossa",
+    title: "Internazionale Rossa",
     description:
       "Notizie, fonti e percorsi di lettura per uno sguardo internazionale sul mondo del lavoro, dei movimenti e del pensiero socialista.",
     type: "website",

@@ -55,7 +55,7 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
       article = { ...stored, link: original };
       source = { ...source, homepage: new URL(original).origin + "/" };
     }
-    const headers = { "user-agent": "Mozilla/5.0 RassegnaRossa/1.0", referer: source.homepage, accept: "image/avif,image/webp,image/*" };
+    const headers = { "user-agent": "Mozilla/5.0 InternazionaleRossa/1.0", referer: source.homepage, accept: "image/avif,image/webp,image/*" };
     const download = async (urls: string[]) => {
       for (const raw of urls) {
         const url = publicPhotoUrl(raw); if (!url) continue;

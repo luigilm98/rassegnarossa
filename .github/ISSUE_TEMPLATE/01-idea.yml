@@ -1,0 +1,36 @@
+name: Idea / Page change
+description: Suggest a feature or change a page, its layout or wording. Proponi una funzione o una modifica
+  alle pagine.
+title: '[Idea] '
+body:
+- type: markdown
+  attributes:
+    value: 'Write in any language. No coding required. / Scrivi nella tua lingua: non serve programmare.
+
+
+      Italiano · English · Español · Français · Deutsch · Português · all other languages welcome.
+
+
+      This proposal is public: omit private data and redact screenshots. / La proposta è pubblica: ometti
+      dati personali e oscura gli screenshot.'
+- type: input
+  id: page
+  attributes:
+    label: Page or feature / Pagina o funzione
+    description: Name the page or paste its link, if known. Indica la pagina o il link, se lo conosci.
+- type: textarea
+  id: proposal
+  attributes:
+    label: Your proposal / La tua proposta
+    description: What would you change and why? Describe it in your own language. Che cosa cambieresti
+      e perché?
+  validations:
+    required: true
+- type: textarea
+  id: example
+  attributes:
+    label: Example / Esempio
+    description: 'Optional: proposed wording, a sketch or an example. Facoltativo: testo proposto, bozza
+      o esempio.'
+  validations:
+    required: false

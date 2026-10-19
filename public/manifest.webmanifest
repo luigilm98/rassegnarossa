@@ -1,6 +1,6 @@
 {
-  "name": "Rassegna Rossa",
-  "short_name": "Rassegna",
+  "name": "Internazionale Rossa",
+  "short_name": "Internazionale",
   "description": "Notizie, fonti e percorsi di lettura per uno sguardo internazionale.",
   "start_url": "/",
   "display": "standalone",

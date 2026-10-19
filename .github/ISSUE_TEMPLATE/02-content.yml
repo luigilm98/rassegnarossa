@@ -1,0 +1,51 @@
+name: Content / Source / Translation
+description: Propose a source, book, historical correction or translation. Proponi fonti, libri, correzioni
+  o traduzioni.
+title: '[Content] '
+body:
+- type: markdown
+  attributes:
+    value: 'Write in any language. No coding required. / Scrivi nella tua lingua: non serve programmare.
+
+
+      Italiano · English · Español · Français · Deutsch · Português · all other languages welcome.
+
+
+      This proposal is public: omit private data and redact screenshots. / La proposta è pubblica: ometti
+      dati personali e oscura gli screenshot.'
+- type: dropdown
+  id: kind
+  attributes:
+    label: Type / Tipo
+    options:
+    - Source or video channel / Fonte o canale video
+    - Book or edition / Libro o edizione
+    - Historical or factual correction / Correzione storica o fattuale
+    - Translation / Traduzione
+    - Other content / Altro contenuto
+  validations:
+    required: true
+- type: textarea
+  id: proposal
+  attributes:
+    label: What should change? / Che cosa proponi?
+    description: Name the page and give the new or corrected text. For a translation, include the target
+      language and current wording. Indica pagina e proposta; per una traduzione aggiungi lingua e testo
+      attuale.
+  validations:
+    required: true
+- type: textarea
+  id: references
+  attributes:
+    label: References / Riferimenti
+    description: Link the official source, legitimate book edition or supporting document. For corrections,
+      identify the relevant passage. For translations, link or name the page. Aggiungi fonte ufficiale,
+      edizione legittima o documento; per traduzioni indica la pagina.
+  validations:
+    required: true
+- type: input
+  id: context
+  attributes:
+    label: Language and context / Lingua e contesto
+    description: 'If relevant: language, country, author, feed URL or rights information. Se pertinente:
+      lingua, paese, autore, feed o diritti.'

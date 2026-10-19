@@ -22,7 +22,7 @@ export async function resolveRadarLink(link: string, publisher: string, signal: 
   } catch { /* Current opaque IDs require Google's public article page. */ }
   if (Date.now() < unavailableUntil) return null;
   try {
-    const headers = { "user-agent": "RassegnaRossa/1.0", accept: "text/html" };
+    const headers = { "user-agent": "InternazionaleRossa/1.0", accept: "text/html" };
     const page = await fetcher(`https://news.google.com/rss/articles/${id}`, { signal, redirect: "manual", credentials: "omit", headers });
     if ([301,302,303,307,308].includes(page.status)) {
       const destination = page.headers.get("location"); await page.body?.cancel();
@@ -62,7 +62,7 @@ export async function resolvePublisherHeadline(title: string, publisher: string,
  const target=normalize(title);if(target.length<20)return null;
  const host=home.hostname.replace(/^www\./,"");
  try{
-  const response=await fetchPublicPhotoResource(home,AbortSignal.any([signal,AbortSignal.timeout(4500)]),{accept:"text/html","user-agent":"RassegnaRossa/1.0"},fetcher,host);
+  const response=await fetchPublicPhotoResource(home,AbortSignal.any([signal,AbortSignal.timeout(4500)]),{accept:"text/html","user-agent":"InternazionaleRossa/1.0"},fetcher,host);
   if(!response.ok||!response.headers.get("content-type")?.includes("text/html")){await response.body?.cancel();return null;}
   const html=new TextDecoder().decode(await readLimited(response,700000,true));
   for(const a of html.matchAll(/<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([^]*?)<\/a>/gi)){
@@ -75,7 +75,7 @@ export async function resolvePublisherHeadline(title: string, publisher: string,
   const feedHref=feedTag?.match(/href=["']([^"']+)["']/i)?.[1];
   const feed=feedHref&&publicPhotoUrl(new URL(feedHref.replace(/&amp;/g,"&"),home).href);
   if(feed&&feed.hostname.replace(/^www\./,"")===host){
-   const rss=await fetchPublicPhotoResource(feed,AbortSignal.any([signal,AbortSignal.timeout(4500)]),{accept:"application/rss+xml, application/atom+xml, text/xml","user-agent":"RassegnaRossa/1.0"},fetcher,host);
+   const rss=await fetchPublicPhotoResource(feed,AbortSignal.any([signal,AbortSignal.timeout(4500)]),{accept:"application/rss+xml, application/atom+xml, text/xml","user-agent":"InternazionaleRossa/1.0"},fetcher,host);
    if(rss.ok){const xml=new TextDecoder().decode(await readLimited(rss,1000000,true));
     for(const item of [...xml.matchAll(/<(?:item|entry)\b[^>]*>([^]*?)<\/(?:item|entry)>/gi)].slice(0,80)){
      const headline=item[1].match(/<title\b[^>]*>([^]*?)<\/title>/i)?.[1]??"";if(normalize(headline)!==target)continue;
