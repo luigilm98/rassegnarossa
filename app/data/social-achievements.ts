@@ -44,33 +44,3 @@ export const SOCIAL_ACHIEVEMENTS: Achievement[] = [
 export const ACHIEVEMENT_COUNTRIES = [...new Set(SOCIAL_ACHIEVEMENTS.map(item => item.country))];
 export const ACHIEVEMENT_THEMES = [...new Set(SOCIAL_ACHIEVEMENTS.map(item => item.theme))];
 export const selectAchievements = (country: string, theme: string) => SOCIAL_ACHIEVEMENTS.filter(item => (country === 'all' || item.country === country) && (theme === 'all' || item.theme === theme));
-
-export const SOCIAL_DOSSIERS = [
-  {
-    id:'comune', title:'Parigi 1871 · Il popolo prova a governare', subtitle:'Lavoro, scuola laica, cooperazione', books:['comune-parigi'],
-    paragraphs:[
-      'La Comune di Parigi rende visibile un’aspirazione che attraverserà il movimento socialista: la capacità delle classi popolari di partecipare direttamente al governo della propria città. Nella sua breve esistenza sperimenta misure sociali e progetti di trasformazione del lavoro e dell’istruzione.',
-      'Il divieto del lavoro notturno nei forni e quello delle multe e trattenute salariali rispondono a bisogni concreti. Il progetto sulle officine abbandonate apre una prospettiva cooperativa. Le iniziative per un insegnamento laico immaginano il sapere come bene comune. Distinguere decreti, progetti e attuazione permette di capire meglio questa eredità.',
-      'Leggere La guerra civile in Francia di Marx significa incontrare una voce partecipe di quell’esperienza; affiancarla ai documenti della Comune aiuta a trasformare la memoria in studio e immaginazione politica.'
-    ],
-    sources:[{label:'L’opera sociale della Comune',url:'https://www.commune1871.org/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/democratie-laicite-oeuvre-sociale/578-l-oeuvre-sociale-de-la-commune'},{label:'L’insegnamento sotto la Comune',url:'https://commune1871.org/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/les-services-publics/568-l-enseignement-sous-la-commune'}]
-  },
-  {
-    id:'cina', title:'Cina · Dalla rivoluzione allo sviluppo', subtitle:'1949, sanità rurale, riforme dal 1978', books:['mao-nuova-democrazia','mao-cooperazione-agricola','mao-servire-popolo'],
-    paragraphs:[
-      'La fondazione della Repubblica Popolare nel 1949 apre un processo di ricostruzione dello Stato e trasformazione sociale. I testi di Mao sulla nuova democrazia, sulla cooperazione e sul servizio al popolo offrono un ingresso nelle idee che hanno orientato quella stagione.',
-      'La sanità rurale e la formazione di personale vicino alle comunità costituiscono un’esperienza studiata dall’OMS. Dal 1978 una fase distinta di riforme e apertura combina iniziativa economica, industrializzazione, infrastrutture e politiche pubbliche.',
-      'Il rapporto congiunto Banca Mondiale–Development Research Center del 2022 documenta quasi 800 milioni di persone uscite dalla povertà estrema in quattro decenni alla soglia di 1,90 dollari giornalieri in PPA 2011. È una trasformazione di enorme portata: per comprenderla servono periodi, misure e strumenti precisi, anziché un primato assoluto non dimostrato.'
-    ],
-    sources:[{label:'La trasformazione della povertà · rapporto 2022',url:'https://www.worldbank.org/en/news/press-release/2022/04/01/lifting-800-million-people-out-of-poverty-new-report-looks-at-lessons-from-china-s-experience'},{label:'L’esperienza sanitaria cinese · OMS',url:'https://www.who.int/news-room/speeches/item/china-s-growing-contribution-to-health-at-home-and-on-the-global-stage-lecture-at-the-chinese-academy-of-governance'}]
-  },
-  {
-    id:'rivoluzione-culturale', title:'Rivoluzione culturale · Leggere le fonti', subtitle:'1966–1976, partecipazione e critica della burocrazia', books:['mao-pratica','mao-contraddizioni-popolo','mao-studio'],
-    paragraphs:[
-      'Il documento dei Sedici punti del 1966 dichiara obiettivi di trasformazione dell’educazione e della cultura, partecipazione delle masse e critica degli apparati burocratici. Sono temi da studiare attraverso il testo stesso, distinguendo intenzioni, pratiche ed esiti.',
-      'Il punto 6 formula un principio prezioso: le controversie vanno affrontate con argomenti e fatti, senza costringere una minoranza a conformarsi. Questa aspirazione permette di riflettere su una politica della partecipazione che custodisca dignità, studio e confronto.',
-      'Le umiliazioni pubbliche e le persecuzioni avvenute durante la Rivoluzione culturale non sono conquiste sociali. La risoluzione storica del PCC del 1981 giudica quel decennio un grave rovescio. Leggere anche questa fonte comunista aiuta a distinguere l’emancipazione dalla sopraffazione. La crescita successiva al 1978 appartiene a una fase diversa e non va attribuita automaticamente alla Rivoluzione culturale.'
-    ],
-    sources:[{label:'I Sedici punti · documento del 1966',url:'https://www.marxists.org/subject/china/peking-review/1966/PR1966-33g.htm'},{label:'Risoluzione storica del PCC · 1981',url:'https://www.marxists.org/subject/china/documents/cpc/history/01.htm'}]
-  }
-];

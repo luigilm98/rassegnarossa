@@ -1,7 +1,8 @@
 "use client";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ArrowUpRight, BookOpen, Bookmark, BookmarkCheck, Search, X } from "lucide-react";
 import { THEORY_LIBRARY, BOOK_LANGUAGES } from "@/app/data/library";
+import { historyId } from "@/app/lib/history-navigation";
 import { READING_PATHS, GLOSSARY } from "@/app/data/editorial";
 import { LocalizedText, LocalizedInput, useLocale } from "./Localization";
 const ALL = "all";
@@ -21,6 +22,9 @@ export function LibraryView({
   const readingLanguage = useLocale();
   const [bookLanguage, setBookLanguage] = useState("all");
   const [showAchievements, setShowAchievements] = useState(false);
+  useEffect(() => {
+    if (historyId(new URL(window.location.href).searchParams.get("storia"))) setShowAchievements(true);
+  }, []);
   const readingLink = (book: typeof THEORY_LIBRARY[number]) => {
     const preferred = bookLanguage === "all" ? readingLanguage : bookLanguage;
     const edition = book.editions?.find(item => item.language === preferred) ?? book.editions?.find(item => item.language === "en") ?? book.editions?.[0];
@@ -55,7 +59,7 @@ export function LibraryView({
       <section className="achievements-showcase">
         <button className="achievements-entry" aria-expanded={showAchievements} aria-controls="social-showcase-content" onClick={() => setShowAchievements(open => !open)}>
           <span className="achievements-entry-mark" aria-hidden="true">✦</span>
-          <span><span className="eyebrow"><LocalizedText>LA MEMORIA CHE COSTRUISCE IL FUTURO</LocalizedText></span><strong><LocalizedText>Le conquiste del socialismo</LocalizedText></strong><small><LocalizedText>Lavoro, scuola, salute e dignità · dall’Italia al mondo</LocalizedText></small></span>
+          <span><span className="eyebrow"><LocalizedText>LA MEMORIA CHE COSTRUISCE IL FUTURO</LocalizedText></span><strong><LocalizedText>Le conquiste del socialismo</LocalizedText></strong><small><LocalizedText>Dossier, cronologie, documenti e letture · dall’Italia al mondo</LocalizedText></small></span>
           <span className="achievements-entry-action"><LocalizedText>{showAchievements ? 'Chiudi la vetrina' : 'Esplora la vetrina'}</LocalizedText><ArrowUpRight size={19}/></span>
         </button>
         <div id="social-showcase-content" hidden={!showAchievements}>{showAchievements && <Suspense fallback={<p className="notice" role="status"><LocalizedText>Apertura della raccolta…</LocalizedText></p>}><SocialAchievements/></Suspense>}</div>

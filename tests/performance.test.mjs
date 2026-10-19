@@ -138,4 +138,6 @@ test("the news startup dependency graph leaves the complete book catalogue in an
  const startup=await Promise.all([...visited].filter(key=>manifest[key]?.file).map(key=>readFile(new URL('../dist/client/'+manifest[key].file,import.meta.url),'utf8')));
  assert.ok(startup.every(code=>!code.includes('selected-works/volume-5/mswv5_58.htm')),'The full library must not download with news');
  assert.ok(manifest['app/components/AggregatorApp.tsx'].dynamicImports.includes('app/components/LibraryView.tsx'));
+ assert.ok(startup.every(code=>!code.includes('Il secondo comma dell’articolo 3 affida')),'Historical articles must stay out of the news startup bundle');
+ assert.ok(manifest['app/components/SocialAchievements.tsx'].dynamicImports.includes('app/components/HistoricalDossiers.tsx'));
 });

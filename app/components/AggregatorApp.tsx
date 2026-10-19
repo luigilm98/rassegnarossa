@@ -58,6 +58,7 @@ import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
 import { ArticleImage } from "./ArticleImage";
 import { InitialLoadBoundary } from "./InitialLoadBoundary";
+import { historyId } from "@/app/lib/history-navigation";
 import { VideoCarousel } from "./VideoCarousel";
 import { WorldWatch } from "./WorldWatch";
 import { useStableNews } from "./StableNews";
@@ -170,6 +171,9 @@ export function AggregatorApp() {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [browserLanguage, setBrowserLanguage] = useState("it");
   const [view, setView] = useState<View>("notizie");
+  useEffect(() => {
+    if (historyId(new URL(window.location.href).searchParams.get("storia"))) setView("teoria");
+  }, []);
   const [articles, setArticles] = useState<Article[]>([]);
   const [statuses, setStatuses] = useState<Record<string, SourceStatus>>({});
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());

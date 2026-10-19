@@ -1,0 +1,1207 @@
+{
+  "sources": {
+    "cost3": {
+      "id": "cost3",
+      "title": "Uguaglianza sostanziale",
+      "publisher": "Senato della Repubblica",
+      "url": "https://www.senato.it/istituzione/la-costituzione/principi-fondamentali/articolo-3",
+      "locator": "Articolo 3",
+      "kind": "Testo costituzionale",
+      "date": "1948"
+    },
+    "cost36": {
+      "id": "cost36",
+      "title": "Retribuzione, riposo e ferie",
+      "publisher": "Senato della Repubblica",
+      "url": "https://www.senato.it/istituzione/la-costituzione/parte-i/titolo-iii/articolo-36",
+      "locator": "Articolo 36",
+      "kind": "Testo costituzionale",
+      "date": "1948"
+    },
+    "cost34": {
+      "id": "cost34",
+      "title": "Il diritto di studiare",
+      "publisher": "Senato della Repubblica",
+      "url": "https://www.senato.it/istituzione/la-costituzione/parte-i/titolo-ii/articolo-34",
+      "locator": "Articolo 34",
+      "kind": "Testo costituzionale",
+      "date": "1948"
+    },
+    "statuto": {
+      "id": "statuto",
+      "title": "Statuto dei lavoratori",
+      "publisher": "Gazzetta Ufficiale",
+      "url": "https://www.gazzettaufficiale.it/eli/id/1970/05/27/070U0300/sg",
+      "locator": "Legge 300; articoli 1, 9, 10 e 20",
+      "kind": "Legge, testo originario",
+      "date": "20 maggio 1970"
+    },
+    "scuolamedia": {
+      "id": "scuolamedia",
+      "title": "Istituzione della scuola media statale",
+      "publisher": "Normattiva",
+      "url": "https://www.normattiva.it/atto/caricaDettaglioAtto?atto.codiceRedazionale=062U1859&atto.dataPubblicazioneGazzetta=1963-01-30&tipoDettaglio=originario",
+      "locator": "Legge 1859, articolo 1",
+      "kind": "Legge, testo originario",
+      "date": "31 dicembre 1962"
+    },
+    "ore1969": {
+      "id": "ore1969",
+      "title": "Formidabile, quel 1969",
+      "publisher": "Collettiva · CGIL",
+      "url": "https://www.collettiva.it/rubriche/buona-memoria/formidabile-quel-1969-mlgx0z47",
+      "locator": "Contratto dei metalmeccanici e orario",
+      "kind": "Storia sindacale",
+      "date": "22 novembre 2023"
+    },
+    "ore150": {
+      "id": "ore150",
+      "title": "Cinquant’anni dal contratto del 1973",
+      "publisher": "FIM-CISL",
+      "url": "https://www.fim-cisl.it/2023/04/19/1973-2023-50-anni-dal-ccnl-del-1973/",
+      "locator": "150 ore, inquadramento unico, firmatari FLM",
+      "kind": "Storia sindacale",
+      "date": "19 aprile 2023"
+    },
+    "ssn": {
+      "id": "ssn",
+      "title": "Istituzione del Servizio sanitario nazionale",
+      "publisher": "Normattiva",
+      "url": "https://www.normattiva.it/eli/id/1978/12/28/078U0833/CONSOLIDATED/",
+      "locator": "Legge 833, principi e obiettivi",
+      "kind": "Legge",
+      "date": "23 dicembre 1978"
+    },
+    "ssn-principi": {
+      "id": "ssn-principi",
+      "title": "Universalità, eguaglianza ed equità",
+      "publisher": "Ministero della Salute",
+      "url": "https://www.salute.gov.it/new/it/ministero/luniversalita-leguaglianza-e-lequita-di-accesso-alle-prestazioni-e-ai-servizi/",
+      "locator": "Superamento del sistema mutualistico",
+      "kind": "Ricostruzione istituzionale",
+      "date": ""
+    },
+    "istruzione-dati": {
+      "id": "istruzione-dati",
+      "title": "Il lungo cammino dell’istruzione",
+      "publisher": "Istat",
+      "url": "https://www.istat.it/produzione-editoriale/il-lungo-cammino-dellistruzione/",
+      "locator": "Popolazione di almeno 6 anni, censimento 1951",
+      "kind": "Statistiche storiche",
+      "date": "2026"
+    },
+    "istruzione-serie": {
+      "id": "istruzione-serie",
+      "title": "Italia in cifre 2011",
+      "publisher": "Istat",
+      "url": "https://www.istat.it/wp-content/uploads/2011/06/italiaincifre2011.pdf",
+      "locator": "Serie storica dell’analfabetismo",
+      "kind": "Statistiche storiche",
+      "date": "2011"
+    },
+    "comune-sociale": {
+      "id": "comune-sociale",
+      "title": "L’opera sociale della Comune",
+      "publisher": "Les Amies et Amis de la Commune",
+      "url": "https://www.commune1871.org/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/democratie-laicite-oeuvre-sociale/578-l-oeuvre-sociale-de-la-commune",
+      "locator": "Decreti del 20 e del 27 aprile 1871",
+      "kind": "Archivio storico e documenti",
+      "date": ""
+    },
+    "comune-affitti": {
+      "id": "comune-affitti",
+      "title": "La politica sociale della Comune",
+      "publisher": "Les Amies et Amis de la Commune",
+      "url": "https://www.commune1871.org/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/democratie-laicite-oeuvre-sociale/580-la-politique-sociale-de-la-commune",
+      "locator": "Affitti, scadenze e Mont-de-Piété",
+      "kind": "Archivio storico e documenti",
+      "date": ""
+    },
+    "comune-coop": {
+      "id": "comune-coop",
+      "title": "All’avanguardia della democrazia sociale",
+      "publisher": "Les Amies et Amis de la Commune",
+      "url": "https://www.commune1871.org/index.php/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/democratie-laicite-oeuvre-sociale/635-a-l-avant-garde-de-la-democratie-sociale",
+      "locator": "Decreto sulle officine abbandonate, 16 aprile",
+      "kind": "Archivio storico e documenti",
+      "date": ""
+    },
+    "comune-scuola": {
+      "id": "comune-scuola",
+      "title": "L’istruzione sotto la Comune",
+      "publisher": "Les Amies et Amis de la Commune",
+      "url": "https://commune1871.org/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/les-services-publics/568-l-enseignement-sous-la-commune",
+      "locator": "Scuola laica e iniziative dei quartieri",
+      "kind": "Archivio storico e documenti",
+      "date": ""
+    },
+    "comune-cultura": {
+      "id": "comune-cultura",
+      "title": "Educazione e cultura",
+      "publisher": "Les Amies et Amis de la Commune",
+      "url": "https://commune1871.org/index.php/la-commune-de-paris/histoire-de-la-commune/dossier-thematique/574-la-commune-l-education-et-la-culture",
+      "locator": "Commissione di Vaillant, aprile 1871",
+      "kind": "Archivio storico e documenti",
+      "date": ""
+    },
+    "comune-donne": {
+      "id": "comune-donne",
+      "title": "Le donne nella Comune",
+      "publisher": "Les Amies et Amis de la Commune",
+      "url": "https://parcours.commune1871.org/histoire-de-la-commune/les-femmes-dans-la-commune/",
+      "locator": "Union des femmes, 11 aprile 1871",
+      "kind": "Archivio storico e documenti",
+      "date": ""
+    },
+    "mao-democrazia": {
+      "id": "mao-democrazia",
+      "title": "Sulla nuova democrazia",
+      "publisher": "Mao Zedong · Marxists Internet Archive",
+      "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-2/mswv2_26.htm",
+      "locator": "Programma politico e sociale del 1940",
+      "kind": "Testo politico primario",
+      "date": "1940"
+    },
+    "cina-report": {
+      "id": "cina-report",
+      "title": "Quattro decenni di riduzione della povertà",
+      "publisher": "Banca Mondiale · Development Research Center",
+      "url": "https://thedocs.worldbank.org/en/doc/bdadc16a4f5c1c88a839c0f905cde802-0070012022/original/Poverty-Synthesis-Report-final.pdf",
+      "locator": "Capitoli su trasformazione strutturale, infrastrutture e politiche mirate",
+      "kind": "Rapporto di ricerca",
+      "date": "2022"
+    },
+    "cina-poverta": {
+      "id": "cina-poverta",
+      "title": "Quasi 800 milioni fuori dalla povertà estrema",
+      "publisher": "Banca Mondiale · Development Research Center",
+      "url": "https://www.worldbank.org/en/news/press-release/2022/04/01/lifting-800-million-people-out-of-poverty-new-report-looks-at-lessons-from-china-s-experience",
+      "locator": "Soglia 1,90 $ al giorno, PPA 2011, quattro decenni",
+      "kind": "Presentazione del rapporto",
+      "date": "1 aprile 2022"
+    },
+    "cina-overview": {
+      "id": "cina-overview",
+      "title": "China overview",
+      "publisher": "Banca Mondiale",
+      "url": "https://www.worldbank.org/ext/en/country/china",
+      "locator": "Crescita media dal 1978",
+      "kind": "Quadro economico",
+      "date": ""
+    },
+    "cina-salute": {
+      "id": "cina-salute",
+      "title": "La Cina e la salute globale",
+      "publisher": "Organizzazione mondiale della sanità",
+      "url": "https://www.who.int/news-room/speeches/item/china-s-growing-contribution-to-health-at-home-and-on-the-global-stage-lecture-at-the-chinese-academy-of-governance",
+      "locator": "Medici scalzi e assistenza sanitaria primaria",
+      "kind": "Intervento istituzionale",
+      "date": "2016"
+    },
+    "cina-sanita-report": {
+      "id": "cina-sanita-report",
+      "title": "Healthy China: Deepening Health Reform in China",
+      "publisher": "Banca Mondiale · OMS · istituzioni cinesi",
+      "url": "https://www.worldbank.org/en/country/china/publication/healthy-china-deepening-health-reform-in-china",
+      "locator": "Assistenza di comunità ed evoluzione del sistema",
+      "kind": "Rapporto di ricerca",
+      "date": "2016"
+    },
+    "cina-riforme": {
+      "id": "cina-riforme",
+      "title": "Quarant’anni di riforme cinesi",
+      "publisher": "Banca Mondiale",
+      "url": "https://blogs.worldbank.org/en/eastasiapacific/reflections-on-forty-years-of-china-reforms",
+      "locator": "Cronologia 1978 e 1992",
+      "kind": "Analisi economica",
+      "date": "2018"
+    },
+    "sedici": {
+      "id": "sedici",
+      "title": "Decisione sulla Rivoluzione culturale: i Sedici punti",
+      "publisher": "Comitato centrale del PCC · Peking Review",
+      "url": "https://www.marxists.org/subject/china/peking-review/1966/PR1966-33g.htm",
+      "locator": "Punti 4, 6, 9 e 10",
+      "kind": "Documento politico primario",
+      "date": "8 agosto 1966"
+    },
+    "risoluzione1981": {
+      "id": "risoluzione1981",
+      "title": "Risoluzione su questioni della storia del Partito",
+      "publisher": "Comitato centrale del PCC",
+      "url": "https://www.marxists.org/subject/china/documents/cpc/history/01.htm",
+      "locator": "Sezione sul 1966–1976 e valutazione di Mao",
+      "kind": "Documento politico primario",
+      "date": "27 giugno 1981"
+    },
+    "deng1981": {
+      "id": "deng1981",
+      "title": "Osservazioni sulle bozze della risoluzione storica",
+      "publisher": "Deng Xiaoping",
+      "url": "https://www.marxists.org/reference/archive/deng-xiaoping/1981/15.htm",
+      "locator": "Continuità, valutazione storica e correzione degli errori",
+      "kind": "Documento politico primario",
+      "date": "1980–1981"
+    },
+    "mao-contraddizioni": {
+      "id": "mao-contraddizioni",
+      "title": "Sulla corretta soluzione delle contraddizioni in seno al popolo",
+      "publisher": "Mao Zedong",
+      "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-5/mswv5_58.htm",
+      "locator": "Dibattito, persuasione e contraddizioni",
+      "kind": "Testo politico primario",
+      "date": "1957"
+    },
+    "puyi1959": {
+      "id": "puyi1959",
+      "title": "The Real Manchurian Candidates: Chinese war criminals in the postwar, prisoners of history",
+      "publisher": "International Journal of Asian Studies · Cambridge University Press",
+      "url": "https://www.cambridge.org/core/journals/international-journal-of-asian-studies/article/real-manchurian-candidates-chinese-war-criminals-in-the-postwar-prisoners-of-history/F7052A7E413F7320FD60571CFBADC29E",
+      "locator": "Amnistie di fine 1959 e prigionieri di Fushun",
+      "kind": "Ricerca storica accademica",
+      "date": "2022"
+    },
+    "fr-ferie": {
+      "id": "fr-ferie",
+      "title": "La legge sulle ferie retribuite",
+      "publisher": "Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/dyn/histoire/il-y-a-90-ans-le-front-populaire-et-les-lois-sociales-de-la-republique/des-accords-de-matignon-aux-cinq-premieres-lois-adoptees/les-lois-adoptees/les-conges-payes",
+      "locator": "14 giorni dopo un anno di servizio; promulgazione 20 giugno",
+      "kind": "Archivio parlamentare",
+      "date": "1936"
+    },
+    "fr-ore": {
+      "id": "fr-ore",
+      "title": "La settimana di quaranta ore",
+      "publisher": "Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/dyn/histoire/il-y-a-90-ans-le-front-populaire-et-les-lois-sociales-de-la-republique/des-accords-de-matignon-aux-cinq-premieres-lois-adoptees/les-lois-adoptees/les-quarante-heures-hebdomadaires",
+      "locator": "Legislazione sociale del Fronte popolare",
+      "kind": "Archivio parlamentare",
+      "date": "1936"
+    },
+    "nhs-archivi": {
+      "id": "nhs-archivi",
+      "title": "La fondazione del NHS",
+      "publisher": "The National Archives",
+      "url": "https://www.nationalarchives.gov.uk/explore-the-collection/stories/the-foundation-of-the-nhs/",
+      "locator": "Documenti del governo e di Bevan",
+      "kind": "Archivio pubblico",
+      "date": "1948"
+    },
+    "nhs-principi": {
+      "id": "nhs-principi",
+      "title": "About NHS 75",
+      "publisher": "NHS England",
+      "url": "https://www.england.nhs.uk/nhsbirthday/about-the-nhs-birthday/",
+      "locator": "Universalità e gratuità al momento dell’accesso",
+      "kind": "Ricostruzione istituzionale",
+      "date": "2023"
+    },
+    "nhs-manifesti": {
+      "id": "nhs-manifesti",
+      "title": "Manifesti e opuscoli del NHS",
+      "publisher": "The National Archives",
+      "url": "https://www.nationalarchives.gov.uk/explore-the-collection/explore-by-topic/health-and-welfare/nhs-posters-and-leaflets/",
+      "locator": "Informare la popolazione sul nuovo servizio",
+      "kind": "Archivio pubblico",
+      "date": "1948"
+    },
+    "vienna": {
+      "id": "vienna",
+      "title": "La Vienna Rossa",
+      "publisher": "Città di Vienna",
+      "url": "https://www.wien.gv.at/en/education/history-red-vienna",
+      "locator": "Politica municipale 1919–1934",
+      "kind": "Storia municipale",
+      "date": ""
+    },
+    "vienna-case": {
+      "id": "vienna-case",
+      "title": "Cent’anni di Vienna Rossa",
+      "publisher": "WienTourismus · ente turistico di Vienna",
+      "url": "https://www.wien.info/en/art-culture/red-vienna/100-years-of-red-vienna-337622",
+      "locator": "Oltre 64.000 alloggi municipali",
+      "kind": "Storia della città",
+      "date": "2019"
+    },
+    "cuba-scuola": {
+      "id": "cuba-scuola",
+      "title": "La campagna nazionale di alfabetizzazione e la sua eredità",
+      "publisher": "UNESCO · Memory of the World",
+      "url": "https://www.unesco.org/en/memory-world/lac/national-literacy-campaign-its-international-legacy",
+      "locator": "Patrimonio documentario della campagna del 1961",
+      "kind": "Registro del patrimonio documentario",
+      "date": "2017"
+    },
+    "cuba-salute": {
+      "id": "cuba-salute",
+      "title": "Validazione dell’eliminazione della trasmissione materno-infantile",
+      "publisher": "Organizzazione mondiale della sanità",
+      "url": "https://www.who.int/news-room/detail/30-06-2015-who-validates-elimination-of-mother-to-child-transmission-of-hiv-and-syphilis-in-cuba",
+      "locator": "HIV e sifilide: criteri di salute pubblica",
+      "kind": "Validazione sanitaria",
+      "date": "30 giugno 2015"
+    },
+    "cuba-metodo": {
+      "id": "cuba-metodo",
+      "title": "Yo, sí puedo",
+      "publisher": "UNESCO Institute for Lifelong Learning",
+      "url": "https://lifelonglearning-toolkit.uil.unesco.org/index.php/en/node/86",
+      "locator": "Cooperazione per l’alfabetizzazione",
+      "kind": "Scheda educativa",
+      "date": ""
+    }
+  },
+  "dossiers": [
+    {
+      "id": "italia",
+      "country": "Italia",
+      "title": "Dalle lotte ai diritti di ogni giorno",
+      "deck": "Come lavoro, scuola e salute sono diventati una responsabilità collettiva.",
+      "period": "1948–1978",
+      "intro": "La forza di una conquista sociale si riconosce nelle possibilità che apre: poter studiare senza nascere ricchi, curarsi senza dipendere dalla propria categoria professionale, organizzarsi sul lavoro senza rinunciare alla dignità. In Italia queste possibilità sono cresciute attraverso Resistenza, partiti popolari, sindacati, movimenti e riforme. Il contributo socialista e comunista va raccontato dentro questa storia concreta: persone che trasformano bisogni condivisi in istituzioni, contratti e servizi.",
+      "sections": [
+        {
+          "id": "uguaglianza",
+          "title": "La Costituzione: libertà anche materiale",
+          "paragraphs": [
+            "Il secondo comma dell’articolo 3 affida alla Repubblica il compito di rimuovere gli ostacoli economici e sociali che impediscono libertà ed eguaglianza effettive. È una differenza decisiva rispetto a una democrazia ridotta alla sola uguaglianza davanti alla legge: la posizione sociale non deve chiudere l’accesso alla partecipazione.",
+            "Questa promessa consente di leggere scuola, salute e lavoro come parti di uno stesso progetto. Il valore del contributo socialista e comunista alla Repubblica sta anche nell’aver sostenuto una cittadinanza sostanziale: la libertà ha bisogno di tempo, sapere, reddito e servizi. La Costituzione nasce dal confronto fra più culture antifasciste; riconoscere questa costruzione comune rende più precisa, e più ricca, la memoria delle sinistre."
+          ],
+          "sources": [
+            "cost3"
+          ]
+        },
+        {
+          "id": "tempo",
+          "title": "Il tempo di vita diventa una questione collettiva",
+          "paragraphs": [
+            "L’articolo 36 collega la retribuzione a un’esistenza libera e dignitosa, riconosce il riposo settimanale e rende irrinunciabili le ferie pagate. Il salario e l’orario smettono così di essere soltanto prezzi di mercato: riguardano la possibilità di vivere.",
+            "L’Autunno caldo del 1969 porta nel rinnovo metalmeccanico aumenti, riduzione dell’orario verso le quaranta ore e nuovi diritti. La conquista prende forma nella contrattazione, non in un unico decreto valido da subito per tutti i settori. Questa distinzione fa capire il meccanismo: organizzazione, piattaforma comune, sciopero e accordo rendono negoziabile ciò che prima sembrava una decisione esclusiva dell’impresa. Tempo per famiglia, studio, riposo e partecipazione è il significato umano di quella battaglia."
+          ],
+          "sources": [
+            "cost36",
+            "ore1969"
+          ]
+        },
+        {
+          "id": "fabbrica",
+          "title": "Lo Statuto: la persona resta cittadina anche al lavoro",
+          "paragraphs": [
+            "La legge 300 del 20 maggio 1970 protegge libertà e dignità nei luoghi di lavoro. Il testo originario consente di seguire conquiste precise: libertà di opinione, tutela della salute, diritti dei lavoratori studenti e assemblea. Non è soltanto un insieme di limiti all’autorità aziendale; è la costruzione di uno spazio nel quale chi lavora può avere voce.",
+            "Per studiarlo conviene affiancare la stagione delle lotte al testo della legge. Una rivendicazione diventa più duratura quando prende forma in una garanzia utilizzabile: conoscere gli articoli significa riconoscere il lavoro politico e sindacale incorporato in un diritto. Le versioni originarie e quelle oggi vigenti vanno lette separatamente, perché la disciplina è stata modificata nel tempo."
+          ],
+          "sources": [
+            "statuto"
+          ]
+        },
+        {
+          "id": "scuola",
+          "title": "Scuola comune e diritto di tornare a studiare",
+          "paragraphs": [
+            "La legge del 1962 istituisce la scuola media statale e un percorso inferiore obbligatorio e gratuito. L’obiettivo di una scuola comune riduce il peso di una selezione troppo precoce. L’articolo 34 offre l’orizzonte costituzionale: accesso all’istruzione e sostegno a chi ha capacità ma non mezzi.",
+            "Il contratto metalmeccanico del 19 aprile 1973 aggiunge un’altra prospettiva: le 150 ore retribuite per l’aggiornamento culturale. Bruno Trentin, Pierre Carniti e Giorgio Benvenuto firmano per la FLM. Il sapere entra nella contrattazione come risorsa della persona, non soltanto come addestramento produttivo. È il ponte fra emancipazione individuale e forza collettiva: comprendere un contratto, prendere parola, continuare a imparare."
+          ],
+          "sources": [
+            "scuolamedia",
+            "cost34",
+            "ore150"
+          ]
+        },
+        {
+          "id": "risultati-scuola",
+          "title": "Misurare la democratizzazione del sapere",
+          "paragraphs": [
+            "Istat ricorda che nel 1951 il 90% della popolazione dai sei anni in su possedeva al massimo la licenza elementare. La sua serie storica registra un analfabetismo del 12,9% nel 1951, dell’8,3% nel 1961 e dell’1,5% nel 2001. Sono trasformazioni che aiutano a dare un volto concreto all’espansione dell’istruzione.",
+            "Questi dati descrivono il cambiamento nazionale di lungo periodo: non misurano l’effetto isolato di una sola legge o di un solo partito. Scuola pubblica, educazione degli adulti, sviluppo economico e iniziativa delle famiglie e delle comunità interagiscono. La lezione politica è la capacità di costruire accesso, istituzioni e continuità, oltre al momento della conquista."
+          ],
+          "sources": [
+            "istruzione-dati",
+            "istruzione-serie"
+          ]
+        },
+        {
+          "id": "salute",
+          "title": "Il SSN: dal legame con la categoria al diritto della popolazione",
+          "paragraphs": [
+            "La riforma del 1978 supera il sistema mutualistico e afferma universalità ed eguaglianza nell’accesso. La differenza è strutturale: la tutela non si esaurisce nell’appartenenza a un ente legato al lavoro, ma diventa responsabilità pubblica verso tutta la popolazione. Prevenzione, cura e riabilitazione appartengono allo stesso disegno.",
+            "La legge 833 permette di osservare come un principio diventa organizzazione. Servono strutture, personale e risorse comuni; il Ministero della Salute richiama la fiscalità generale e l’equità. Il contributo delle lotte operaie, della cultura della prevenzione e delle forze riformatrici vive in questa scelta: condividere il rischio della malattia. Celebrare il SSN significa valorizzare la solidarietà che rende possibile l’accesso, insieme al lavoro quotidiano di chi lo fa funzionare."
+          ],
+          "sources": [
+            "ssn",
+            "ssn-principi"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1948",
+          "text": "Entrano in vigore le garanzie costituzionali di uguaglianza, studio e dignità del lavoro.",
+          "source": "cost3"
+        },
+        {
+          "date": "1962",
+          "text": "Nasce la scuola media statale comune, obbligatoria e gratuita.",
+          "source": "scuolamedia"
+        },
+        {
+          "date": "1969",
+          "text": "L’Autunno caldo incide su orario, salari e potere contrattuale.",
+          "source": "ore1969"
+        },
+        {
+          "date": "1970",
+          "text": "Lo Statuto tutela dignità e libertà nei luoghi di lavoro.",
+          "source": "statuto"
+        },
+        {
+          "date": "1973",
+          "text": "Il contratto metalmeccanico riconosce le 150 ore per la cultura dei lavoratori.",
+          "source": "ore150"
+        },
+        {
+          "date": "1978",
+          "text": "La legge 833 istituisce il Servizio sanitario nazionale.",
+          "source": "ssn"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Assistenza frammentata nel sistema mutualistico.",
+          "after": "Responsabilità sanitaria verso tutta la popolazione.",
+          "source": "ssn-principi"
+        },
+        {
+          "before": "Studio e lavoro trattati come percorsi separati.",
+          "after": "Permessi retribuiti per la crescita culturale dei lavoratori.",
+          "source": "ore150"
+        },
+        {
+          "before": "L’orario come limite della vita quotidiana.",
+          "after": "Riduzione del tempo di lavoro come obiettivo contrattuale comune.",
+          "source": "ore1969"
+        }
+      ],
+      "readings": [
+        {
+          "book": "salario-prezzo-profitto",
+          "why": "Per distinguere salario, profitto e rapporti di forza nella contrattazione."
+        },
+        {
+          "book": "comune-parigi",
+          "why": "Per collegare le istituzioni dei diritti al problema del potere popolare."
+        }
+      ],
+      "related": [
+        "francia",
+        "nhs",
+        "vienna"
+      ],
+      "metrics": [
+        {
+          "value": "150 ore",
+          "label": "Tempo retribuito per lo studio",
+          "note": "Conquista del contratto metalmeccanico del 1973; condizioni definite dal contratto.",
+          "source": "ore150"
+        },
+        {
+          "value": "12,9% → 1,5%",
+          "label": "Analfabetismo, 1951–2001",
+          "note": "Popolazione dai 6 anni; serie Istat. Indicatore nazionale, non effetto isolato di una riforma.",
+          "source": "istruzione-serie"
+        }
+      ],
+      "minutes": 4
+    },
+    {
+      "id": "comune",
+      "country": "Francia",
+      "title": "La Comune: governare la città dalla parte di chi la vive",
+      "deck": "Affitti, lavoro, scuola e cooperazione nell’esperienza di Parigi.",
+      "period": "1871",
+      "intro": "La Comune di Parigi non è importante soltanto per ciò che promette: prova a intervenire sui bisogni immediati di una città popolare. Gli affitti, il turno notturno del fornaio, le trattenute sul salario e l’accesso alla scuola diventano materia di governo. La sua eredità socialista e comunista si trova nell’incontro fra autogoverno e vita materiale, dentro un’esperienza breve e incompiuta.",
+      "sections": [
+        {
+          "id": "affitti",
+          "title": "La casa e la protezione dalla perdita del necessario",
+          "paragraphs": [
+            "La politica sociale della Comune affronta gli affitti arretrati e le scadenze che pesano sulle famiglie. Interviene anche sul Mont-de-Piété, dove oggetti di uso quotidiano erano depositati in cambio di prestiti. Il bisogno non viene trattato come una colpa privata: è riconosciuto come questione della città.",
+            "L’aspetto da comprendere è il passaggio dalla supplica al provvedimento collettivo. Se il reddito viene meno durante una crisi, la comunità può scegliere di proteggere l’abitare e gli strumenti della vita. Le misure descritte nei decreti restano legate al contesto parigino del 1871; non vanno confuse con un sistema nazionale di welfare già compiuto."
+          ],
+          "sources": [
+            "comune-affitti"
+          ]
+        },
+        {
+          "id": "lavoro",
+          "title": "Il fornaio e il salario: piccoli decreti, grandi principi",
+          "paragraphs": [
+            "Il decreto del 20 aprile vieta il lavoro notturno nei forni. Quello del 27 aprile contrasta le multe e le trattenute salariali imposte ai lavoratori. Sono decisioni circoscritte, ma rendono visibile un criterio generale: il lavoro deve essere organizzato tenendo conto della persona che lo svolge.",
+            "Questa concretezza spiega la forza della memoria comunarda. La trasformazione sociale non vive soltanto nelle dichiarazioni sulla proprietà; entra nell’ora in cui una persona torna a casa e nella parte di salario che può effettivamente usare. Studiare i provvedimenti permette di riconoscere l’incontro fra rivendicazioni operaie e capacità di governo."
+          ],
+          "sources": [
+            "comune-sociale"
+          ]
+        },
+        {
+          "id": "officine",
+          "title": "Le officine abbandonate e la capacità di autorganizzarsi",
+          "paragraphs": [
+            "Il 16 aprile la Comune avvia una ricognizione sulle officine abbandonate e un progetto di riapertura attraverso associazioni cooperative dei lavoratori. Il punto decisivo è la domanda che pone: se chi possiede si ritira, chi sa produrre può organizzare il lavoro insieme?",
+            "Il decreto apre un processo di indagine e proposta; non dimostra che tutte le officine siano state effettivamente trasformate in cooperative. La sua fecondità sta nella capacità di rendere pensabile un’altra autorità nella produzione. Il lavoro associato appare come competenza collettiva, responsabilità e possibilità di dirigere, oltre che come forza da vendere."
+          ],
+          "sources": [
+            "comune-coop"
+          ]
+        },
+        {
+          "id": "scuola",
+          "title": "Un sapere laico, integrale, aperto",
+          "paragraphs": [
+            "La trasformazione dell’insegnamento religioso in istruzione laica e le iniziative locali per la scuola esprimono una democrazia del sapere. L’istruzione non dovrebbe riprodurre una soggezione, ma fornire strumenti per comprendere. La ricostruzione degli archivi della Comune mostra il ruolo dei quartieri e degli insegnanti, non soltanto dei decreti centrali.",
+            "Con Édouard Vaillant, la riflessione sull’insegnamento comprende formazione primaria e professionale, arti e cultura. Si delinea un ideale di istruzione integrale, per ragazze e ragazzi: imparare a vivere, pensare e produrre senza separare rigidamente mano e intelletto. È un programma da leggere nella sua ambizione e nella brevità del tempo disponibile per realizzarlo."
+          ],
+          "sources": [
+            "comune-scuola",
+            "comune-cultura"
+          ]
+        },
+        {
+          "id": "donne",
+          "title": "Le donne come soggetto dell’emancipazione",
+          "paragraphs": [
+            "L’Union des femmes pour la défense de Paris et les soins aux blessés nasce l’11 aprile. Figure come Nathalie Le Mel collegano lavoro, organizzazione e difesa della città. La presenza femminile non si riduce al sostegno a decisioni prese da altri: è iniziativa politica e sociale.",
+            "La memoria di questa organizzazione permette di seguire una domanda ancora viva: chi prende parola quando una comunità decide di trasformarsi? Raccontare la Comune attraverso i suoi soggetti collettivi aiuta a restituire visibilità alle competenze e alla solidarietà quotidiana che rendono possibile una rivoluzione."
+          ],
+          "sources": [
+            "comune-donne"
+          ]
+        },
+        {
+          "id": "leggere-marx",
+          "title": "Leggere Marx insieme agli atti della Comune",
+          "paragraphs": [
+            "La guerra civile in Francia è una lettura politica partecipe dell’esperienza comunarda. Serve per comprendere perché la Comune sia diventata un riferimento della discussione socialista sullo Stato, sulla rappresentanza e sull’autogoverno.",
+            "Il percorso proposto è doppio: leggere il ragionamento di Marx e ritornare a un decreto concreto. Il rapporto fra le due scale è il cuore dell’approfondimento: che cosa cambia nell’organizzazione del potere, e quale differenza produce nella vita di un lavoratore, di una famiglia o di una scolara? La memoria diventa così uno strumento di comprensione, non una semplice sequenza di nomi e anniversari."
+          ],
+          "sources": [
+            "comune-sociale",
+            "comune-coop"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "29 marzo",
+          "text": "Le prime misure sociali affrontano affitti e oggetti impegnati.",
+          "source": "comune-affitti"
+        },
+        {
+          "date": "11 aprile",
+          "text": "Si organizza l’Union des femmes.",
+          "source": "comune-donne"
+        },
+        {
+          "date": "16 aprile",
+          "text": "Decreto e progetto per le officine abbandonate.",
+          "source": "comune-coop"
+        },
+        {
+          "date": "20 aprile",
+          "text": "Divieto del lavoro notturno nei forni.",
+          "source": "comune-sociale"
+        },
+        {
+          "date": "27 aprile",
+          "text": "Intervento su multe e trattenute salariali.",
+          "source": "comune-sociale"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Bisogni individuali affrontati come debiti privati.",
+          "after": "Protezione sociale attraverso provvedimenti della città.",
+          "source": "comune-affitti"
+        },
+        {
+          "before": "Officine chiuse dai proprietari.",
+          "after": "Progetto di riapertura mediante associazioni operaie.",
+          "source": "comune-coop"
+        },
+        {
+          "before": "Istruzione come trasmissione di un’autorità.",
+          "after": "Prospettiva laica e integrale del sapere.",
+          "source": "comune-scuola"
+        }
+      ],
+      "readings": [
+        {
+          "book": "comune-parigi",
+          "why": "Inizia dal testo di Marx e confrontalo con i decreti citati in questo dossier."
+        },
+        {
+          "book": "stato-rivoluzione",
+          "why": "Prosegui con il modo in cui Lenin interpreta l’eredità della Comune."
+        }
+      ],
+      "related": [
+        "italia",
+        "rivoluzione-culturale"
+      ],
+      "metrics": [],
+      "minutes": 4
+    },
+    {
+      "id": "cina",
+      "country": "Cina",
+      "title": "Costruire le basi, trasformare lo sviluppo",
+      "deck": "Dal progetto rivoluzionario ai servizi di comunità e alla riduzione della povertà.",
+      "period": "1949 · 1978 · quattro decenni di trasformazione",
+      "intro": "La storia della Repubblica Popolare è un percorso di costruzione sociale e di cambiamenti di strategia. La salute nelle campagne, l’accumulazione di competenze, l’industrializzazione e la capacità di mobilitare risorse pubbliche sono fili che aiutano a comprenderne la scala. Il risultato più noto — quasi 800 milioni di persone uscite dalla povertà estrema in quattro decenni — acquista significato quando si studiano le condizioni e gli strumenti che lo hanno reso possibile.",
+      "sections": [
+        {
+          "id": "progetto",
+          "title": "1949: un nuovo Stato, un progetto di trasformazione",
+          "paragraphs": [
+            "La fondazione della Repubblica Popolare nel 1949 apre la costruzione di un nuovo ordinamento. Per entrare nelle idee che precedono quel passaggio, Sulla nuova democrazia di Mao è un punto di partenza: discute rapporti fra classi, cultura, economia e rivoluzione. È un programma politico del 1940, non una descrizione dei risultati successivi.",
+            "Leggere un progetto prima di studiarne le realizzazioni aiuta a distinguere livelli diversi: l’obiettivo di emancipazione, le istituzioni costruite e gli effetti sulla popolazione. La storia cinese diventa più comprensibile quando le trasformazioni vengono seguite nel tempo, senza ridurle a un’unica politica rimasta immutata per decenni."
+          ],
+          "sources": [
+            "mao-democrazia",
+            "risoluzione1981"
+          ]
+        },
+        {
+          "id": "sanita-rurale",
+          "title": "La cura vicino alle comunità",
+          "paragraphs": [
+            "L’esperienza dei medici scalzi porta l’attenzione su prevenzione, prossimità e formazione di personale radicato nelle campagne. Nel 2016 l’OMS richiama l’influenza di questa esperienza sul dibattito che conduce alla centralità internazionale dell’assistenza sanitaria primaria.",
+            "La conquista da osservare è un diverso punto di partenza: non aspettare soltanto che la persona raggiunga un grande ospedale, ma costruire capacità di cura vicino a dove vive. La relazione con la comunità e il riconoscimento dei bisogni comuni sono risorse organizzative, oltre che valori. Il rapporto Healthy China, prodotto con istituzioni cinesi, OMS e Banca Mondiale, ritorna proprio alla centralità dell’assistenza di base come elemento da sviluppare."
+          ],
+          "sources": [
+            "cina-salute",
+            "cina-sanita-report"
+          ]
+        },
+        {
+          "id": "basi",
+          "title": "Le riforme non partono da una pagina bianca",
+          "paragraphs": [
+            "Il rapporto del 2022 sulla riduzione della povertà sottolinea anche le condizioni iniziali della trasformazione. All’inizio delle riforme, nel 1978, la speranza di vita era già di circa 66 anni: un risultato sociale precedente alla lunga accelerazione del reddito. Questo dato aiuta a riconoscere il valore delle capacità umane e della salute costruite nel tempo.",
+            "Studiare lo sviluppo significa collegare le fasi, senza confonderle. Una popolazione con maggiori capacità di vivere, lavorare e imparare dispone di risorse essenziali per affrontare trasformazioni economiche. La costruzione sociale e la crescita del reddito si incontrano, pur restando processi distinti."
+          ],
+          "sources": [
+            "cina-report"
+          ]
+        },
+        {
+          "id": "riforme",
+          "title": "Dal 1978: sperimentazione, apertura, trasformazione produttiva",
+          "paragraphs": [
+            "Il 1978 identifica l’avvio della fase di riforma e apertura; la cronologia della Banca Mondiale segnala poi il rilancio associato al viaggio di Deng Xiaoping nel sud nel 1992. Non è corretto descrivere questi passaggi come una semplice prosecuzione della Rivoluzione culturale. Sono scelte di strategia economica da studiare nei loro strumenti.",
+            "La Banca Mondiale riassume il periodo dal 1978 con una crescita media del PIL superiore al 9% annuo. Il dato descrive una traiettoria eccezionale; non è il tasso di ogni singolo anno. Il tema politico e formativo è capire come capacità pubblica, investimenti, riforme e trasformazione produttiva possano essere coordinati su una scala tanto ampia."
+          ],
+          "sources": [
+            "cina-riforme",
+            "cina-overview"
+          ]
+        },
+        {
+          "id": "meccanismi",
+          "title": "Come il cambiamento economico raggiunge le persone",
+          "paragraphs": [
+            "Il rapporto congiunto del 2022 analizza produttività agricola, industrializzazione progressiva, urbanizzazione, migrazione e infrastrutture. La riduzione della povertà non viene spiegata come un singolo trasferimento di denaro: comprende il mutamento delle opportunità di lavoro e dei collegamenti fra territori.",
+            "Accanto alla trasformazione generale, il rapporto considera le politiche rivolte alle aree e ai gruppi rimasti indietro. La lezione di metodo è osservare insieme produzione, servizi e distribuzione delle possibilità. Un’infrastruttura conta socialmente quando permette a una comunità di accedere a mercati, scuola, cura o lavoro; una crescita nazionale diventa progresso umano quando i suoi benefici raggiungono le persone."
+          ],
+          "sources": [
+            "cina-report",
+            "cina-poverta"
+          ]
+        },
+        {
+          "id": "misura",
+          "title": "Quasi 800 milioni: che cosa significa il dato",
+          "paragraphs": [
+            "La stima presentata nel 2022 riguarda le persone al di sotto di 1,90 dollari al giorno, a parità di potere d’acquisto 2011, nell’arco di circa quattro decenni. La soglia è quella adottata dal rapporto, non una cifra di reddito nominale né la definizione attuale di ogni forma di povertà.",
+            "La precisione rafforza la portata della conquista: consente di capire quali condizioni materiali siano cambiate e di confrontare il risultato con altri indicatori. Per approfondire, parti dalla presentazione del rapporto e passa poi ai capitoli sui meccanismi della trasformazione. Il passo successivo è collegare i dati alle vite: salute, tempo, sicurezza e possibilità di progettare il futuro."
+          ],
+          "sources": [
+            "cina-poverta"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1949",
+          "text": "Fondazione della Repubblica Popolare Cinese.",
+          "source": "risoluzione1981"
+        },
+        {
+          "date": "Anni Sessanta–Settanta",
+          "text": "Esperienza dei medici scalzi e della sanità rurale.",
+          "source": "cina-salute"
+        },
+        {
+          "date": "1978",
+          "text": "Avvio della fase di riforma e apertura.",
+          "source": "cina-riforme"
+        },
+        {
+          "date": "1992",
+          "text": "Il viaggio meridionale di Deng accompagna un rilancio delle riforme.",
+          "source": "cina-riforme"
+        },
+        {
+          "date": "2022",
+          "text": "Pubblicazione del rapporto congiunto sui quattro decenni di riduzione della povertà.",
+          "source": "cina-poverta"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Cure difficili da raggiungere nelle campagne.",
+          "after": "Personale e prevenzione radicati nelle comunità.",
+          "source": "cina-salute"
+        },
+        {
+          "before": "Bassa produttività e isolamento di molti territori.",
+          "after": "Trasformazione agricola, produttiva e infrastrutturale.",
+          "source": "cina-report"
+        },
+        {
+          "before": "Povertà estrema su scala enorme.",
+          "after": "Quasi 800 milioni di persone in meno sotto la soglia considerata dal rapporto.",
+          "source": "cina-poverta"
+        }
+      ],
+      "readings": [
+        {
+          "book": "mao-nuova-democrazia",
+          "why": "Per leggere il programma politico precedente alla fondazione della Repubblica Popolare."
+        },
+        {
+          "book": "mao-cooperazione-agricola",
+          "why": "Per entrare nel tema del lavoro associato nelle campagne."
+        },
+        {
+          "book": "mao-servire-popolo",
+          "why": "Per riflettere sull’idea del servizio alla comunità."
+        }
+      ],
+      "related": [
+        "rivoluzione-culturale",
+        "cuba"
+      ],
+      "metrics": [
+        {
+          "value": "≈ 800 milioni",
+          "label": "Fuori dalla povertà estrema",
+          "note": "Stima del rapporto 2022: circa quattro decenni, soglia 1,90 $/giorno in PPA 2011.",
+          "source": "cina-poverta"
+        },
+        {
+          "value": "Oltre 9%",
+          "label": "Crescita media annua del PIL dal 1978",
+          "note": "Sintesi della Banca Mondiale, non dato relativo al solo ultimo anno.",
+          "source": "cina-overview"
+        }
+      ],
+      "minutes": 4
+    },
+    {
+      "id": "rivoluzione-culturale",
+      "country": "Cina",
+      "title": "Partecipazione, cultura e potere: un confronto fra fonti",
+      "deck": "Studiare le aspirazioni e le valutazioni interne al comunismo cinese.",
+      "period": "1966–1976 · bilancio del 1981",
+      "intro": "La Rivoluzione culturale va studiata entrando nei suoi documenti, nelle sue promesse di partecipazione e nelle successive valutazioni del Partito comunista cinese. Critica della burocrazia, accesso alla cultura e protagonismo popolare sono questioni politiche importanti. Per comprenderle occorre distinguere ciò che i testi dichiarano, ciò che accadde e il modo in cui quelle vicende furono rilette.",
+      "sections": [
+        {
+          "id": "documento",
+          "title": "I Sedici punti: quale trasformazione si proponeva",
+          "paragraphs": [
+            "La decisione dell’8 agosto 1966 propone di trasformare educazione, letteratura, arte e altre parti della vita culturale. I punti 4 e 9 insistono sull’iniziativa delle masse, sui dibattiti e su forme di organizzazione da esse espresse. Il documento richiama anche il modello della Comune di Parigi per elezione e revoca dei rappresentanti.",
+            "La domanda politica è come impedire che gli apparati si separino dalla popolazione. È una domanda da prendere sul serio, ma un testo programmatico non dimostra da solo il buon funzionamento delle pratiche che ne seguono. Leggerlo significa ricostruire un’aspirazione e chiedersi quali istituzioni rendano effettiva la partecipazione."
+          ],
+          "sources": [
+            "sedici"
+          ]
+        },
+        {
+          "id": "dibattito",
+          "title": "Il punto 6: una minoranza deve poter argomentare",
+          "paragraphs": [
+            "Il punto 6 riconosce la normalità di opinioni diverse e richiede discussioni fondate su fatti e ragionamento. Respinge la coercizione di una minoranza e ammette che essa possa avere ragione. È un passaggio da leggere direttamente, perché permette di confrontare il linguaggio dell’emancipazione con le condizioni del suo esercizio.",
+            "Una politica della conoscenza ha bisogno di persone che possano prendere parola, studiare e correggere un giudizio. La critica di un dirigente e il confronto su una decisione pubblica acquistano forza quando producono comprensione e possibilità di controllo, invece di sostituire l’argomento con l’umiliazione."
+          ],
+          "sources": [
+            "sedici"
+          ]
+        },
+        {
+          "id": "contraddizioni",
+          "title": "Un tema precedente al 1966: discutere fra persone",
+          "paragraphs": [
+            "Sulla corretta soluzione delle contraddizioni in seno al popolo risale al 1957. Mao vi distingue tipi di conflitto e metodi di trattamento. La lettura è utile per interrogare il rapporto fra dissenso, persuasione e autorità all’interno di un progetto socialista.",
+            "Affiancare questo testo ai Sedici punti evita di ridurre tutta la riflessione maoista a un solo episodio. Un percorso di studio può seguire la continuità di una domanda — come partecipano le persone alle decisioni che le riguardano? — e poi verificare come essa venga affrontata in contesti diversi. La teoria diventa uno strumento di lettura, non un sostituto della storia."
+          ],
+          "sources": [
+            "mao-contraddizioni"
+          ]
+        },
+        {
+          "id": "bilancio",
+          "title": "Il 1981: il Partito comunista formula il proprio giudizio",
+          "paragraphs": [
+            "La risoluzione del 27 giugno 1981 considera la Rivoluzione culturale un grave rovescio per il Partito, lo Stato e il popolo. Allo stesso tempo distingue quel giudizio dalla valutazione complessiva della rivoluzione cinese e del ruolo di Mao. È una fonte comunista interna al processo storico, non una voce esterna da confondere con esso.",
+            "Le osservazioni di Deng sulle bozze mostrano il lavoro politico di costruzione del bilancio: riconoscere meriti, individuare errori e proseguire. Il confronto fra questi documenti permette di studiare il cambiamento di strategia senza cancellare le aspirazioni socialiste che lo attraversano. Le persecuzioni e le umiliazioni pubbliche non sono conquiste sociali: non vanno scambiate per partecipazione democratica o per prova di colpevolezza."
+          ],
+          "sources": [
+            "risoluzione1981",
+            "deng1981"
+          ]
+        },
+        {
+          "id": "puyi",
+          "title": "Puyi: una vicenda da collocare nel suo tempo",
+          "paragraphs": [
+            "L’amnistia di Puyi appartiene al 1959, prima dell’inizio della Rivoluzione culturale. Una ricerca pubblicata nell’International Journal of Asian Studies ricostruisce le amnistie di fine 1959 e il caso del carcere di Fushun, dove Puyi era detenuto. La vicenda va quindi collocata nella fase storica corretta.",
+            "La vicenda apre un tema diverso: la possibilità di tornare alla vita civile oltre una precedente posizione di potere. Collocarla correttamente consente di approfondire reinserimento e trasformazione personale. La cronologia restituisce anche a questa storia il suo significato specifico, nella Cina del decennio successivo alla rivoluzione."
+          ],
+          "sources": [
+            "puyi1959"
+          ]
+        },
+        {
+          "id": "confrontare",
+          "title": "Un percorso di lettura, non una scorciatoia",
+          "paragraphs": [
+            "Parti da due documenti: i Sedici punti del 1966 e la risoluzione del 1981. Segna che cosa ciascuno considera partecipazione, che cosa attribuisce ai dirigenti e come immagina il rapporto fra cultura e trasformazione sociale. Poi passa ai testi di Mao sulla pratica e sulle contraddizioni.",
+            "Il valore formativo sta nel poter ricostruire un ragionamento, verificarlo e discuterlo. Per studiare la successiva crescita economica, apri il dossier sullo sviluppo cinese: il 1978 inaugura una fase distinta. Tenere insieme continuità e cambiamento permette di comprendere meglio le diverse strade percorse dal socialismo cinese."
+          ],
+          "sources": [
+            "deng1981",
+            "cina-riforme"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1957",
+          "text": "Mao discute le contraddizioni in seno al popolo.",
+          "source": "mao-contraddizioni"
+        },
+        {
+          "date": "1959",
+          "text": "Amnistia di Puyi, documentata nella stampa dell’epoca.",
+          "source": "puyi1959"
+        },
+        {
+          "date": "8 agosto 1966",
+          "text": "Adozione dei Sedici punti.",
+          "source": "sedici"
+        },
+        {
+          "date": "1966–1976",
+          "text": "Periodo della Rivoluzione culturale nella ricostruzione del PCC.",
+          "source": "risoluzione1981"
+        },
+        {
+          "date": "27 giugno 1981",
+          "text": "Adozione della risoluzione storica.",
+          "source": "risoluzione1981"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Un problema politico: la separazione degli apparati dalla popolazione.",
+          "after": "Una dichiarata aspirazione a controllo e iniziativa delle masse.",
+          "source": "sedici"
+        },
+        {
+          "before": "La promessa del confronto attraverso argomenti.",
+          "after": "Un criterio con cui valutare anche le pratiche del movimento.",
+          "source": "sedici"
+        },
+        {
+          "before": "Il racconto di una fase come se spiegasse tutta la storia cinese.",
+          "after": "Confronto fra programmi, esperienze e bilanci di periodi diversi.",
+          "source": "risoluzione1981"
+        }
+      ],
+      "readings": [
+        {
+          "book": "mao-pratica",
+          "why": "Per interrogare il rapporto fra esperienza e conoscenza."
+        },
+        {
+          "book": "mao-contraddizioni-popolo",
+          "why": "Per studiare il problema del dissenso e dei metodi del confronto."
+        },
+        {
+          "book": "mao-studio",
+          "why": "Per riflettere su ricerca, verifica e apprendimento politico."
+        }
+      ],
+      "related": [
+        "cina",
+        "comune"
+      ],
+      "metrics": [],
+      "minutes": 4
+    },
+    {
+      "id": "francia",
+      "country": "Francia",
+      "title": "1936: il tempo liberato entra nella vita operaia",
+      "deck": "Ferie e orario ridotto nella stagione del Fronte popolare.",
+      "period": "1936",
+      "intro": "Una conquista sociale può cambiare anche l’immaginazione della vita: partire, riposare, conoscere un luogo diverso, stare con altre persone. Le riforme francesi del 1936 trasformano il tempo libero in una possibilità accessibile a una parte molto più ampia del mondo del lavoro.",
+      "sections": [
+        {
+          "id": "ferie",
+          "title": "Da un vantaggio di alcune categorie a un diritto esteso",
+          "paragraphs": [
+            "L’Assemblée nationale ricorda che prima del 1936 le ferie retribuite esistevano per alcune categorie, ma non per la maggioranza dei salariati. La legge promulgata il 20 giugno riconosce quattordici giorni dopo un anno di servizio continuo e sei giorni dopo sei mesi.",
+            "Il significato è concreto: il riposo non implica necessariamente rinunciare al reddito. I decreti applicativi consentono già nell’estate del 1936 partenze per vacanze di centinaia di migliaia di lavoratori. La storia legislativa mostra anche precedenti progetti e ostacoli: una vittoria non nasce dal nulla, ma può diventare possibile quando mutano forza sociale e condizioni politiche."
+          ],
+          "sources": [
+            "fr-ferie"
+          ]
+        },
+        {
+          "id": "orario",
+          "title": "Il governo e la forza delle rivendicazioni",
+          "paragraphs": [
+            "La settimana di quaranta ore è un’altra riforma della stagione del Fronte popolare. Ridurre l’orario significa riconoscere che la persona non coincide con il tempo acquistato dall’impresa. La dimensione politica del tempo unisce contrattazione, iniziativa legislativa e desiderio di una vita più ampia.",
+            "Il caso francese permette un confronto utile con l’Italia: strumenti e tempi sono diversi, ma la questione comune è chi possa decidere come dividere lavoro e vita. Per approfondire, confronta la legge sulle ferie con quella sull’orario, poi torna al contratto italiano del 1969."
+          ],
+          "sources": [
+            "fr-ore"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "20 giugno 1936",
+          "text": "Promulgazione della legge sulle ferie retribuite.",
+          "source": "fr-ferie"
+        },
+        {
+          "date": "1936",
+          "text": "Riforma della settimana di lavoro a quaranta ore.",
+          "source": "fr-ore"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Ferie pagate limitate a specifiche categorie.",
+          "after": "Estensione del diritto ai salariati secondo le condizioni della legge.",
+          "source": "fr-ferie"
+        },
+        {
+          "before": "Il tempo libero come possibilità diseguale.",
+          "after": "Riposo retribuito e riduzione dell’orario entrano nella legislazione sociale.",
+          "source": "fr-ore"
+        }
+      ],
+      "readings": [
+        {
+          "book": "salario-prezzo-profitto",
+          "why": "Per approfondire la relazione fra salario, tempo di lavoro e potere contrattuale."
+        }
+      ],
+      "related": [
+        "italia",
+        "nhs"
+      ],
+      "metrics": [
+        {
+          "value": "14 giorni",
+          "label": "Ferie pagate nella legge del 1936",
+          "note": "Dopo un anno di servizio continuo; sei giorni dopo sei mesi.",
+          "source": "fr-ferie"
+        }
+      ],
+      "minutes": 1
+    },
+    {
+      "id": "nhs",
+      "country": "Regno Unito",
+      "title": "La cura come servizio comune",
+      "deck": "Il NHS e la costruzione pratica dell’universalità.",
+      "period": "1948",
+      "intro": "Il 5 luglio 1948 la nascita del NHS rende visibile una grande ambizione del laburismo: organizzare l’assistenza intorno al bisogno. Il valore della conquista non è soltanto sanitario. Una comunità sceglie di condividere un rischio che nessuno può affrontare con certezza da solo.",
+      "sections": [
+        {
+          "id": "nascita",
+          "title": "Il progetto deve diventare un servizio utilizzabile",
+          "paragraphs": [
+            "Gli archivi pubblici britannici documentano il lavoro di Aneurin Bevan e del governo per costruire il nuovo servizio. Il 5 luglio 1948 segna l’apertura, non la fine del lavoro organizzativo. L’universalità richiede collegare strutture, personale e accesso a un progetto comune.",
+            "Questo passaggio aiuta a comprendere il significato materiale di una riforma: non basta dichiarare che la salute conta. Occorre che una persona sappia dove andare e che l’organizzazione sia capace di prendersene cura. Il socialismo democratico si misura qui con la costruzione di capacità pubbliche."
+          ],
+          "sources": [
+            "nhs-archivi"
+          ]
+        },
+        {
+          "id": "bisogno",
+          "title": "La persona prima della capacità di pagare",
+          "paragraphs": [
+            "Il NHS descrive la propria origine attraverso accesso universale e gratuità al momento dell’erogazione. Il principio sposta la decisione verso il bisogno clinico. La condivisione delle risorse permette di affrontare un costo che, preso individualmente, può sconvolgere la vita di una famiglia.",
+            "La documentazione dei National Archives comprende anche manifesti e opuscoli destinati alla popolazione. Informare su come accedere è parte della realizzazione di un diritto: un servizio deve essere conosciuto, comprensibile e raggiungibile. È una lezione preziosa anche nel confronto con il SSN italiano, nato trent’anni dopo."
+          ],
+          "sources": [
+            "nhs-principi",
+            "nhs-manifesti"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "5 luglio 1948",
+          "text": "Avvio del National Health Service.",
+          "source": "nhs-archivi"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Il costo della malattia come rischio della singola persona.",
+          "after": "Risorse e servizi organizzati collettivamente secondo il bisogno.",
+          "source": "nhs-principi"
+        }
+      ],
+      "readings": [],
+      "related": [
+        "italia",
+        "cuba"
+      ],
+      "metrics": [],
+      "minutes": 1
+    },
+    {
+      "id": "vienna",
+      "country": "Austria",
+      "title": "Vienna Rossa: una casa e una città da condividere",
+      "deck": "L’edilizia municipale come infrastruttura della dignità.",
+      "period": "1919–1934",
+      "intro": "Una casa non è soltanto un tetto: è lo spazio da cui diventa possibile riposare, crescere, studiare e partecipare. L’esperienza della Vienna socialdemocratica porta questo bisogno dentro un progetto municipale. L’abitare viene trattato come una questione pubblica capace di cambiare la vita urbana.",
+      "sections": [
+        {
+          "id": "scala",
+          "title": "La forza di un’amministrazione che costruisce",
+          "paragraphs": [
+            "La ricostruzione di WienTourismus ricorda oltre 64.000 appartamenti realizzati dal comune per ridurre la dipendenza dalla speculazione. L’assegnazione tramite un sistema a punti rende visibile l’idea di criteri sociali per l’accesso. La scala della costruzione è parte della conquista: una politica dell’abitare deve creare possibilità reali, oltre a dichiarare un’intenzione.",
+            "La scelta di intervenire direttamente modifica il rapporto fra città e abitanti. Il comune non è soltanto un regolatore esterno: può produrre e custodire una risorsa essenziale, sottraendo una parte della sicurezza quotidiana all’incertezza del mercato."
+          ],
+          "sources": [
+            "vienna-case"
+          ]
+        },
+        {
+          "id": "citta",
+          "title": "La casa dentro una politica della vita",
+          "paragraphs": [
+            "La storia municipale della Vienna Rossa collega edilizia, salute e opportunità della classe lavoratrice. L’abitare viene pensato insieme ai servizi e alla costruzione di una vita urbana più dignitosa. La politica sociale assume così una forma che si può attraversare e usare ogni giorno.",
+            "Il confronto con sanità e scuola aiuta a capire il meccanismo comune: un bisogno diventa una responsabilità organizzata. Studiare Vienna significa chiedersi quali risorse possa amministrare una comunità e come la qualità dello spazio incida sulle possibilità delle persone."
+          ],
+          "sources": [
+            "vienna"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1919–1934",
+          "text": "Esperienza municipale della Vienna Rossa.",
+          "source": "vienna"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Dipendenza dell’abitare dalla capacità di pagare sul mercato.",
+          "after": "Produzione municipale e criteri sociali di assegnazione.",
+          "source": "vienna-case"
+        }
+      ],
+      "readings": [],
+      "related": [
+        "italia",
+        "nhs"
+      ],
+      "metrics": [
+        {
+          "value": "Oltre 64.000",
+          "label": "Appartamenti costruiti dal comune",
+          "note": "Dato storico riportato dall’ente turistico della città per la Vienna Rossa.",
+          "source": "vienna-case"
+        }
+      ],
+      "minutes": 1
+    },
+    {
+      "id": "cuba",
+      "country": "Cuba",
+      "title": "Condividere sapere e prevenzione",
+      "deck": "Alfabetizzazione e salute come capacità collettive.",
+      "period": "1961 · 2015",
+      "intro": "La capacità di leggere e la possibilità di curarsi ampliano ciò che una persona può fare della propria vita. Due esperienze cubane mostrano come organizzazione pubblica e partecipazione possano affrontare bisogni fondamentali: la campagna di alfabetizzazione e la prevenzione della trasmissione materno-infantile di infezioni.",
+      "sections": [
+        {
+          "id": "alfabetizzazione",
+          "title": "Imparare e insegnare come mobilitazione comune",
+          "paragraphs": [
+            "L’UNESCO conserva la campagna del 1961 nel registro della memoria documentaria dell’America Latina e dei Caraibi. Il patrimonio comprende materiali didattici, testimonianze degli insegnanti e lettere degli allievi. La memoria della conquista passa così anche dalle persone che hanno imparato e insegnato.",
+            "Il significato non è soltanto l’acquisizione di una tecnica. Leggere permette di comprendere un testo, comunicare con maggiore autonomia e partecipare a un mondo condiviso. L’UNESCO sottolinea l’influenza di questa esperienza su movimenti di educazione popolare in altri paesi. Il programma Yo, sí puedo è un ulteriore punto di accesso allo studio della cooperazione educativa cubana."
+          ],
+          "sources": [
+            "cuba-scuola",
+            "cuba-metodo"
+          ]
+        },
+        {
+          "id": "prevenzione",
+          "title": "La salute richiede una rete che raggiunga le persone",
+          "paragraphs": [
+            "Nel 2015 Cuba è il primo paese a ottenere dall’OMS la validazione dell’eliminazione della trasmissione materno-infantile di HIV e sifilide come problema di salute pubblica. È una definizione tecnica, che non significa assenza assoluta di ogni caso per sempre.",
+            "La conquista mette in risalto prevenzione, accesso ai servizi e continuità delle cure. Il confronto con l’alfabetizzazione rivela una domanda comune: come si raggiungono persone e comunità che un intervento occasionale potrebbe lasciare fuori? Qui il valore della capacità pubblica sta nel rendere un obiettivo verificabile attraverso un’organizzazione che continua a funzionare."
+          ],
+          "sources": [
+            "cuba-salute"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1961",
+          "text": "Campagna nazionale di alfabetizzazione.",
+          "source": "cuba-scuola"
+        },
+        {
+          "date": "2015",
+          "text": "Validazione OMS della conquista nella prevenzione materno-infantile.",
+          "source": "cuba-salute"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Lettura e scrittura come possibilità diseguali.",
+          "after": "Mobilitazione educativa e metodi condivisi oltre le frontiere.",
+          "source": "cuba-scuola"
+        },
+        {
+          "before": "Prevenzione come intervento soltanto individuale.",
+          "after": "Una rete sanitaria produce un risultato verificato dall’OMS.",
+          "source": "cuba-salute"
+        }
+      ],
+      "readings": [],
+      "related": [
+        "cina",
+        "nhs"
+      ],
+      "metrics": [],
+      "minutes": 1
+    }
+  ]
+}

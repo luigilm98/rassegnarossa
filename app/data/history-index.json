@@ -1,0 +1,66 @@
+[
+  {
+    "id": "italia",
+    "country": "Italia",
+    "title": "Dalle lotte ai diritti di ogni giorno",
+    "deck": "Come lavoro, scuola e salute sono diventati una responsabilità collettiva.",
+    "period": "1948–1978",
+    "minutes": 4
+  },
+  {
+    "id": "comune",
+    "country": "Francia",
+    "title": "La Comune: governare la città dalla parte di chi la vive",
+    "deck": "Affitti, lavoro, scuola e cooperazione nell’esperienza di Parigi.",
+    "period": "1871",
+    "minutes": 4
+  },
+  {
+    "id": "cina",
+    "country": "Cina",
+    "title": "Costruire le basi, trasformare lo sviluppo",
+    "deck": "Dal progetto rivoluzionario ai servizi di comunità e alla riduzione della povertà.",
+    "period": "1949 · 1978 · quattro decenni di trasformazione",
+    "minutes": 4
+  },
+  {
+    "id": "rivoluzione-culturale",
+    "country": "Cina",
+    "title": "Partecipazione, cultura e potere: un confronto fra fonti",
+    "deck": "Studiare le aspirazioni e le valutazioni interne al comunismo cinese.",
+    "period": "1966–1976 · bilancio del 1981",
+    "minutes": 4
+  },
+  {
+    "id": "francia",
+    "country": "Francia",
+    "title": "1936: il tempo liberato entra nella vita operaia",
+    "deck": "Ferie e orario ridotto nella stagione del Fronte popolare.",
+    "period": "1936",
+    "minutes": 1
+  },
+  {
+    "id": "nhs",
+    "country": "Regno Unito",
+    "title": "La cura come servizio comune",
+    "deck": "Il NHS e la costruzione pratica dell’universalità.",
+    "period": "1948",
+    "minutes": 1
+  },
+  {
+    "id": "vienna",
+    "country": "Austria",
+    "title": "Vienna Rossa: una casa e una città da condividere",
+    "deck": "L’edilizia municipale come infrastruttura della dignità.",
+    "period": "1919–1934",
+    "minutes": 1
+  },
+  {
+    "id": "cuba",
+    "country": "Cuba",
+    "title": "Condividere sapere e prevenzione",
+    "deck": "Alfabetizzazione e salute come capacità collettive.",
+    "period": "1961 · 2015",
+    "minutes": 1
+  }
+]
