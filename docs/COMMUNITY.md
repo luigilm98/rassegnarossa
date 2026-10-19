@@ -2,6 +2,20 @@
 
 Anyone can propose a correction, a page change, a source, a book, a translation or a technical improvement. Write in any language. You do not need to code. Start with the [contribution guide](../CONTRIBUTING.md).
 
+## Proposals and voting on the website
+
+Open **Partecipa** on the website. Anyone can read proposals. Sign in with ChatGPT to publish a proposal or choose support, opposition or abstention; no GitHub account is required. Activists, journalists, collectives, trade unions and readers can contribute without declaring an affiliation. Professional status and identity are not verified.
+
+Each account can hold one vote per proposal, change it or revoke it. Totals are public; individual choices and account details are not. Proposals and votes are stored on the server and survive browser-data deletion. Proposal authors may withdraw their text. Up to three proposals per account in 24 hours are allowed. Do not publish private information. Public proposal text may be sent to the translation service when readers request another language.
+
+Votes help prioritise discussion. They are advisory and describe participating accounts, not the views of the worldwide left or verified unique people. An open proposal does not automatically change the website. Maintainers record decisions and explain their reasons.
+
+### Recording decisions and moderation
+
+A reviewed change to `app/data/community-decisions.json` records the decision under the proposal UUID. Each entry contains `status` (`open`, `planned`, `implemented`, `declined` or `hidden`), a public `reason`, an ISO date (`YYYY-MM-DD`) and an optional HTTPS `url` to the resulting change. Never put private account information in this file. Publishing the change applies the decision. Non-open proposals stop accepting new votes; existing voters may still revoke their choice.
+
+Use `hidden` for spam, harassment or publication of private information, with a concise reason that does not repeat the offending material. Hidden proposals are removed from public results. This is maintainer moderation, not an automated verdict from vote totals. An empty file means no decisions have been recorded; the site does not generate example proposals or votes.
+
 ## From an idea to a published change
 
 1. **Propose.** Open **Issues → New issue** and choose a form. A short description is enough to start. Blank issues remain available if none of the forms fits.

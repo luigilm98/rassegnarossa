@@ -350,6 +350,78 @@
       "locator": "Cooperazione per l’alfabetizzazione",
       "kind": "Scheda educativa",
       "date": ""
+    },
+    "ore150-testo": {
+      "id": "ore150-testo",
+      "title": "Il contratto delle 150 ore: testo e applicazione",
+      "publisher": "LABOUR · Ilaria Romeo",
+      "url": "https://www.labour.it/150-ore-allo-studio-e-alla-lotta/",
+      "locator": "Clausola: massimo individuale nel triennio e durata del corso",
+      "kind": "Ricostruzione con testo contrattuale",
+      "date": "2023"
+    },
+    "urss-costituzione": {
+      "id": "urss-costituzione",
+      "title": "Costituzione sovietica del 1936",
+      "publisher": "Bucknell University · archivio di documenti russi",
+      "url": "https://www.departments.bucknell.edu/russian/const/36cons04.html",
+      "locator": "Articoli 118–122: lavoro, riposo, protezione sociale, istruzione e donne",
+      "kind": "Testo costituzionale",
+      "date": "1936"
+    },
+    "urss-sputnik": {
+      "id": "urss-sputnik",
+      "title": "L’inizio dell’era spaziale",
+      "publisher": "NASA",
+      "url": "https://www.nasa.gov/history/65-years-ago-sputnik-ushers-in-the-space-age/",
+      "locator": "Sputnik 1, 4 ottobre 1957",
+      "kind": "Storia della scienza",
+      "date": "2022"
+    },
+    "urss-gagarin": {
+      "id": "urss-gagarin",
+      "title": "Il primo volo umano nello spazio",
+      "publisher": "NASA",
+      "url": "https://www.nasa.gov/history/60-years-ago-soviets-select-their-first-cosmonauts/",
+      "locator": "Gagarin e la preparazione dei primi cosmonauti",
+      "kind": "Storia della scienza",
+      "date": "2020"
+    },
+    "urss-tereshkova": {
+      "id": "urss-tereshkova",
+      "title": "Space Travel",
+      "publisher": "NASA · StarChild",
+      "url": "https://starchild.gsfc.nasa.gov/docs/StarChild/space_level2/travel.html",
+      "locator": "Sputnik, Gagarin e Tereškova",
+      "kind": "Storia della scienza",
+      "date": ""
+    },
+    "vn-poverta": {
+      "id": "vn-poverta",
+      "title": "Dieci anni di riduzione della povertà",
+      "publisher": "Banca Mondiale",
+      "url": "https://www.worldbank.org/en/news/press-release/2022/04/28/addressing-chronic-poverty-ensuring-sustainable-economic-mobility-keys-to-achieving-vietnam-s-high-income-aspirations",
+      "locator": "Tasso dal 16,8% al 5%, 2010–2020; soglia 3,20 $ PPA 2011",
+      "kind": "Rapporto economico",
+      "date": "28 aprile 2022"
+    },
+    "vn-report": {
+      "id": "vn-report",
+      "title": "Vietnam Poverty and Equity Assessment 2022",
+      "publisher": "Banca Mondiale",
+      "url": "https://www.worldbank.org/en/country/vietnam/publication/2022-vietnam-poverty-and-equity-assessment-report",
+      "locator": "Trasformazione dell’economia, istruzione e mobilità sociale",
+      "kind": "Rapporto economico",
+      "date": "2022"
+    },
+    "vn-overview": {
+      "id": "vn-overview",
+      "title": "Viet Nam overview",
+      "publisher": "Banca Mondiale",
+      "url": "https://www.worldbank.org/ext/en/country/vietnam",
+      "locator": "Riforme Đổi Mới dal 1986 e trasformazione economica",
+      "kind": "Quadro economico",
+      "date": ""
     }
   },
   "dossiers": [
@@ -397,15 +469,16 @@
         },
         {
           "id": "scuola",
-          "title": "Scuola comune e diritto di tornare a studiare",
+          "title": "Le 150 ore: essere pagati anche mentre si studia",
           "paragraphs": [
-            "La legge del 1962 istituisce la scuola media statale e un percorso inferiore obbligatorio e gratuito. L’obiettivo di una scuola comune riduce il peso di una selezione troppo precoce. L’articolo 34 offre l’orizzonte costituzionale: accesso all’istruzione e sostegno a chi ha capacità ma non mezzi.",
-            "Il contratto metalmeccanico del 19 aprile 1973 aggiunge un’altra prospettiva: le 150 ore retribuite per l’aggiornamento culturale. Bruno Trentin, Pierre Carniti e Giorgio Benvenuto firmano per la FLM. Il sapere entra nella contrattazione come risorsa della persona, non soltanto come addestramento produttivo. È il ponte fra emancipazione individuale e forza collettiva: comprendere un contratto, prendere parola, continuare a imparare."
+            "La scuola media unica del 1962 e le 150 ore del 1973 rispondono a due esigenze diverse. La prima allarga l’istruzione dei ragazzi; le seconde aiutano chi lavora a tornare sui banchi. Il contratto metalmeccanico riconosce infatti permessi retribuiti per frequentare corsi di studio: il lavoratore può assentarsi dal lavoro senza perdere la paga per quelle ore.",
+            "Il massimo individuale previsto dalla clausola è di 150 ore in tre anni, utilizzabili anche in un solo anno. Per ottenere tutte le 150 ore, il corso deve durare almeno 300 ore: una parte del tempo viene quindi riconosciuta dall’azienda, mentre l’altra resta a carico del lavoratore. L’accesso segue anche i limiti contrattuali sulle assenze contemporanee.",
+            "La conquista riguarda il diritto a crescere culturalmente: recuperare la licenza media, capire meglio il mondo, prendere parola. Il contratto del 19 aprile 1973, firmato per la FLM da Bruno Trentin, Pierre Carniti e Giorgio Benvenuto, fa dello studio un tema della contrattazione collettiva. Il tempo per imparare diventa un diritto da organizzare insieme."
           ],
           "sources": [
             "scuolamedia",
-            "cost34",
-            "ore150"
+            "ore150",
+            "ore150-testo"
           ]
         },
         {
@@ -472,9 +545,9 @@
           "source": "ssn-principi"
         },
         {
-          "before": "Studio e lavoro trattati come percorsi separati.",
-          "after": "Permessi retribuiti per la crescita culturale dei lavoratori.",
-          "source": "ore150"
+          "before": "L’orario di lavoro rende difficile frequentare un corso.",
+          "after": "Il contratto riconosce ore di assenza retribuita per lo studio.",
+          "source": "ore150-testo"
         },
         {
           "before": "L’orario come limite della vita quotidiana.",
@@ -500,9 +573,9 @@
       "metrics": [
         {
           "value": "150 ore",
-          "label": "Tempo retribuito per lo studio",
-          "note": "Conquista del contratto metalmeccanico del 1973; condizioni definite dal contratto.",
-          "source": "ore150"
+          "label": "Permessi retribuiti per studiare",
+          "note": "Fino a 150 ore per lavoratore in tre anni, utilizzabili anche in un solo anno secondo le condizioni del contratto metalmeccanico del 1973.",
+          "source": "ore150-testo"
         },
         {
           "value": "12,9% → 1,5%",
@@ -1202,6 +1275,216 @@
       ],
       "metrics": [],
       "minutes": 1
+    },
+    {
+      "id": "urss",
+      "country": "URSS (storica)",
+      "title": "Dalla scuola allo spazio: l’esperienza sovietica",
+      "deck": "Istruzione, diritti sociali e ricerca scientifica in uno Stato che ha segnato il Novecento.",
+      "period": "1936–1963",
+      "intro": "L’Unione Sovietica entra in questo percorso con due piani distinti: i diritti sociali scritti nella Costituzione e risultati scientifici effettivamente raggiunti. La scuola, la formazione tecnica e il lavoro di ricerca sono parte della sua eredità. I primati spaziali rendono visibile una capacità costruita da ingegneri, operai, scienziati e cosmonauti.",
+      "sections": [
+        {
+          "id": "diritti",
+          "title": "Lavoro, riposo e protezione sociale",
+          "paragraphs": [
+            "La Costituzione del 1936 dedica gli articoli 118–122 a lavoro, riposo, protezione sociale, istruzione e condizione delle donne. Il testo lega questi diritti all’organizzazione dell’economia e alla responsabilità pubblica. È una fonte per capire il progetto sociale sovietico.",
+            "Un diritto scritto e la sua realizzazione sono livelli diversi. Per questo il dossier riporta il contenuto costituzionale come impegno istituzionale, mentre i risultati misurati vanno cercati nelle statistiche e nella storia dei servizi. La distinzione consente di studiare concretamente che cosa uno Stato dichiara di garantire e come organizza le risorse per farlo."
+          ],
+          "sources": [
+            "urss-costituzione"
+          ]
+        },
+        {
+          "id": "istruzione",
+          "title": "La formazione come responsabilità pubblica",
+          "paragraphs": [
+            "L’articolo 121 riconosce il diritto all’istruzione e prevede scuola elementare obbligatoria, istruzione gratuita anche superiore, borse di studio e formazione professionale. Include l’insegnamento nelle lingue native e corsi tecnici e agronomici nei luoghi della produzione.",
+            "Il punto politico è l’accesso alle competenze: una società può scegliere di investire nella formazione delle persone come risorsa comune. La qualità di una scuola e la diffusione delle opportunità richiedono poi dati specifici; il solo articolo costituzionale non basta a misurarle."
+          ],
+          "sources": [
+            "urss-costituzione"
+          ]
+        },
+        {
+          "id": "sputnik",
+          "title": "1957: il primo satellite artificiale",
+          "paragraphs": [
+            "Il 4 ottobre 1957 lo Sputnik 1 raggiunge l’orbita terrestre. La NASA lo riconosce come l’avvio dell’era spaziale. Per la prima volta un oggetto costruito dall’umanità gira attorno alla Terra: una svolta verificabile nella storia della tecnica.",
+            "Il risultato nasce dal lavoro di un sistema scientifico e industriale. Raccontarlo significa dare spazio alle competenze collettive che rendono possibile un’impresa di tale scala: progettazione, materiali, produzione, calcolo e coordinamento."
+          ],
+          "sources": [
+            "urss-sputnik"
+          ]
+        },
+        {
+          "id": "gagarin",
+          "title": "1961: una persona guarda la Terra dall’orbita",
+          "paragraphs": [
+            "Nel 1961 Jurij Gagarin compie il primo volo umano nello spazio, a bordo della Vostok 1. La preparazione dei cosmonauti e i voli precedenti sono parte di un programma articolato, documentato anche nella storia della NASA.",
+            "Questo primato è un risultato concreto dell’URSS. Il suo valore supera la competizione fra Stati: apre un nuovo campo dell’esperienza umana e mette al centro la capacità di costruire conoscenza attraverso ricerca e organizzazione."
+          ],
+          "sources": [
+            "urss-gagarin"
+          ]
+        },
+        {
+          "id": "tereshkova",
+          "title": "1963: la prima donna nello spazio",
+          "paragraphs": [
+            "Valentina Tereškova vola sulla Vostok 6 nel 1963 e diventa la prima donna nello spazio. Il suo viaggio appartiene alla storia sovietica e a quella dell’accesso delle donne alle attività scientifiche e tecniche.",
+            "Sputnik, Gagarin e Tereškova sono tre primati differenti. Vanno letti insieme alla storia dell’istruzione e della ricerca, senza usare una singola impresa come misura automatica di ogni aspetto della vita sociale."
+          ],
+          "sources": [
+            "urss-tereshkova"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1936",
+          "text": "La Costituzione dedica un capitolo ai diritti sociali.",
+          "source": "urss-costituzione"
+        },
+        {
+          "date": "1957",
+          "text": "Sputnik 1: primo satellite artificiale.",
+          "source": "urss-sputnik"
+        },
+        {
+          "date": "1961",
+          "text": "Gagarin: primo volo umano nello spazio.",
+          "source": "urss-gagarin"
+        },
+        {
+          "date": "1963",
+          "text": "Tereškova: prima donna nello spazio.",
+          "source": "urss-tereshkova"
+        }
+      ],
+      "changes": [
+        {
+          "before": "La Terra viene osservata soltanto da strumenti terrestri o in volo atmosferico.",
+          "after": "Un satellite artificiale entra in orbita: nasce l’era spaziale.",
+          "source": "urss-sputnik"
+        }
+      ],
+      "readings": [
+        {
+          "book": "stato-rivoluzione",
+          "why": "Per leggere il progetto di trasformazione dello Stato discusso da Lenin nel 1917."
+        }
+      ],
+      "related": [
+        "cina",
+        "italia"
+      ],
+      "metrics": [
+        {
+          "value": "1957 · 1961 · 1963",
+          "label": "Tre primati dell’URSS nello spazio",
+          "note": "Primo satellite artificiale, primo essere umano nello spazio, prima donna nello spazio. Fonti NASA.",
+          "source": "urss-tereshkova"
+        }
+      ],
+      "minutes": 2
+    },
+    {
+      "id": "vietnam",
+      "country": "Vietnam",
+      "title": "Đổi Mới: come cambia la vita materiale",
+      "deck": "Riforme, lavoro, istruzione e riduzione della povertà.",
+      "period": "Dal 1986 · dati 2010–2020",
+      "intro": "Il Vietnam offre un caso importante per studiare trasformazione economica e politiche sociali. Le riforme Đổi Mới, avviate nel 1986, accompagnano il passaggio da una delle economie più povere a un paese a reddito medio. Il dato sulla povertà permette di osservare un risultato concreto e di interrogare gli strumenti che lo hanno reso possibile.",
+      "sections": [
+        {
+          "id": "riforme",
+          "title": "1986: l’avvio di una nuova fase",
+          "paragraphs": [
+            "Đổi Mới indica la fase di rinnovamento avviata nel 1986. Nel quadro di un sistema politico guidato dal Partito comunista, le riforme modificano il funzionamento dell’economia e i suoi rapporti con il commercio e gli investimenti.",
+            "La storia va studiata seguendo le politiche effettive: produzione, lavoro, servizi e apertura economica. Una stessa etichetta politica non descrive da sola tutti questi meccanismi."
+          ],
+          "sources": [
+            "vn-overview"
+          ]
+        },
+        {
+          "id": "poverta",
+          "title": "Dal 16,8% al 5% in dieci anni",
+          "paragraphs": [
+            "Il rapporto della Banca Mondiale del 2022 registra una discesa del tasso di povertà dal 16,8% nel 2010 al 5% nel 2020. La misura usa la soglia di 3,20 dollari al giorno, a parità di potere d’acquisto 2011.",
+            "Il calo è di 11,8 punti percentuali, pari a circa il 70,2% del tasso iniziale. Sono due modi diversi di leggere lo stesso cambiamento. Il rapporto stima inoltre oltre dieci milioni di persone uscite dalla povertà nel periodo."
+          ],
+          "sources": [
+            "vn-poverta"
+          ]
+        },
+        {
+          "id": "opportunita",
+          "title": "Lavoro e istruzione cambiano le possibilità",
+          "paragraphs": [
+            "La valutazione del 2022 collega la riduzione della povertà alla crescita, ai progressi nell’istruzione e agli spostamenti del lavoro fuori dall’agricoltura. Lo sviluppo non è soltanto un numero nazionale: cambia quando cambiano opportunità e sicurezza materiale delle famiglie.",
+            "Per capire una politica conviene seguire il percorso del beneficio: un investimento crea lavoro? Una scuola rende accessibili nuove competenze? I servizi raggiungono i territori rimasti indietro? Sono domande che rendono confrontabili progetti e risultati."
+          ],
+          "sources": [
+            "vn-report"
+          ]
+        },
+        {
+          "id": "misure",
+          "title": "Confrontare dati che misurano la stessa cosa",
+          "paragraphs": [
+            "La soglia del rapporto del 2022 non va mescolata con quelle adottate successivamente. Il grafico conserva il periodo 2010–2020 e la definizione originale, così il confronto resta leggibile e verificabile.",
+            "Il dato descrive una trasformazione sociale importante. Per attribuirne una quota a una singola misura servono analisi dedicate: crescita, istruzione, investimenti e politiche pubbliche interagiscono."
+          ],
+          "sources": [
+            "vn-report"
+          ]
+        }
+      ],
+      "timeline": [
+        {
+          "date": "1986",
+          "text": "Avvio delle riforme Đổi Mới.",
+          "source": "vn-overview"
+        },
+        {
+          "date": "2010",
+          "text": "Tasso di povertà al 16,8%, secondo la soglia del rapporto.",
+          "source": "vn-poverta"
+        },
+        {
+          "date": "2020",
+          "text": "Lo stesso indicatore scende al 5%.",
+          "source": "vn-poverta"
+        },
+        {
+          "date": "2022",
+          "text": "Pubblicazione della valutazione Banca Mondiale.",
+          "source": "vn-report"
+        }
+      ],
+      "changes": [
+        {
+          "before": "Il 16,8% della popolazione è sotto la soglia considerata nel 2010.",
+          "after": "Nel 2020 la quota scende al 5%, a parità di definizione.",
+          "source": "vn-poverta"
+        }
+      ],
+      "readings": [],
+      "related": [
+        "cina",
+        "cuba"
+      ],
+      "metrics": [
+        {
+          "value": "16,8% → 5%",
+          "label": "Povertà, 2010–2020",
+          "note": "Soglia 3,20 $/giorno in PPA 2011. Calo di 11,8 punti percentuali.",
+          "source": "vn-poverta"
+        }
+      ],
+      "minutes": 2
     }
   ]
 }

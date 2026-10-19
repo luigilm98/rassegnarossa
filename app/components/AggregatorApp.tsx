@@ -84,7 +84,7 @@ import {
 } from "@/app/lib/editorial-ranking";
 
 type FeedPayload = { articles: Article[]; statuses: SourceStatus[] };
-type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo";
+type View = "notizie" | "fonti" | "teoria" | "salvati" | "metodo" | "partecipa";
 type DirectorySource = SourceDefinition & {
   count: number;
   status?: SourceStatus;
@@ -93,6 +93,7 @@ type DirectorySource = SourceDefinition & {
 const ALL = "all";
 const validBookIds = new Set(BOOK_IDS);
 const LibraryView = lazy(() => import("./LibraryView").then(module => ({ default: module.LibraryView })));
+const CommunityView = lazy(() => import("./CommunityView"));
 const SavedBooks = lazy(() => import("./LibraryView").then(module => ({ default: module.SavedBooks })));
 const publisherFor = createPublisherResolver(SOURCE_CATALOG);
 const PAGE_SIZE = 24;
@@ -101,8 +102,14 @@ const NAV: { id: View; label: string }[] = [
   { id: "fonti", label: "Atlante delle fonti" },
   { id: "teoria", label: "Biblioteca" },
   { id: "salvati", label: "Salvati" },
+  { id: "partecipa", label: "Partecipa" },
 ];
 const HEADINGS = {
+  partecipa: {
+    overline:"LA COMUNITÀ",
+    title:<LocalizedText>Proporre. Confrontarsi. Decidere.</LocalizedText>,
+    description:"Uno spazio comune per far crescere Internazionale Rossa attraverso proposte e consultazioni aperte.",
+  },
   notizie: {
     overline: "NOTIZIE · ANALISI · PROSPETTIVE",
     title: "Una citazione per cominciare",
@@ -172,7 +179,9 @@ export function AggregatorApp() {
   const [browserLanguage, setBrowserLanguage] = useState("it");
   const [view, setView] = useState<View>("notizie");
   useEffect(() => {
-    if (historyId(new URL(window.location.href).searchParams.get("storia"))) setView("teoria");
+    const params=new URL(window.location.href).searchParams;
+    if(params.get("view")==="partecipa")setView("partecipa");
+    else if (historyId(params.get("storia"))) setView("teoria");
   }, []);
   const [articles, setArticles] = useState<Article[]>([]);
   const [statuses, setStatuses] = useState<Record<string, SourceStatus>>({});
@@ -323,6 +332,10 @@ export function AggregatorApp() {
     setVisibleCount(PAGE_SIZE);
   }, []);
   const navigate = (next: View) => {
+    const url=new URL(window.location.href);
+    if(next==="partecipa")url.searchParams.set("view","partecipa");
+    else {url.searchParams.delete("view");url.searchParams.delete("proposal");}
+    window.history.replaceState(window.history.state,"",url);
     setView(next);
     reset();
     setFiltersOpen(false);
@@ -1266,6 +1279,7 @@ export function AggregatorApp() {
             {view === "teoria" ? (
               <Suspense fallback={<p className="reader-message" role="status"><LocalizedText>Apertura della biblioteca…</LocalizedText></p>}><LibraryView query={query} setQuery={setQuery} savedBooks={savedBooks} onToggleBook={toggleBook} /></Suspense>
             ) : null}
+            {view === "partecipa" ? <Suspense fallback={<p className="reader-message" role="status"><LocalizedText>Apertura della comunità…</LocalizedText></p>}><CommunityView/></Suspense> : null}
             {view === "metodo" ? (
               <MethodView onSources={() => navigate("fonti")} />
             ) : null}

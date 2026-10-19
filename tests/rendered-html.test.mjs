@@ -662,3 +662,16 @@ test('news controls start in one closed banner below a manually scrollable video
  const firstControls=html.slice(controls,html.indexOf('class="news-layout"'));
  for(const label of ['Lingua di lettura','Lingua delle fonti in analisi','Ordina le notizie','Ultimo ciclo di raccolta'])assert.match(firstControls,new RegExp(label));
 });
+
+test('community endpoints enforce the Worker authentication boundary and bypass shared caches',async()=>{
+ const {default:worker}=await import('../dist/server/index.js');
+ let queries=0,background=0;
+ const env={DB:{prepare(){queries++;return {bind(){return this;},async all(){return {results:[]};}};}},ASSETS:{fetch:async()=>{throw new Error('Community API must not use assets');}}};
+ const ctx={waitUntil(){background++;},passThroughOnException(){}};
+ for(const [path,method,status] of [['/api/community','GET',200],['/api/community/mine','GET',401],['/api/community','POST',401]]){
+  const response=await worker.fetch(new Request('https://example.test'+path,{method,headers:{'x-user-id':'forged','content-type':'application/json'},...(method==='POST'?{body:JSON.stringify({action:'vote',userId:'forged'})}:{})}),env,ctx);
+  assert.equal(response.status,status);assert.equal(response.headers.get('cache-control'),'private, no-store');assert.equal(response.headers.has('x-rassegna-cache'),false);
+  const data=await response.json();if(status===200)assert.deepEqual(data,{items:[],nextOffset:null});else assert.equal(data.authenticated,false);
+ }
+ assert.equal(queries,1);assert.equal(background,0);
+});

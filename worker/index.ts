@@ -1,3 +1,4 @@
+import { handleCommunity } from "../app/lib/community";
 import { handleReadingProgress } from "../app/lib/reading-progress";
 import { readBook } from "../app/lib/book-reader";
 /** Cloudflare Worker entry point for the vinext-starter template. */
@@ -49,6 +50,9 @@ const sourceIds = new Set(SOURCE_CATALOG.map(source => source.id));
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/community" || url.pathname === "/api/community/mine")
+      return handleCommunity(request, env.DB, chatGPTUserFromHeaders(request.headers)?.id ?? null, chatGPTSignInPath("/?view=partecipa"));
 
     if (url.pathname === "/api/reading-progress" || url.pathname === "/api/library/read") {
       const userId = chatGPTUserFromHeaders(request.headers)?.id ?? null;

@@ -62,5 +62,21 @@
     "deck": "Alfabetizzazione e salute come capacità collettive.",
     "period": "1961 · 2015",
     "minutes": 1
+  },
+  {
+    "id": "urss",
+    "country": "URSS (storica)",
+    "title": "Dalla scuola allo spazio: l’esperienza sovietica",
+    "deck": "Istruzione, diritti sociali e ricerca scientifica in uno Stato che ha segnato il Novecento.",
+    "period": "1936–1963",
+    "minutes": 2
+  },
+  {
+    "id": "vietnam",
+    "country": "Vietnam",
+    "title": "Đổi Mới: come cambia la vita materiale",
+    "deck": "Riforme, lavoro, istruzione e riduzione della povertà.",
+    "period": "Dal 1986 · dati 2010–2020",
+    "minutes": 2
   }
 ]

@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { ACHIEVEMENT_COUNTRIES, ACHIEVEMENT_THEMES, SOCIAL_ACHIEVEMENTS, selectAchievements } from '@/app/data/social-achievements';
 import { LocalizedText } from './Localization';
 
+const HistoricalStatistics = lazy(() => import('./HistoricalStatistics'));
 const HistoricalDossiers = lazy(() => import('./HistoricalDossiers'));
 
 export default function SocialAchievements() {
@@ -14,10 +15,11 @@ export default function SocialAchievements() {
   return <div className="social-achievements" id="conquiste-sociali">
     <header className="achievements-intro">
       <p className="eyebrow"><LocalizedText>MEMORIA, DIRITTI, POSSIBILITÀ</LocalizedText></p>
-      <h3><LocalizedText>Le conquiste che fanno vivere meglio.</LocalizedText></h3>
-      <p><LocalizedText>Una vetrina delle conquiste socialiste, comuniste, sindacali e popolari: tempo liberato, sapere condiviso, cure e dignità. Le vittorie nascono da persone, movimenti e alleanze. Qui ne celebriamo il contributo, con documenti da leggere e idee da portare nel presente.</LocalizedText></p>
+      <h3><LocalizedText>Diritti, sviluppo e conquiste sociali.</LocalizedText></h3>
+      <p><LocalizedText>Dalle lotte per studiare e lavorare con dignità alle trasformazioni di interi paesi. Una storia del contributo socialista, comunista, sindacale e popolare, attraverso dati, documenti e libri.</LocalizedText></p>
       <span>{ACHIEVEMENT_COUNTRIES.length} <LocalizedText>paesi</LocalizedText> · {SOCIAL_ACHIEVEMENTS.length} <LocalizedText>schede nell’atlante</LocalizedText></span>
     </header>
+    <Suspense fallback={<p className="notice" role="status"><LocalizedText>Apertura dei grafici…</LocalizedText></p>}><HistoricalStatistics/></Suspense>
     <Suspense fallback={<p className="notice" role="status"><LocalizedText>Apertura degli approfondimenti…</LocalizedText></p>}><HistoricalDossiers/></Suspense>
     <details className="achievements-atlas" onToggle={event=>setAtlasOpen(event.currentTarget.open)}><summary><LocalizedText>Atlante delle conquiste</LocalizedText><span>20 <LocalizedText>paesi</LocalizedText> · 33 <LocalizedText>schede di consultazione</LocalizedText></span></summary>
     {atlasOpen && <>

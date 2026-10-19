@@ -29,3 +29,22 @@ export const readingProgress = sqliteTable("reading_progress", {
   revision: text("revision").notNull(),
   updatedAt: integer("updated_at").notNull(),
 }, table => [primaryKey({ columns: [table.ownerId, table.bookId, table.edition] })]);
+
+// Public proposals keep account identifiers private; votes are unique per proposal and account key.
+export const communityProposals = sqliteTable("community_proposals", {
+  id: text("id").primaryKey(),
+  ownerKey: text("owner_key").notNull(),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  references: text("references_text").notNull().default(""),
+  category: text("category").notNull(),
+  language: text("language").notNull(),
+  createdAt: integer("created_at").notNull(),
+  withdrawn: integer("withdrawn").notNull().default(0),
+}, table => [index("community_created_idx").on(table.createdAt), index("community_owner_created_idx").on(table.ownerKey, table.createdAt)]);
+export const communityVotes = sqliteTable("community_votes", {
+  proposalId: text("proposal_id").notNull(),
+  voterKey: text("voter_key").notNull(),
+  value: integer("value").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+}, table => [primaryKey({columns:[table.proposalId,table.voterKey]})]);

@@ -1,6 +1,6 @@
-# Istruzioni per Codex e agenti AI
+# Guida alla manutenzione
 
-Valide per l'intero repository. Applicano le convenzioni di ingegneria usate negli altri progetti del maintainer: semplicità, comprensione del sistema, verifiche integrate, reversibilità e comunicazione precisa.
+Valide per l’intero repository. Convenzioni comuni: semplicità, comprensione del sistema, verifiche integrate, reversibilità e comunicazione precisa.
 
 ## Prima di modificare
 
@@ -15,6 +15,14 @@ Leggere `README.md`, `docs/ARCHITECTURE.md`, `CONTRIBUTING.md` e il codice perti
 5. Rendere esplicite le scelte difficili da invertire: identificatori delle fonti, chiavi localStorage, contratti API e hosting. Descrivere compatibilità e rollback.
 6. Fermare l'espansione quando emergono regressioni o basi fragili; correggere la causa con il cambiamento minimo.
 7. Aggiornare la documentazione del runtime reale e riportare solo test e deploy effettivamente osservati.
+
+## Coerenza editoriale e del prodotto
+
+- Interpretare esempi di autori, paesi o funzionalità alla luce dell’obiettivo generale: verificare le lacune dell’intero catalogo e del flusso interessato, senza restringere automaticamente il lavoro all’esempio.
+- Integrare i contenuti nella tassonomia e nell’interfaccia esistenti. Creare una sezione autonoma solo quando serve a un compito distinto del lettore, non per ogni intervento di manutenzione.
+- Descrivere lo stato corrente del progetto nei documenti. Aggiornare i paragrafi pertinenti; eliminare duplicazioni, resoconti conversazionali ed elenchi di aggiunte presentati come funzionalità separate. La cronologia tecnica resta in Git.
+- Mantenere criteri uniformi per opere, autori, lingue, paesi e periodi. Segnalare i limiti di copertura; non presentare il catalogo come completo.
+- Usare italiano naturale e termini adatti al pubblico: “lettura online” per la funzione, “lettore” per una persona o, nei dettagli tecnici, per il componente software.
 
 ## Invarianti del progetto
 

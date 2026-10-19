@@ -141,3 +141,13 @@ test("the news startup dependency graph leaves the complete book catalogue in an
  assert.ok(startup.every(code=>!code.includes('Il secondo comma dell’articolo 3 affida')),'Historical articles must stay out of the news startup bundle');
  assert.ok(manifest['app/components/SocialAchievements.tsx'].dynamicImports.includes('app/components/HistoricalDossiers.tsx'));
 });
+
+
+test("participation does not pull the book catalogue or historical statistics into its initial chunk",async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const manifest=JSON.parse(await readFile(new URL('../dist/client/.vite/manifest.json',import.meta.url),'utf8'));
+ const visited=new Set();function visit(key){if(visited.has(key))return;visited.add(key);for(const dep of manifest[key]?.imports??[])visit(dep);}visit('app/components/CommunityView.tsx');
+ const codes=await Promise.all([...visited].filter(key=>manifest[key]?.file).map(key=>readFile(new URL('../dist/client/'+manifest[key].file,import.meta.url),'utf8')));
+ assert.ok(codes.every(code=>!code.includes('selected-works/volume-5/mswv5_58.htm')&&!code.includes('constant2015USD')));
+ assert.ok(manifest['app/components/AggregatorApp.tsx'].dynamicImports.includes('app/components/CommunityView.tsx'));
+});

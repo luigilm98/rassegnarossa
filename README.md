@@ -6,6 +6,8 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 
 **[Proponi una modifica · Suggest a change](CONTRIBUTING.md)**
 
+Nel sito, **Partecipa** permette a lettori, attivisti, giornalisti e collettivi di proporre cambiamenti e votare le priorità con un account ChatGPT. Il voto è consultivo e riguarda la comunità partecipante, senza rappresentare tutta la sinistra mondiale. Non sono pubblicati dati dell’account o scelte individuali di voto.
+
 Non serve saper programmare. Nel repository apri **Issues → New issue**, scegli il modulo e descrivi cosa vuoi migliorare. Puoi proporre modifiche alle pagine, correzioni, fonti, libri, traduzioni o segnalare un problema. Scrivi nella lingua che preferisci; basta un account GitHub gratuito.
 
 **Everyone can contribute, in any language.** Open **Issues → New issue**, choose a form and explain your idea. No coding is required. To edit a page or a text yourself, use GitHub’s pencil button and submit a pull request. Proposals are reviewed before publication.
@@ -31,7 +33,9 @@ Non serve saper programmare. Nel repository apri **Issues → New issue**, scegl
 - Marchio essenziale con libro aperto e stella, “internazionale” rossa e “rossa” nera, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Raccolta personale di articoli e libri: accesso con ChatGPT e copia privata persistente sul server; importazione dei salvataggi locali esistenti. Senza accesso resta una copia sul dispositivo, indicata come tale.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
-- Vetrina “Le conquiste del socialismo”: 33 schede documentate in 20 paesi, filtri per paese e tema e otto dossier estesi: Italia, Comune, Cina, Rivoluzione culturale, Francia, NHS britannico, Vienna Rossa e Cuba. Capitoli, cronologie, confronti prima/dopo, 39 riferimenti documentari e letture guidate; link diretti ai dossier.
+- Vetrina “Le conquiste del socialismo”: 33 schede documentate in 20 paesi, filtri per paese e tema e dieci dossier estesi, con URSS e Vietnam. 41 capitoli, cronologie, confronti prima/dopo, 47 riferimenti documentari e letture guidate; link diretti ai dossier.
+- Grafici consultabili su crescita reale cinese, povertà in Vietnam e aspettativa di vita; dati annuali, definizioni e fonti accessibili. Iscritti dichiarati da alcuni partiti con data e provenienza separate.
+- Spazio **Partecipa**: proposte pubbliche, voti favorevoli/contrari/astensioni modificabili per account e decisioni motivate; persistenza D1.
 - Carosello tra testata e banner: ultime pubblicazioni di 18 canali internazionali, YouTube e PeerTube, scorrimento manuale e collegamenti diretti. Clara Statello, Dazibao e OttolinaTV inclusi; nessun player incorporato o autoplay.
 - Sei percorsi tematici e una pagina trasparente su metodo, attribuzione e limiti.
 - Lettore in una finestra dedicata, con invito a leggere e sostenere l’editore, traduzione automatica e anteprima esterna facoltativa.
@@ -91,13 +95,13 @@ npm run typecheck
 | `tests/` | Verifiche automatiche del rendering |
 | `.github/workflows/` | Controlli GitHub Actions |
 
-Stack: React, TypeScript, vinext, Vite e Cloudflare Workers. Il progetto conserva le integrazioni del runtime Sites. D1 conserva le raccolte personali private; R2 non è utilizzato.
+Stack: React, TypeScript, vinext, Vite e Cloudflare Workers. Il progetto conserva le integrazioni del runtime Sites. D1 conserva le raccolte personali private e le proposte e i voti della comunità; R2 non è utilizzato.
 
 ## Documentazione e contributi
 
 - [Architettura e deploy](docs/ARCHITECTURE.md): flusso dei dati, runtime e limiti.
 - [Contribuire](CONTRIBUTING.md): sviluppo e verifica delle modifiche.
-- [AGENTS.md](AGENTS.md): regole comuni per Codex e altri assistenti.
+- [Guida alla manutenzione](AGENTS.md): convenzioni tecniche ed editoriali.
 - [Istruzioni Copilot](.github/copilot-instructions.md): rinvio alla guida comune.
 
 ## Pubblicazione e limiti
@@ -108,7 +112,7 @@ Le cache dei feed rimangono temporanee; le raccolte personali degli utenti auten
 
 I sorgenti pubblici non includono identificativi di hosting specifici del proprietario.
 
-## Biblioteca gratuita e lettore personale
+## Biblioteca e lettura online
 
 La biblioteca comprende 74 libri, saggi e raccolte con 635 edizioni in 37 lingue, incluse numerose lingue europee. Tre percorsi introducono cooperazione e mutuo appoggio, critica del capitalismo e costruzione di alternative. Il filtro delle edizioni seleziona testi realmente pubblicati in quella lingua; il lettore non sostituisce una traduzione editoriale con una traduzione automatica.
 
