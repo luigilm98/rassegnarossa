@@ -1,10 +1,12 @@
 export type ReaderBlock = { type: "p" | "h2" | "h3"; text: string };
 export type ReaderChapter = { title: string; url: string };
-const entities: Record<string,string> = { amp:"&",quot:'"',apos:"'",lt:"<",gt:">",nbsp:" ",ndash:"–",mdash:"—",hellip:"…",lsquo:"‘",rsquo:"’",ldquo:"“",rdquo:"”",eacute:"é",egrave:"è",agrave:"à",aacute:"á",ouml:"ö",auml:"ä",uuml:"ü",szlig:"ß",ccedil:"ç",ecirc:"ê",ocirc:"ô",acirc:"â",oacute:"ó",uacute:"ú",ntilde:"ñ",copy:"©" };
+// Complete HTML5 named references, generated from Python html.entities.html5.
+import namedEntities from "./html-entities.json" with { type: "json" };
+const entities: Record<string, string> = namedEntities;
 export function readerText(value: string) {
- return value.replace(/<[^>]*>/g," ").replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi,(whole,key:string)=>{
-  if(key.startsWith("#")){const n=key[1].toLowerCase()==="x"?parseInt(key.slice(2),16):Number(key.slice(1));return n>0&&n<=0x10ffff?String.fromCodePoint(n):"";}
-  return entities[key]??whole;
+ return value.replace(/<[^>]*>/g," ").replace(/&(#x[\da-f]+|#\d+|[a-z][a-z0-9]+);/gi,(whole,key:string)=>{
+  if(key.startsWith("#")){const n=key[1].toLowerCase()==="x"?parseInt(key.slice(2),16):Number(key.slice(1));return n>0&&n<=0x10ffff&&!(n>=0xd800&&n<=0xdfff)?String.fromCodePoint(n):"�";}
+  return Object.hasOwn(entities,key)?entities[key]:whole;
  }).replace(/\s+/g," ").trim();
 }
 export function parseReaderPage(html: string): ReaderBlock[] {

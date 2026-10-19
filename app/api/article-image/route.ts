@@ -24,7 +24,11 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
   const suppliedLink = rawLink ? publicPhotoUrl(rawLink) : null;
   const publisherHost = new URL(source.homepage).hostname.replace(/^www\./, "");
   // Legacy/local cards may predate the retained feed. Limit their page lookup to this configured publisher.
-  if (params.getAll("articleLink").length > 1 || (rawLink !== null && (!suppliedLink || rawLink.length > 2048 || (source.kind !== "radar" && suppliedLink.hostname.replace(/^www\./, "") !== publisherHost) || suppliedLink.pathname === "/"))) return fail(400);
+  if (params.getAll("articleLink").length > 1 || (rawLink !== null && (!suppliedLink || rawLink.length > 2048 || suppliedLink.pathname === "/"))) return fail(400);
+  const stored = await find?.(source.id, id).catch(() => undefined);
+  // Regional editions can use another host. Only a matching server-observed record
+  // may authorize that host; a client-supplied URL never expands the allowlist.
+  if (source.kind !== "radar" && suppliedLink && suppliedLink.hostname.replace(/^www\./, "") !== publisherHost && suppliedLink.href !== stored?.link) return fail(400);
   const selectedSource = source;
   const key = `${source.id}:${id}:${suppliedLink?.href ?? ""}`;
   const cached = cache.get(key);
@@ -36,10 +40,13 @@ export async function GET(request: Request, find?: (sourceId: string, id: string
     try {
     let source = selectedSource;
     // Resolve the exact reference already delivered to readers before consulting a rotating feed.
-    const stored = await find?.(source.id, id).catch(() => undefined);
     let article = source.kind === "radar" ? stored : stored ?? (suppliedLink ? { id, sourceId: source.id, link: suppliedLink.href, image: null } :
       (await fetchSource(source, 24)).articles.find(item => item.id === id));
     if (!article) return fail(404);
+    if (source.kind !== "radar" && stored) {
+      const observed = publicPhotoUrl(stored.link);
+      if (observed) source = { ...source, homepage: observed.origin + "/" };
+    }
     const signal = AbortSignal.timeout(source.kind === "radar" ? 20000 : 12000);
     if (source.kind === "radar") {
       if (!stored?.sourceHomepage || (suppliedLink && suppliedLink.href !== stored.link)) return fail(400);

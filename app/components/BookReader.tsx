@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, BookmarkCheck, BookOpen } from "lucide-react";
 import { BOOK_LANGUAGES, THEORY_LIBRARY, bookEdition } from "@/app/data/library";
 import type { ReaderDocument } from "@/app/lib/book-reader";
 import type { Progress } from "@/app/lib/reading-progress";
+import { readerDestination } from "@/app/lib/book-navigation";
 import { LocalizationProvider, LocalizedText } from "./Localization";
 
 export function BookReader() {
@@ -63,7 +64,7 @@ function Reader({language,ready}:{language:string;ready:boolean}) {
    const data=await response.json();if(version!==request.current)return;
    if(response.status===401){setAuth(false);setSignIn(data.signInUrl);return;}
    if(!response.ok||!Array.isArray(data.pages))throw Error(data.error??"Edizione non disponibile");
-   restoredScroll.current=scroll;setDocument(data);setPage(Math.min(Math.max(0,restorePage),data.pages.length-1));
+   restoredScroll.current=scroll;setDocument(data);setPage(restorePage===-1?data.pages.length-1:Math.min(Math.max(0,restorePage),data.pages.length-1));
   }catch(e){if(!abort.signal.aborted)setError(e instanceof Error?e.message:"Non è stato possibile aprire il testo.");}
   finally{if(version===request.current)setLoading(false);}
  },[bookId,edition]);
@@ -102,9 +103,11 @@ function Reader({language,ready}:{language:string;ready:boolean}) {
   window.addEventListener("pagehide",flush);return()=>{window.removeEventListener("pagehide",flush);flush();};
  },[]);
  const move=(delta:number)=>{
-  if(!document)return;queueSave(true);
-  if(page+delta>=0&&page+delta<document.pages.length){restoredScroll.current=0;setPage(page+delta);}
-  else if(document.chapter+delta>=0&&document.chapter+delta<document.chapters.length)void load(document.chapter+delta);
+  if(!document)return;
+  const next=readerDestination(document.chapter,page,document.pages.length,document.chapters.length,delta);
+  if(!next)return;queueSave(true);
+  if(next.chapter===document.chapter){restoredScroll.current=0;setPage(next.page);}
+  else void load(next.chapter,next.page);
  };
  const scroll=()=>{if(restoring.current||!current.current||!viewport.current)return;const el=viewport.current;current.current={...current.current,scroll:Math.max(0,Math.min(10000,Math.round(el.scrollTop/Math.max(1,el.scrollHeight-el.clientHeight)*10000)))};queueSave();};
  return <main className="book-reader">

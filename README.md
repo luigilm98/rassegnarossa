@@ -39,6 +39,7 @@ Aprire l'indirizzo mostrato dal server. Per compilare e verificare:
 ```sh
 npm run build
 npm test
+npm run typecheck
 ```
 
 `npm test` compila il progetto e verifica rendering e API senza rete, filtri, fusione degli aggiornamenti e ripristino dei salvataggi. Non verifica la disponibilità di tutti i feed esterni, la qualità delle traduzioni o il comportamento completo nei browser.
@@ -96,7 +97,7 @@ I sorgenti pubblici non includono identificativi di hosting specifici del propri
 
 ## Biblioteca gratuita e lettore personale
 
-La biblioteca comprende 34 libri e saggi con oltre 450 edizioni in 37 lingue, incluse numerose lingue europee. Tre percorsi introducono cooperazione e mutuo appoggio, critica del capitalismo e costruzione di alternative. Il filtro delle edizioni seleziona testi realmente pubblicati in quella lingua; il lettore non sostituisce una traduzione editoriale con una traduzione automatica.
+La biblioteca comprende 74 libri, saggi e raccolte con 635 edizioni in 37 lingue, incluse numerose lingue europee. Tre percorsi introducono cooperazione e mutuo appoggio, critica del capitalismo e costruzione di alternative. Il filtro delle edizioni seleziona testi realmente pubblicati in quella lingua; il lettore non sostituisce una traduzione editoriale con una traduzione automatica.
 
 Le copertine e il comando **Leggi online** aprono `/read`. L’accesso con ChatGPT è richiesto per il testo e per il segnalibro. Capitolo, pagina di lettura e posizione nello scorrimento vengono salvati in D1 per account ed edizione; si ripristinano anche dopo la cancellazione dei dati locali e su un altro dispositivo. Gli articoli salvati continuano a usare la raccolta privata già presente. Le pagine del lettore sono una suddivisione per la lettura sullo schermo, non la numerazione di un’edizione a stampa. Le schede storiche che rimandano ad archivi tematici restano disponibili senza essere conteggiate come libri integrali.
 

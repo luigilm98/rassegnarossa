@@ -2,7 +2,27 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { DatabaseSync } from "node:sqlite";
-import { parseReaderPage, readerChapters, paginateBook, sectionReaderBook, decodeBookHtml } from "../app/lib/book-text.ts";
+import { readerText, parseReaderPage, readerChapters, paginateBook, sectionReaderBook, decodeBookHtml } from "../app/lib/book-text.ts";
+import { readerDestination } from "../app/lib/book-navigation.ts";
+
+test("reader navigation crosses chapter boundaries in both directions without skipping preceding pages",()=>{
+ assert.deepEqual(readerDestination(1,0,4,3,-1),{chapter:0,page:-1});
+ assert.deepEqual(readerDestination(1,3,4,3,1),{chapter:2,page:0});
+ assert.deepEqual(readerDestination(1,2,4,3,-1),{chapter:1,page:1});
+ assert.equal(readerDestination(0,0,4,3,-1),null);
+ assert.equal(readerDestination(2,3,4,3,1),null);
+});
+
+test("book text decodes complete HTML entities in Italian and other editions without activating encoded markup",()=>{
+ const blocks=parseReaderPage('<h1>Prefazione all&rsquo;edizione tedesca</h1><p>La Lega incaric&ograve; i sottoscritti. Cos&igrave; nacque il Manifesto, che part&igrave; per Londra. &Egrave; gi&agrave; qui.</p>');
+ assert.equal(blocks[1].text,'La Lega incaricò i sottoscritti. Così nacque il Manifesto, che partì per Londra. È già qui.');
+ assert.equal(readerText('&OElig;uvre &Auml;nderung &Scaron; &lstrok; &Alpha; &NotEqualTilde; &frac12;'),'Œuvre Änderung Š ł Α ≂̸ ½');
+ assert.equal(readerText('&#242; &#x1F91D; &#0; &#xD800;'),'ò 🤝 � �');
+ assert.equal(readerText('&lt;img src=x onerror=alert(1)&gt; &amp;ograve; &unknown;'),'<img src=x onerror=alert(1)> &ograve; &unknown;');
+ assert.equal(readerText('&constructor; &toString;'),'&constructor; &toString;');
+ const toc=readerChapters('<a href="one.htm">Cooperazione &amp; libert&agrave;</a>','https://www.marxists.org/test/index.htm');
+ assert.equal(toc[0].title,'Cooperazione & libertà');
+});
 
 async function setup(){
  const sqlite=new DatabaseSync(":memory:");
@@ -58,12 +78,12 @@ test("invalid and cross-site progress cannot mutate the private archive; older p
 test("authenticated native reader loads a real edition chapter as text, rejects arbitrary URLs and reports missing chapters",async()=>{
  const {sqlite,call}=await setup(),original=globalThis.fetch;let fetches=0;
  globalThis.fetch=async raw=>{fetches++;const url=String(raw);if(url.endsWith('/1848/manifesto/index.htm'))return new Response('<title>Manifesto</title><a href="one.htm">Capitolo uno</a>',{headers:{'content-type':'text/html;charset=utf-8'}});
- if(url.endsWith('/1848/manifesto/one.htm'))return new Response('<h1>Manifesto</h1><p>Un testo da leggere insieme.</p><script>not executable</script>',{headers:{'content-type':'text/html'}});
+ if(url.endsWith('/1848/manifesto/one.htm'))return new Response('<h1>Manifesto</h1><p>Cos&igrave; il testo part&igrave;: incaric&ograve; la comunit&agrave;.</p><script>not executable</script>',{headers:{'content-type':'text/html'}});
  throw Error('Unexpected URL '+url);
  };
  try{
   const r=await call('/api/library/read?bookId=manifesto&edition=it&chapter=0');assert.equal(r.status,200);const j=await r.json();
-  assert.equal(j.pages[0][1].text,'Un testo da leggere insieme.');assert.equal(j.revision.length,64);assert.equal(j.language,'it');
+  assert.equal(j.pages[0][1].text,'Così il testo partì: incaricò la comunità.');assert.equal(j.revision.length,64);assert.equal(j.language,'it');
   const before=fetches;
   assert.equal((await call('/api/library/read?bookId=manifesto&edition=it&url=https://127.0.0.1/')).status,400);
   assert.equal((await call('/api/library/read?bookId=unknown&edition=it')).status,400);

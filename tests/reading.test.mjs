@@ -139,3 +139,22 @@ test("a text-only refresh preserves the recovered photo for the same story while
  assert.equal(mergeArticles(refreshed,[article({image:"https://example.org/new.jpg"})])[0].image,"https://example.org/new.jpg");
  assert.equal(mergeArticles([known],[article({link:"https://example.org/different",image:null})])[0].image,null);
 });
+
+test('expanded library exposes Mao and other authors through real, distinct language editions',async()=>{
+ const {THEORY_LIBRARY,bookEdition,BOOK_LANGUAGES}=await import('../app/data/library.ts');
+ const ids=new Set();
+ for(const book of THEORY_LIBRARY){
+  assert.ok(!ids.has(book.id),'Duplicate book ID '+book.id);ids.add(book.id);
+  const languages=new Set();
+  for(const edition of book.editions??[]){
+   assert.ok(!languages.has(edition.language),'Duplicate edition '+book.id);languages.add(edition.language);
+   assert.ok(BOOK_LANGUAGES[edition.language]);assert.equal(new URL(edition.url).protocol,'https:');
+   assert.equal(bookEdition(book.id,edition.language),edition);
+  }
+ }
+ for(const id of ['mao-pratica','mao-contraddizione','mao-organizzarsi','mao-servire-popolo','mao-cooperazione-agricola','mao-opere-1','mao-opere-5','mao-citazioni','gramsci-citta-futura','zetkin-donne-socialismo','capitale-2','capitale-3'])assert.ok(THEORY_LIBRARY.find(book=>book.id===id)?.editions?.length,id);
+ assert.equal(bookEdition('mao-pratica','it').language,'it');
+ assert.equal(bookEdition('mao-pratica','es').language,'es');
+ assert.equal(bookEdition('mao-pratica','pt').language,'pt');
+ assert.ok(THEORY_LIBRARY.filter(book=>book.author==='Mao Zedong').length>=25);
+});

@@ -14,9 +14,10 @@ import { publicDataResponse } from "../app/lib/public-data-cache";
 import { handleBookmarks } from "../app/lib/bookmarks";
 import { chatGPTUserFromHeaders, chatGPTSignInPath } from "../app/chatgpt-auth";
 import { THEORY_LIBRARY } from "../app/data/library";
+import type { D1Database } from "@cloudflare/workers-types/index.ts";
 
 interface Env {
-  ASSETS: Fetcher;
+  ASSETS: { fetch(request: Request): Promise<Response> };
   DB: D1Database;
   IMAGES: {
     input(stream: ReadableStream): {

@@ -56,3 +56,27 @@ test("article API includes its photo and the same-origin endpoint delivers actua
   assert.equal((await call(path(first.id)+"&url=http://127.0.0.1/private")).status,400);
  }finally{globalThis.fetch=originalFetch;}
 });
+
+test("a regional publisher host is allowed only for the exact article observed by the server",async()=>{
+ const {DatabaseSync}=await import('node:sqlite');const {readFile}=await import('node:fs/promises');
+ const sqlite=new DatabaseSync(':memory:');sqlite.exec(await readFile(new URL('../drizzle/0001_unknown_loa.sql',import.meta.url),'utf8'));
+ const db={prepare(sql){const s=sqlite.prepare(sql);return{bind(...v){return{first:async()=>s.get(...v)??null,run:async()=>s.run(...v)}}}}};
+ const {createArticlePhotoStore}=await import('../app/lib/public-news-store.ts');
+ const article={id:'regional-host-fixture',sourceId:'cgtn',link:'https://newsaf.cgtn.com/news/regional-story/p.html',image:null};
+ await createArticlePhotoStore(db,new Set(['cgtn'])).remember('cgtn',[article]);
+ const original=globalThis.fetch;const calls=[];const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9ZlS0AAAAASUVORK5CYII=','base64');
+ globalThis.fetch=async raw=>{const url=String(raw);calls.push(url);
+  if(url==='https://newsaf.cgtn.com/')return new Response('<html></html>',{headers:{'content-type':'text/html'}});
+  if(url===article.link)return new Response('<meta property="og:image" content="https://images.example.org/regional.png">',{headers:{'content-type':'text/html'}});
+  if(url==='https://images.example.org/regional.png')return new Response(png,{headers:{'content-type':'image/png'}});
+  throw Error('Unexpected destination '+url);
+ };
+ try{
+  const {default:worker}=await import('../dist/server/index.js');
+  const call=(id,link)=>worker.fetch(new Request('https://news.example/api/article-image?'+new URLSearchParams({sourceId:'cgtn',articleId:id,articleLink:link})),{DB:db,ASSETS:{fetch:async()=>new Response(null,{status:404})}},{waitUntil(){},passThroughOnException(){}});
+  const result=await call(article.id,article.link);assert.equal(result.status,200);assert.deepEqual(Buffer.from(await result.arrayBuffer()),png);
+  const before=calls.length;
+  for(const [id,link] of [['invented',article.link],[article.id,'https://evil.example.org/story'],[article.id,'https://newsaf.cgtn.com/news/different/p.html']])assert.equal((await call(id,link)).status,400);
+  assert.equal(calls.length,before);
+ }finally{globalThis.fetch=original;sqlite.close();}
+});

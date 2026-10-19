@@ -3238,5 +3238,1685 @@
         "source": "Marxists Internet Archive"
       }
     ]
+  },
+  {
+    "id": "mao-pratica",
+    "title": "Sulla pratica",
+    "author": "Mao Zedong",
+    "period": "1937",
+    "lane": "Metodo",
+    "summary": "Conoscenza ed esperienza: il rapporto tra studio, verifica e azione collettiva.",
+    "level": "intermedio",
+    "tags": [
+      "metodo",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_16.htm",
+        "title": "Sulla pratica",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1937/07/pratica.htm",
+        "title": "Sulla pratica",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/reference/mao/pratica.htm",
+        "title": "Sulla pratica",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/mao/escritos/OP37s.html",
+        "title": "Sulla pratica",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-contraddizione",
+    "title": "Sulla contraddizione",
+    "author": "Mao Zedong",
+    "period": "1937",
+    "lane": "Metodo",
+    "summary": "Un saggio di dialettica sulle contraddizioni, sul loro sviluppo e sulla loro analisi concreta.",
+    "level": "intermedio",
+    "tags": [
+      "metodo",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_17.htm",
+        "title": "Sulla contraddizione",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1937/08/contra.htm",
+        "title": "Sulla contraddizione",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/mao/escritos/OC37s.html",
+        "title": "Sulla contraddizione",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-classi-cina",
+    "title": "Analisi delle classi nella società cinese",
+    "author": "Mao Zedong",
+    "period": "1926",
+    "lane": "Storia",
+    "summary": "Una ricostruzione delle classi e delle alleanze nella Cina degli anni Venti.",
+    "level": "intermedio",
+    "tags": [
+      "storia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_1.htm",
+        "title": "Analisi delle classi nella società cinese",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1926/03/classes.htm",
+        "title": "Analisi delle classi nella società cinese",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-hunan",
+    "title": "Rapporto sul movimento contadino nello Hunan",
+    "author": "Mao Zedong",
+    "period": "1927",
+    "lane": "Storia",
+    "summary": "Inchiesta sociale, iniziativa contadina e trasformazione dei rapporti di potere rurali.",
+    "level": "intermedio",
+    "tags": [
+      "storia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_2.htm",
+        "title": "Rapporto sul movimento contadino nello Hunan",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1927/03/hunan.htm",
+        "title": "Rapporto sul movimento contadino nello Hunan",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-correggere-idee",
+    "title": "Correggere le idee errate nel partito",
+    "author": "Mao Zedong",
+    "period": "1929",
+    "lane": "Organizzazione",
+    "summary": "Un documento storico su formazione politica, responsabilità e organizzazione.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_5.htm",
+        "title": "Correggere le idee errate nel partito",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1929/12/elimina.htm",
+        "title": "Correggere le idee errate nel partito",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-scintilla",
+    "title": "Una scintilla può incendiare la prateria",
+    "author": "Mao Zedong",
+    "period": "1930",
+    "lane": "Storia",
+    "summary": "Una riflessione sulle prospettive della rivoluzione cinese nel suo contesto storico.",
+    "level": "intermedio",
+    "tags": [
+      "storia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_6.htm",
+        "title": "Una scintilla può incendiare la prateria",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1930/01/05.htm",
+        "title": "Una scintilla può incendiare la prateria",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-vita-masse",
+    "title": "La vita delle masse e i metodi di lavoro",
+    "author": "Mao Zedong",
+    "period": "1934",
+    "lane": "Cura e società",
+    "summary": "Bisogni quotidiani, ascolto e rapporto fra organizzazione politica e popolazione.",
+    "level": "intermedio",
+    "tags": [
+      "cura e società",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/mswv1_10.htm",
+        "title": "La vita delle masse e i metodi di lavoro",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1934/01/27.htm",
+        "title": "La vita delle masse e i metodi di lavoro",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-liberalismo",
+    "title": "Contro il liberalismo",
+    "author": "Mao Zedong",
+    "period": "1937",
+    "lane": "Organizzazione",
+    "summary": "Un breve testo storico sul rapporto fra responsabilità individuale e vita collettiva.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-2/mswv2_03.htm",
+        "title": "Contro il liberalismo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1937/09/07.htm",
+        "title": "Contro il liberalismo",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-nuova-democrazia",
+    "title": "Sulla nuova democrazia",
+    "author": "Mao Zedong",
+    "period": "1940",
+    "lane": "Stato e potere",
+    "summary": "Il programma politico, economico e culturale della rivoluzione cinese nella fase anticoloniale.",
+    "level": "intermedio",
+    "tags": [
+      "stato e potere",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-2/mswv2_26.htm",
+        "title": "Sulla nuova democrazia",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1940/01/democracia.htm",
+        "title": "Sulla nuova democrazia",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-studio",
+    "title": "Riformare il nostro studio",
+    "author": "Mao Zedong",
+    "period": "1941",
+    "lane": "Formazione",
+    "summary": "Studiare i fatti e collegare la teoria alla conoscenza delle condizioni concrete.",
+    "level": "intermedio",
+    "tags": [
+      "formazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_02.htm",
+        "title": "Riformare il nostro studio",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1941/mes/estudo.htm",
+        "title": "Riformare il nostro studio",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/mao/escritos/ROS41s.html",
+        "title": "Riformare il nostro studio",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-stile-lavoro",
+    "title": "Rettificare lo stile di lavoro",
+    "author": "Mao Zedong",
+    "period": "1942",
+    "lane": "Organizzazione",
+    "summary": "Un testo storico su metodo, studio e pratiche delle organizzazioni politiche.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_06.htm",
+        "title": "Rettificare lo stile di lavoro",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1942/02/01.htm",
+        "title": "Rettificare lo stile di lavoro",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/mao/escritos/RPSW42s.html",
+        "title": "Rettificare lo stile di lavoro",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-scrittura",
+    "title": "Contro lo stile stereotipato nel partito",
+    "author": "Mao Zedong",
+    "period": "1942",
+    "lane": "Formazione",
+    "summary": "Chiarezza, concretezza e rapporto con chi legge nella comunicazione politica.",
+    "level": "intermedio",
+    "tags": [
+      "formazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_07.htm",
+        "title": "Contro lo stile stereotipato nel partito",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1942/02/08.htm",
+        "title": "Contro lo stile stereotipato nel partito",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/mao/escritos/OPSW42s.html",
+        "title": "Contro lo stile stereotipato nel partito",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-arte-letteratura",
+    "title": "Discorsi su letteratura e arte a Yan'an",
+    "author": "Mao Zedong",
+    "period": "1942",
+    "lane": "Cultura",
+    "summary": "Il dibattito storico sul rapporto fra produzione culturale, pubblico e politica.",
+    "level": "intermedio",
+    "tags": [
+      "cultura",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_08.htm",
+        "title": "Discorsi su letteratura e arte a Yan'an",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1942/05/23.htm",
+        "title": "Discorsi su letteratura e arte a Yan'an",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-direzione",
+    "title": "Alcune questioni sui metodi di direzione",
+    "author": "Mao Zedong",
+    "period": "1943",
+    "lane": "Organizzazione",
+    "summary": "Il rapporto fra esperienza collettiva, ascolto e decisioni organizzative.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_13.htm",
+        "title": "Alcune questioni sui metodi di direzione",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1943/06/01.htm",
+        "title": "Alcune questioni sui metodi di direzione",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-organizzarsi",
+    "title": "Organizziamoci!",
+    "author": "Mao Zedong",
+    "period": "1943",
+    "lane": "Cooperazione",
+    "summary": "Lavoro in comune, produzione e sostegno reciproco nel contesto delle basi rurali cinesi.",
+    "level": "intermedio",
+    "tags": [
+      "cooperazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_17.htm",
+        "title": "Organizziamoci!",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1943/11/29.htm",
+        "title": "Organizziamoci!",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-servire-popolo",
+    "title": "Servire il popolo",
+    "author": "Mao Zedong",
+    "period": "1944",
+    "lane": "Cooperazione",
+    "summary": "Un breve discorso su responsabilità pubblica, solidarietà e critica.",
+    "level": "intermedio",
+    "tags": [
+      "cooperazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_19.htm",
+        "title": "Servire il popolo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1944/09/08.htm",
+        "title": "Servire il popolo",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-montagne",
+    "title": "Il vecchio stolto che rimosse le montagne",
+    "author": "Mao Zedong",
+    "period": "1945",
+    "lane": "Formazione",
+    "summary": "Una metafora della perseveranza e dello sforzo collettivo nel suo contesto storico.",
+    "level": "intermedio",
+    "tags": [
+      "formazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/mswv3_26.htm",
+        "title": "Il vecchio stolto che rimosse le montagne",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1945/06/11.htm",
+        "title": "Il vecchio stolto che rimosse le montagne",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-cooperazione-agricola",
+    "title": "Mutuo aiuto e cooperazione in agricoltura",
+    "author": "Mao Zedong",
+    "period": "1951",
+    "lane": "Cooperazione",
+    "summary": "Un documento sulla costruzione delle organizzazioni di mutuo aiuto nelle campagne cinesi.",
+    "level": "intermedio",
+    "tags": [
+      "cooperazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-5/mswv5_18.htm",
+        "title": "Mutuo aiuto e cooperazione in agricoltura",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-dieci-rapporti",
+    "title": "Sui dieci grandi rapporti",
+    "author": "Mao Zedong",
+    "period": "1956",
+    "lane": "Economia politica",
+    "summary": "Una discussione dei rapporti fra settori economici, territori, Stato e produttori.",
+    "level": "intermedio",
+    "tags": [
+      "economia politica",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-5/mswv5_51.htm",
+        "title": "Sui dieci grandi rapporti",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-contraddizioni-popolo",
+    "title": "La corretta soluzione delle contraddizioni in seno al popolo",
+    "author": "Mao Zedong",
+    "period": "1957",
+    "lane": "Stato e potere",
+    "summary": "Il dibattito sulle contraddizioni sociali nella costruzione socialista cinese.",
+    "level": "intermedio",
+    "tags": [
+      "stato e potere",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-5/mswv5_58.htm",
+        "title": "La corretta soluzione delle contraddizioni in seno al popolo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1957/02/27.htm",
+        "title": "La corretta soluzione delle contraddizioni in seno al popolo",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/mao/escritos/CHC57s.html",
+        "title": "La corretta soluzione delle contraddizioni in seno al popolo",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-opere-1",
+    "title": "Opere scelte, volume 1",
+    "author": "Mao Zedong",
+    "period": "1926–1957",
+    "lane": "Raccolte",
+    "summary": "Raccolta storica di saggi e discorsi, con indice dei testi. Include opere disponibili anche come letture singole.",
+    "level": "avanzato",
+    "tags": [
+      "raccolte",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-1/index.htm",
+        "title": "Opere scelte, volume 1",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-opere-2",
+    "title": "Opere scelte, volume 2",
+    "author": "Mao Zedong",
+    "period": "1926–1957",
+    "lane": "Raccolte",
+    "summary": "Raccolta storica di saggi e discorsi, con indice dei testi. Include opere disponibili anche come letture singole.",
+    "level": "avanzato",
+    "tags": [
+      "raccolte",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-2/index.htm",
+        "title": "Opere scelte, volume 2",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-opere-3",
+    "title": "Opere scelte, volume 3",
+    "author": "Mao Zedong",
+    "period": "1926–1957",
+    "lane": "Raccolte",
+    "summary": "Raccolta storica di saggi e discorsi, con indice dei testi. Include opere disponibili anche come letture singole.",
+    "level": "avanzato",
+    "tags": [
+      "raccolte",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-3/index.htm",
+        "title": "Opere scelte, volume 3",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-opere-4",
+    "title": "Opere scelte, volume 4",
+    "author": "Mao Zedong",
+    "period": "1926–1957",
+    "lane": "Raccolte",
+    "summary": "Raccolta storica di saggi e discorsi, con indice dei testi. Include opere disponibili anche come letture singole.",
+    "level": "avanzato",
+    "tags": [
+      "raccolte",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-4/index.htm",
+        "title": "Opere scelte, volume 4",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-opere-5",
+    "title": "Opere scelte, volume 5",
+    "author": "Mao Zedong",
+    "period": "1926–1957",
+    "lane": "Raccolte",
+    "summary": "Raccolta storica di saggi e discorsi, con indice dei testi. Include opere disponibili anche come letture singole.",
+    "level": "avanzato",
+    "tags": [
+      "raccolte",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/selected-works/volume-5/index.htm",
+        "title": "Opere scelte, volume 5",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "mao-citazioni",
+    "title": "Citazioni del presidente Mao Zedong",
+    "author": "Mao Zedong",
+    "period": "1966",
+    "lane": "Raccolte",
+    "summary": "Antologia storica organizzata per argomenti: da leggere accanto ai saggi completi e al loro contesto.",
+    "level": "intermedio",
+    "tags": [
+      "raccolte",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/reference/archive/mao/works/red-book/index.htm",
+        "title": "Quotations",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/mao/1966/citas/index.htm",
+        "title": "Citações",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "anti-duhring",
+    "title": "Anti-Dühring",
+    "author": "Friedrich Engels",
+    "period": "1878",
+    "lane": "Metodo",
+    "summary": "Un confronto sistematico su filosofia, economia e socialismo, da affrontare dopo le letture introduttive.",
+    "level": "avanzato",
+    "tags": [
+      "metodo",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1877/anti-duhring/index.htm",
+        "title": "Anti-Dühring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1878/AD/index.html",
+        "title": "Анти-Дюринг",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/1878vpro.htm",
+        "title": "La revoluci n de la ciencia de Eugenio D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1878/anti-duhring/index.htm",
+        "title": "Anti-D¨hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/engels/works/1878/06/fe18780611.htm",
+        "title": "L",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/marx-engels/1878/tentang-dialektika.htm",
+        "title": "Kata-Pengantar Lama Pada Anti-Duhring. Tentang Dialektika",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1878/antiduhring/index.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1877/anti-diuringas/index.htm",
+        "title": "Anti-Diuringas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "hu",
+        "url": "https://www.marxists.org/magyar/archive/marx/1878/anti-duhring/index.htm",
+        "title": "Anti-D�hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1877/anti-duhring/index.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1876/anty_dur/index.htm",
+        "title": "Anty D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1877/antiduhring/index.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1878/20-d025.htm",
+        "title": "Anti-D hring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/marx-engels/1870s/chongduhring/index.htm",
+        "title": "Chong Duhring",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1876a.htm",
+        "title": "《反杜林论》旧序。论辩证法",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "capitale-2",
+    "title": "Il Capitale, Libro II",
+    "author": "Karl Marx",
+    "period": "1885",
+    "lane": "Economia politica",
+    "summary": "Circolazione del capitale e riproduzione sociale, in continuità con il primo libro.",
+    "level": "avanzato",
+    "tags": [
+      "economia politica",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1885-c2/index.htm",
+        "title": "Capital vol. 2",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/Kapitalat/K2/kap-T2-index.html",
+        "title": "Капиталът. Книга II.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1885/kapitalas-2/index.htm",
+        "title": "Kapitalas. Politinės ekonomijos kritika. II tomas",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1885/kapitaal-2/index.htm",
+        "title": "Het Kapitaal, boek 2",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1885/capitalul-vol2/index.htm",
+        "title": "Capitalul, vol. II",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1885/24-d200.htm",
+        "title": "Kapitalet. Andra Bandet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/capital/marxist.org-chinese-marx-capital-vol2-01.htm",
+        "title": "资本论第二卷",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "capitale-3",
+    "title": "Il Capitale, Libro III",
+    "author": "Karl Marx",
+    "period": "1894",
+    "lane": "Economia politica",
+    "summary": "Profitto, rendita e distribuzione del plusvalore nel sistema capitalistico.",
+    "level": "avanzato",
+    "tags": [
+      "economia politica",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1894-c3/index.htm",
+        "title": "Capital vol. 3",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/Kapitalat/K3/kap-T3-index.html",
+        "title": "Капиталът. Книга III.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1867/Capital-III/index.htm",
+        "title": "Le Capital - Livre troisieme",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1894/kapitaal-3/index.htm",
+        "title": "Il Capitale, Libro III",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1894/25-d300.htm",
+        "title": "Kapitalet. Tredje Bandet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx/capital/marxist.org-chinese-marx-capital-vol3-01.htm",
+        "title": "资本论第三卷",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "autorita",
+    "title": "Sull'autorità",
+    "author": "Friedrich Engels",
+    "period": "1873",
+    "lane": "Organizzazione",
+    "summary": "Un breve intervento storico su autorità, coordinamento e azione collettiva.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1872/10/authority.htm",
+        "title": "On Authority",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/marx/1872/on_authority.htm",
+        "title": "حول السلطة",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/1873/Za-avtoriteta.html",
+        "title": "За авторитета",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/marx/1873/02/autorit.htm",
+        "title": "Om autoritet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/marx-engels/1873/02/autorit.htm",
+        "title": "Von der Autorit t",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1870s/1873auto.htm",
+        "title": "De la autoridad",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1873/auktoriteetista.htm",
+        "title": "Auktoriteetista",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1872/autorita.htm",
+        "title": "Dell",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ka",
+        "url": "https://www.marxists.org/georgian/m-e/1874/avtoritetze.htm",
+        "title": "Sull'autorità",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "lt",
+        "url": "https://www.marxists.org/lietuviu/m-e/1873/apie-autoriteta.htm",
+        "title": "Apie autoritetą",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "mk",
+        "url": "https://www.marxists.org/makedonski/m-e/1872/avtoritet.htm",
+        "title": "Za avtoritetot",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1872/1872autoriteit.htm",
+        "title": "Sull'autorità",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/marx-engels/1873/autoritet.htm",
+        "title": "Om autoritet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/marks-engels/1873/02/autorytet.htm",
+        "title": "O zasadzie autorytetu",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/marx/1873/03/autoridade-pt.htm",
+        "title": "Sobre a Autoridade",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1873/03/aut.htm",
+        "title": "Despre autoritate",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sl",
+        "url": "https://www.marxists.org/slovenian/marx-engels/1873/03/o-avtoriteti.htm",
+        "title": "O avtoriteti",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1873/18-d063.htm",
+        "title": "Om Auktoritet",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/engels/marxist.org-chinese-engels-1872-1873.htm",
+        "title": "论权威",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "critica-economia",
+    "title": "Per la critica dell'economia politica",
+    "author": "Karl Marx",
+    "period": "1859",
+    "lane": "Economia politica",
+    "summary": "Merci, denaro e metodo nella critica dei rapporti economici.",
+    "level": "intermedio",
+    "tags": [
+      "economia politica",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/marx/works/1859/critique-pol-economy/index.htm",
+        "title": "Contr'n. to Critique of Political Ec.",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "bg",
+        "url": "https://www.marxists.org/bulgarsky/m-e/Kym-kritikata/index.html",
+        "title": "Към критиката на политическата икономия",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/m-e/1850s/1859contri.htm",
+        "title": "Contribuci n a la cr tica de la econom a pol tica",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/marx-engels/1859/poliittisen-taloustieteen-arvostelua/index.htm",
+        "title": "Poliittisen taloustieteen arvostelua",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/marx/works/1859/01/index.htm",
+        "title": "Critique Pol Econ",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/marx-engels/1859/criticaep/index.htm",
+        "title": "Per la Critica dell",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/marx-engels/1859/bijdrage-boek/index.htm",
+        "title": "Per la critica dell'economia politica",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/m-e/1859/critica-ec-pol/index.htm",
+        "title": "Contribuții la  critica economiei politice",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/marx/1857/13-d018.htm",
+        "title": "Till kritiken av den politiska ekonomin",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "uk",
+        "url": "https://www.marxists.org/ukrainian/marx-engels/1859/m-kritique-ep.htm",
+        "title": "До критики політичної економії",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/marx-engels/13/index.htm",
+        "title": "政治经济学批判",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "lenin-giovani",
+    "title": "I compiti delle associazioni giovanili",
+    "author": "Vladimir I. Lenin",
+    "period": "1920",
+    "lane": "Formazione",
+    "summary": "Studio, apprendimento e partecipazione sociale nell'educazione dei giovani.",
+    "level": "intermedio",
+    "tags": [
+      "formazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1920/oct/02.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/lenin/obras/1920s/2-x-20.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/lenin/1920/TugasLigaPemuda.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1920/10/02.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1920/oct/02.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1920/10/ungdomsforeningarnas_uppgifter.html",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "vi",
+        "url": "https://www.marxists.org/vietnamese/lenin/1920/oct/02.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin-cworks/39/041.htm",
+        "title": "The Tasks of the Youth Leagues",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "autodeterminazione",
+    "title": "Il diritto delle nazioni all'autodeterminazione",
+    "author": "Vladimir I. Lenin",
+    "period": "1914",
+    "lane": "Imperialismo",
+    "summary": "Uguaglianza nazionale, autodeterminazione e solidarietà internazionale.",
+    "level": "intermedio",
+    "tags": [
+      "imperialismo",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1914/self-det/index.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/lenin/1914-sd/index.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/lenin/1914/autodet/index.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/lenin/obras/1910s/derech.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/lenin/1914/kansakuntien-itsemaaraamisoikeudesta.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1914/prawonar/index.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1914/auto/index.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1914/05.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/marxist.org-chinese-lenin-191402-05.htm",
+        "title": "The Right of Nations to Self-Determination",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "tesi-aprile",
+    "title": "Tesi di aprile",
+    "author": "Vladimir I. Lenin",
+    "period": "1917",
+    "lane": "Storia",
+    "summary": "Il programma dell'aprile 1917 nella fase fra le due rivoluzioni russe.",
+    "level": "intermedio",
+    "tags": [
+      "storia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1917/apr/04.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ca",
+        "url": "https://www.marxists.org/catala/lenin/1917/04/0407a.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/lenin/1917/1704-apr.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/lenin/1917/04/april.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "el",
+        "url": "https://www.marxists.org/ellinika/archive/lenin/works/1917/04/04/april.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "es",
+        "url": "https://www.marxists.org/espanol/lenin/obras/1910s/abril.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/lenin/1917/teesit.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1917/04/vil19170407.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/lenin/19170407-lenin-tesisapril.html",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/lenin/1917/4/18-tesia.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/lenin/1917/1917aprilstellingen.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/lenin/1917/04/apriltesene.html",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1917/04/04tezy.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1917/04/04_teses.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1917/apr/04.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/lenin/1917/0407a.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/lenjin/1917/04/04.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1917/04/05.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/mia-chinese-lenin-19170404-5.htm",
+        "title": "April theses",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "estremismo",
+    "title": "L'estremismo, malattia infantile del comunismo",
+    "author": "Vladimir I. Lenin",
+    "period": "1920",
+    "lane": "Strategia",
+    "summary": "Un dibattito storico su tattica, partecipazione e rapporti con i movimenti di massa.",
+    "level": "intermedio",
+    "tags": [
+      "strategia",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1920/lwc/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ar",
+        "url": "https://www.marxists.org/arabic/archive/lenin/1920-lwc/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/lenin/1920/ven-komm/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "de",
+        "url": "https://www.marxists.org/deutsch/archiv/lenin/1920/linksrad/index.html",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fi",
+        "url": "https://www.marxists.org/suomi/lenin/1920/vasemmistolaisuus-lastentautina-kommunismissa.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1920/04/gauchisme.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "id",
+        "url": "https://www.marxists.org/indonesia/archive/lenin/19200401-lenin-komunismesayapkiri/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "nl",
+        "url": "https://www.marxists.org/nederlands/lenin/1920/kinderziekten/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "no",
+        "url": "https://www.marxists.org/norsk/lenin/1920/radikalismen_en_barnesykdom/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1920/04/lewicowosc/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1920/esquerdismo/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1920/stg/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ru",
+        "url": "https://www.marxists.org/russkij/lenin/1920/leftwing/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1920/05.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/192004/index.htm",
+        "title": "Left-Wing Communism: an Infantile Disorder",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "grande-iniziativa",
+    "title": "La grande iniziativa",
+    "author": "Vladimir I. Lenin",
+    "period": "1919",
+    "lane": "Cooperazione",
+    "summary": "Lavoro volontario, organizzazione comune e ricostruzione dopo la rivoluzione.",
+    "level": "intermedio",
+    "tags": [
+      "cooperazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1919/jun/28.htm",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1919/06/vil19190628.htm",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pt",
+        "url": "https://www.marxists.org/portugues/lenin/1919/06/28.htm",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "ro",
+        "url": "https://www.marxists.org/romana/lenin/1919/iun/28.htm",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sr",
+        "url": "https://www.marxists.org/srpshrva/biblioteka/lenjin/1919/06/28.htm",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1919/06/ett_stort_initiativ.html",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin-cworks/37/001.htm",
+        "title": "A Great Beginning. \"Communist subbotniks\"",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "materialismo-lenin",
+    "title": "Materialismo ed empiriocriticismo",
+    "author": "Vladimir I. Lenin",
+    "period": "1908",
+    "lane": "Metodo",
+    "summary": "Un'opera filosofica sul materialismo e sulle teorie della conoscenza.",
+    "level": "avanzato",
+    "tags": [
+      "metodo",
+      "avanzato"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1908/mec/index.htm",
+        "title": "Materialism and Empirio-Criticism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1908/09/index.htm",
+        "title": "Materialism and Empirio-Criticism",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin-cworks/18/index.htm",
+        "title": "Materialism and Empirio-Criticism",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "meglio-meno",
+    "title": "Meglio meno, ma meglio",
+    "author": "Vladimir I. Lenin",
+    "period": "1923",
+    "lane": "Organizzazione",
+    "summary": "Qualità dell'organizzazione, formazione e critica della burocrazia.",
+    "level": "intermedio",
+    "tags": [
+      "organizzazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/lenin/works/1923/mar/02.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "da",
+        "url": "https://www.marxists.org/dansk/lenin/1923/03/02-mindr.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "fr",
+        "url": "https://www.marxists.org/francais/lenin/works/1923/03/vil19230304.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/lenin/1923/3/megliomenomameglio.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "pl",
+        "url": "https://www.marxists.org/polski/lenin/1923/03/lepiej_mniej.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "sv",
+        "url": "https://www.marxists.org/svenska/lenin/1923/03/02.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      },
+      {
+        "language": "zh",
+        "url": "https://www.marxists.org/chinese/lenin/mia-chinese-lenin-19230304.htm",
+        "title": "Better Fewer, But Better",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "gramsci-citta-futura",
+    "title": "La città futura",
+    "author": "Antonio Gramsci",
+    "period": "1917",
+    "lane": "Formazione",
+    "summary": "Gli scritti del numero unico del 1917, inclusa la riflessione sull’indifferenza e sulla responsabilità politica.",
+    "level": "intermedio",
+    "tags": [
+      "formazione",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "it",
+        "url": "https://www.marxists.org/italiano/gramsci/17/cittafutura.htm",
+        "title": "La città futura",
+        "source": "Marxists Internet Archive"
+      }
+    ]
+  },
+  {
+    "id": "zetkin-donne-socialismo",
+    "title": "Donne proletarie e socialismo",
+    "author": "Clara Zetkin",
+    "period": "1896",
+    "lane": "Cura e società",
+    "summary": "Organizzazione delle lavoratrici, autonomia economica e rapporto fra emancipazione e trasformazione sociale.",
+    "level": "intermedio",
+    "tags": [
+      "cura e società",
+      "intermedio"
+    ],
+    "editions": [
+      {
+        "language": "en",
+        "url": "https://www.marxists.org/archive/zetkin/1896/10/women.htm",
+        "title": "Proletarian Woman and Socialism",
+        "source": "Marxists Internet Archive"
+      }
+    ]
   }
 ]
