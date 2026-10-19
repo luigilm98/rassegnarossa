@@ -650,3 +650,15 @@ test("article cards receive publisher-sized responsive photos and image thumbnai
   assert.equal(images.get("Photo fixture 4"),"https://images.example/photo.jpg");
  } finally {globalThis.fetch=originalFetch;}
 });
+
+test('news controls start in one closed banner below a manually scrollable video carousel',async()=>{
+ const html=await(await render()).text();
+ const banner=html.match(/<details class="reading-controls-banner"[^>]*>/)?.[0];assert.ok(banner);assert.doesNotMatch(banner,/\bopen(?:=|\s|>)/);
+ const headerEnd=html.indexOf('</header>'),carousel=html.indexOf('class="video-carousel"'),controls=html.indexOf('class="reading-controls-banner"');
+ assert.ok(headerEnd<carousel&&carousel<controls);
+ assert.match(html,/class="video-track"[^>]*tabindex="0"/i);assert.match(html,/Esplora i canali/);
+ assert.match(html,/POLIVOX/);assert.match(html,/Dazibao/);assert.match(html,/OttolinaTV/);assert.match(html,/PeerTube/);
+ assert.doesNotMatch(html,/<iframe[^>]*youtube|autoplay/i);
+ const firstControls=html.slice(controls,html.indexOf('class="news-layout"'));
+ for(const label of ['Lingua di lettura','Lingua delle fonti in analisi','Ordina le notizie','Ultimo ciclo di raccolta'])assert.match(firstControls,new RegExp(label));
+});

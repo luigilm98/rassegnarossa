@@ -62,6 +62,7 @@ export function InitialLoadBoundary({ children, collecting, progress, language }
     notify.current = check;
     const prepareAssets = () => {
       for (const image of root.current?.querySelectorAll("img") ?? []) {
+        if (image.closest("[data-defer-preparation]")) continue;
         if (assets.has(image)) continue;
         assets.set(image, false);
         void prepareImage(image, controller.signal).then(() => { assets.set(image, true); check(); });

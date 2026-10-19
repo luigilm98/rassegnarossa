@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ArrowUpRight, BookOpen, Bookmark, BookmarkCheck, Search, X } from "lucide-react";
 import { THEORY_LIBRARY, BOOK_LANGUAGES } from "@/app/data/library";
 import { READING_PATHS, GLOSSARY } from "@/app/data/editorial";
 import { LocalizedText, LocalizedInput, useLocale } from "./Localization";
 const ALL = "all";
+const SocialAchievements = lazy(() => import('./SocialAchievements'));
 const availableLanguages = [...new Set(THEORY_LIBRARY.flatMap(book => book.editions?.map(edition => edition.language) ?? []))].sort((a,b) => (BOOK_LANGUAGES[a] ?? a).localeCompare(BOOK_LANGUAGES[b] ?? b));
 export function LibraryView({
   query,
@@ -19,6 +20,7 @@ export function LibraryView({
 }) {
   const readingLanguage = useLocale();
   const [bookLanguage, setBookLanguage] = useState("all");
+  const [showAchievements, setShowAchievements] = useState(false);
   const readingLink = (book: typeof THEORY_LIBRARY[number]) => {
     const preferred = bookLanguage === "all" ? readingLanguage : bookLanguage;
     const edition = book.editions?.find(item => item.language === preferred) ?? book.editions?.find(item => item.language === "en") ?? book.editions?.[0];
@@ -50,6 +52,14 @@ export function LibraryView({
         </div>
         <BookOpen size={24} strokeWidth={1.3} />
       </div>
+      <section className="achievements-showcase">
+        <button className="achievements-entry" aria-expanded={showAchievements} aria-controls="social-showcase-content" onClick={() => setShowAchievements(open => !open)}>
+          <span className="achievements-entry-mark" aria-hidden="true">✦</span>
+          <span><span className="eyebrow"><LocalizedText>LA MEMORIA CHE COSTRUISCE IL FUTURO</LocalizedText></span><strong><LocalizedText>Le conquiste del socialismo</LocalizedText></strong><small><LocalizedText>Lavoro, scuola, salute e dignità · dall’Italia al mondo</LocalizedText></small></span>
+          <span className="achievements-entry-action"><LocalizedText>{showAchievements ? 'Chiudi la vetrina' : 'Esplora la vetrina'}</LocalizedText><ArrowUpRight size={19}/></span>
+        </button>
+        <div id="social-showcase-content" hidden={!showAchievements}>{showAchievements && <Suspense fallback={<p className="notice" role="status"><LocalizedText>Apertura della raccolta…</LocalizedText></p>}><SocialAchievements/></Suspense>}</div>
+      </section>
       <div className="reading-paths">
         {READING_PATHS.map((p, i) => (
           <button

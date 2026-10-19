@@ -1,0 +1,164 @@
+[
+  {
+    "id": "clara-statello",
+    "name": "POLIVOX · Clara Statello",
+    "language": "it",
+    "country": "Italia",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@ClaraStatello",
+    "channelId": "UCP-0ZuOawBtw2c_cCJY1QZw"
+  },
+  {
+    "id": "dazibao",
+    "name": "Dazibao",
+    "language": "it",
+    "country": "Italia",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@dazibao",
+    "channelId": "UCbamUSZwEixZ-_7PiXF-YHw"
+  },
+  {
+    "id": "ottolina",
+    "name": "OttolinaTV",
+    "language": "it",
+    "country": "Italia",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@OttolinaTV",
+    "channelId": "UCoxLVRisaG8rdel1D1eseng"
+  },
+  {
+    "id": "novara",
+    "name": "Novara Media",
+    "language": "en",
+    "country": "Regno Unito",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@NovaraMedia",
+    "channelId": "UCOzMAa6IhV6uwYQATYG_2kg"
+  },
+  {
+    "id": "double-down",
+    "name": "Double Down News",
+    "language": "en",
+    "country": "Regno Unito",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@DoubleDownNews",
+    "channelId": "UCeRYN0tYBQVrC2cKsxJjdow"
+  },
+  {
+    "id": "blast",
+    "name": "BLAST",
+    "language": "fr",
+    "country": "Francia",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@blastinfo",
+    "channelId": "UC__xRB5L4toU9yYawt_lIKg"
+  },
+  {
+    "id": "jacobin-de",
+    "name": "Jacobin Magazin",
+    "language": "de",
+    "country": "Germania",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@JacobinMagazin",
+    "channelId": "UCNycWCsLkCuK56bOaZ_iTIg"
+  },
+  {
+    "id": "diem25",
+    "name": "DiEM25",
+    "language": "en",
+    "country": "Europa",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@diem25official",
+    "channelId": "UCnMk-6Brd8rVEKWSWkwsWUg"
+  },
+  {
+    "id": "geopolitical-economy",
+    "name": "Geopolitical Economy Report",
+    "language": "en",
+    "country": "Internazionale",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@GeopoliticalEconomyReport",
+    "channelId": "UCwlvSJdcMc7iGdR-aducSog"
+  },
+  {
+    "id": "breakthrough",
+    "name": "BreakThrough News",
+    "language": "en",
+    "country": "Stati Uniti",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@BreakThroughNews",
+    "channelId": "UCiinSjWS3E0vtAa3DCvp7iA"
+  },
+  {
+    "id": "democracy-now",
+    "name": "Democracy Now!",
+    "language": "en",
+    "country": "Stati Uniti",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@DemocracyNow",
+    "channelId": "UCzuqE7-t13O4NIDYJfakrhw"
+  },
+  {
+    "id": "real-news",
+    "name": "The Real News Network",
+    "language": "en",
+    "country": "Stati Uniti",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@TheRealNews",
+    "channelId": "UCrmm_7RDZJeQzq2-wvmjueg"
+  },
+  {
+    "id": "peoples-dispatch",
+    "name": "Peoples Dispatch",
+    "language": "en",
+    "country": "Internazionale",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@PeoplesDispatch",
+    "channelId": "UCdoRUr0SUpfGQC4vsXZeovg"
+  },
+  {
+    "id": "boitempo",
+    "name": "TV Boitempo",
+    "language": "pt",
+    "country": "Brasile",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@TVBoitempo",
+    "channelId": "UCzwfw0utuEVxc4D6ggXcqiQ"
+  },
+  {
+    "id": "newsclick",
+    "name": "NewsClick",
+    "language": "en",
+    "country": "India",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@Newsclickin",
+    "channelId": "UCOF1iS7lmNRSWVqL8N3L6kQ"
+  },
+  {
+    "id": "canal-red",
+    "name": "Canal Red",
+    "language": "es",
+    "country": "Spagna",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@canalredtv",
+    "channelId": "UC3PhLH0Rj2e_-0hNvwTLxGA"
+  },
+  {
+    "id": "green-left",
+    "name": "Green Left",
+    "language": "en",
+    "country": "Australia",
+    "platform": "youtube",
+    "url": "https://www.youtube.com/@GreenLeftOnline",
+    "channelId": "UC8W1PDkZhEDTV9H31hwJQqQ"
+  },
+  {
+    "id": "le-media",
+    "name": "Le Média",
+    "language": "fr",
+    "country": "Francia",
+    "platform": "peertube",
+    "url": "https://video.lemediatv.fr/c/chaine_officielle/videos",
+    "apiUrl": "https://video.lemediatv.fr/api/v1/video-channels/chaine_officielle/videos?count=3&sort=-publishedAt"
+  }
+]

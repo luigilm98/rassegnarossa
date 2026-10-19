@@ -33,3 +33,9 @@ Il catalogo include 26 opere di Mao Zedong: venti saggi, cinque volumi di opere 
 Fonti: [indici delle opere scelte di Mao](https://www.marxists.org/reference/archive/mao/selected-works/index.htm), [Mao in portoghese](https://www.marxists.org/portugues/mao/index.htm), [Mao in italiano](https://www.marxists.org/italiano/reference/mao/index.htm), [La città futura](https://www.marxists.org/italiano/gramsci/17/cittafutura.htm), [Clara Zetkin](https://www.marxists.org/archive/zetkin/1896/10/women.htm). Le descrizioni del catalogo sono redazionali e distinguono saggi, documenti e raccolte.
 
 L’ampliamento aggiunge 40 opere e 180 edizioni: ogni collegamento aggiunto è stato scaricato e verificato come HTML. Un PDF non compatibile è stato escluso; un rinvio HTML senza testo è stato sostituito con la destinazione effettiva. Il parsing dei 180 documenti è stato controllato separatamente. Questo controllo non equivale alla revisione integrale dei testi o di tutti i capitoli collegati.
+
+## Vetrina delle conquiste sociali
+
+La biblioteca include una raccolta tematica positiva e documentata, distinta dai 74 libri e saggi. Le 33 schede coprono 20 paesi e i temi lavoro, scuola, salute, casa, diritti, scienza e cooperazione. La selezione iniziale è l’Italia; il menu consente di esplorare ogni paese o tutto il mondo, incrociando un tema. Nessun filtro elimina o modifica il catalogo dei libri.
+
+Tre approfondimenti collegano fonti sulla Comune di Parigi, la trasformazione cinese e la Rivoluzione culturale a edizioni reali del lettore. La raccolta celebra risultati sociali con attribuzioni circostanziate: non è una storia nazionale esaustiva, né una promessa di copertura di ogni paese. I diritti costituzionali vengono descritti come riconoscimenti giuridici, senza confonderli con la loro piena attuazione.

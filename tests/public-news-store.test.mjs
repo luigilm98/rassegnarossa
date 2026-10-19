@@ -97,3 +97,14 @@ test("image endpoint serves an archived article after it has disappeared from it
   assert.ok(!calls.some(url=>url.includes("feed")));
  }finally{globalThis.fetch=originalFetch;sqlite.close();}
 });
+
+test('video cache keys are limited to verified channels and never accept visitor URLs',async()=>{
+ const {sqlite,db}=await setup();const store=createPublicNewsStore(db,new Set());
+ try{
+  const good=publicDataKey(new Request('https://news.example/api/videos?channel=clara-statello'));
+  await store.put(good,Response.json({videos:[]},{headers:{'cache-control':'public, max-age=120'}}));
+  assert.ok(await store.match(good));
+  for(const query of ['channel=unknown','channel=clara-statello&url=https://127.0.0.1/','channel=clara-statello&channel=dazibao'])await store.put(new Request('https://news.example/api/videos?'+query),Response.json({videos:[]}));
+  assert.equal(sqlite.prepare('SELECT count(*) AS count FROM public_news_cache').get().count,1);
+ }finally{sqlite.close();}
+});

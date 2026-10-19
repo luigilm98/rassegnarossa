@@ -1,4 +1,5 @@
 import type { ArticleRecord } from "./feed";
+import { VIDEO_CHANNELS } from "../data/video-catalog.ts";
 /** Server-observed public references survive feed rotation; no visitor URL enters this store. */
 export type PhotoArticle = Pick<ArticleRecord, "id" | "sourceId" | "link" | "image" | "imageFallbacks" | "sourceHomepage" | "feedSourceId" | "title">;
 export type PhotoDatabase = { prepare(sql: string): { bind(...values: unknown[]): { first<T>(): Promise<T | null>; run(): Promise<unknown> } } };
@@ -54,8 +55,10 @@ export function createPublicNewsStore(db: NewsDatabase | undefined, sourceIds: R
       if (!AREAS.has(url.searchParams.get("area") ?? "europe")) return null;
     } else if (url.pathname === "/api/highlights") {
       if (!sourceIds.has(url.searchParams.get("sourceId") ?? "")) return null;
+    } else if (url.pathname === "/api/videos") {
+      if (!VIDEO_CHANNELS.some(channel => channel.id === url.searchParams.get("channel"))) return null;
     } else return null;
-    const allowed = url.pathname === "/api/articles" ? ["sourceIds", "limitPerSource", "includeImages", "_public_cache"] : url.pathname === "/api/pulse" ? ["area", "_public_cache"] : ["sourceId", "_public_cache"];
+    const allowed = url.pathname === "/api/articles" ? ["sourceIds", "limitPerSource", "includeImages", "_public_cache"] : url.pathname === "/api/pulse" ? ["area", "_public_cache"] : url.pathname === "/api/videos" ? ["channel", "_public_cache"] : ["sourceId", "_public_cache"];
     if ([...url.searchParams.keys()].some(key => !allowed.includes(key))) return null;
     if (allowed.some(key => url.searchParams.getAll(key).length > 1)) return null;
     // Host, cookies and identity are deliberately absent: content is public for the whole site.
@@ -65,6 +68,7 @@ export function createPublicNewsStore(db: NewsDatabase | undefined, sourceIds: R
       canonical.searchParams.set("limitPerSource", "24");
       if (url.searchParams.get("includeImages") === "1") canonical.searchParams.set("includeImages", "1");
     } else if (url.pathname === "/api/pulse") canonical.searchParams.set("area", url.searchParams.get("area") ?? "europe");
+    else if (url.pathname === "/api/videos") canonical.searchParams.set("channel", url.searchParams.get("channel")!);
     else canonical.searchParams.set("sourceId", url.searchParams.get("sourceId")!);
     return "images-v5:" + canonical.pathname + canonical.search;
   };

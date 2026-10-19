@@ -3,6 +3,7 @@ const POLICIES: Record<string, readonly string[]> = {
   "/api/articles": ["sourceIds", "limitPerSource", "includeImages"],
   "/api/pulse": ["area"],
   "/api/highlights": ["sourceId"],
+  "/api/videos": ["channel"],
 };
 const FRESH_MS = 120000;
 const RETAIN_MS = 600000;

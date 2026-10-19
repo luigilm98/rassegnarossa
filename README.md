@@ -10,7 +10,7 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Atlante completo per aree, con testate, radar e fonti scoperte distinti e sezioni espandibili.
 - Cache condivisa delle sole API pubbliche: risultati pronti e rinnovo in background, senza coinvolgere dati personali. Aggiornamenti raggruppati per ridurre i ricalcoli su smartphone.
 - Catalogo di 130 testate, canali e risorse, distinto dai 136 radar di ricerca.
-- Lingua di lettura e lingua delle fonti in analisi hanno controlli sempre visibili e preferenze distinti. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
+- Lingua di lettura e lingua delle fonti in analisi hanno controlli e preferenze distinti, raccolti nel banner espandibile “Personalizza”. È possibile leggere in italiano analizzando fonti di qualsiasi lingua.
 - Tutte le 266 fonti e ricerche partecipano automaticamente: sei richieste parallele per le fonti dirette e due per i radar, risposte indipendenti, cache locale e nessun pulsante per caricare altre fonti.
 - Traduzione automatica di interfaccia, citazioni, titoli ed estratti nella lingua di lettura; cache locale, concorrenza limitata e Google Translate e MyMemory come servizi alternativi, senza fermare la coda al primo errore.
 - Apertura con preparazione di titoli e immagini entro un budget assoluto di sei secondi: cache riutilizzabile, dati disponibili subito dopo la preparazione e recuperi successivi senza spostare i riquadri; testata compatta, citazione a fine pagina e filtri raccolti in un pannello.
@@ -20,6 +20,8 @@ Aggregatore di fonti socialiste, comuniste, sindacali e anticoloniali da tutto i
 - Marchio essenziale con libro aperto e stella, “rassegna” rossa e “rossa” nera, senza note musicali; citazioni documentate di Marx, Gramsci, Lenin e Mao, diverse a ogni ricaricamento nella sessione.
 - Raccolta personale di articoli e libri: accesso con ChatGPT e copia privata persistente sul server; importazione dei salvataggi locali esistenti. Senza accesso resta una copia sul dispositivo, indicata come tale.
 - Biblioteca con tre itinerari di lettura, ricerca per autore e concetto, e un glossario introduttivo.
+- Vetrina “Le conquiste del socialismo”: 33 schede documentate in 20 paesi, filtri per paese e tema e tre approfondimenti sulla Comune, sulla trasformazione cinese e sulla Rivoluzione culturale, con documenti e libri leggibili nel sito.
+- Carosello tra testata e banner: ultime pubblicazioni di 18 canali internazionali, YouTube e PeerTube, scorrimento manuale e collegamenti diretti. Clara Statello, Dazibao e OttolinaTV inclusi; nessun player incorporato o autoplay.
 - Sei percorsi tematici e una pagina trasparente su metodo, attribuzione e limiti.
 - Lettore in una finestra dedicata, con invito a leggere e sostenere l’editore, traduzione automatica e anteprima esterna facoltativa.
 

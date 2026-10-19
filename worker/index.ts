@@ -15,6 +15,7 @@ import { handleBookmarks } from "../app/lib/bookmarks";
 import { chatGPTUserFromHeaders, chatGPTSignInPath } from "../app/chatgpt-auth";
 import { THEORY_LIBRARY } from "../app/data/library";
 import type { D1Database } from "@cloudflare/workers-types/index.ts";
+import { GET as videosEndpoint } from "../app/api/videos/route";
 
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -40,6 +41,7 @@ interface ExecutionContext {
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
 const publicEndpoints: Record<string, (request: Request) => Promise<Response>> = {
+  "/api/videos": videosEndpoint,
   "/api/article-image": articleImageEndpoint, "/api/articles": articlesEndpoint, "/api/pulse": pulseEndpoint, "/api/highlights": highlightsEndpoint,
 };
 const sourceIds = new Set(SOURCE_CATALOG.map(source => source.id));

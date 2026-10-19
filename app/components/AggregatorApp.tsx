@@ -58,6 +58,7 @@ import { CommunityEmblem } from "./CommunityEmblem";
 import { QUOTATIONS, nextQuotation } from "@/app/data/quotes";
 import { ArticleImage } from "./ArticleImage";
 import { InitialLoadBoundary } from "./InitialLoadBoundary";
+import { VideoCarousel } from "./VideoCarousel";
 import { WorldWatch } from "./WorldWatch";
 import { useStableNews } from "./StableNews";
 import { useCloudBookmarks, type RestoredCollection } from "./CloudBookmarks";
@@ -213,6 +214,7 @@ export function AggregatorApp() {
   const refreshNumber = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const readerDialog = useRef<HTMLDialogElement>(null);
+  const controls = useRef<HTMLDetailsElement>(null);
 
   const restoreCollection = useCallback((snapshot: RestoredCollection) => {
     const removedArticles = new Set(snapshot.removed.filter(item => item.kind === "article").map(item => item.key));
@@ -574,7 +576,8 @@ export function AggregatorApp() {
       const search = document.getElementById("rassegna-search");
       if (search) {
         event.preventDefault();
-        search.focus();
+        if (controls.current) controls.current.open = true;
+        requestAnimationFrame(() => search.focus());
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -828,6 +831,7 @@ export function AggregatorApp() {
         </header>
 
         <main>
+          {view === "notizie" ? <VideoCarousel /> : null}
           {view !== "notizie" ? (
             <section className="editorial-hero hero-compact" aria-labelledby="page-title">
               <div className="hero-copy">
@@ -845,6 +849,13 @@ export function AggregatorApp() {
           >
             {view === "notizie" || view === "salvati" || view === "fonti" ? (
               <>
+                <details className="reading-controls-banner" ref={controls}>
+                  <summary>
+                    <span className="controls-banner-title"><SlidersHorizontal size={17} /><LocalizedText>{view === "notizie" ? "La rassegna" : view === "salvati" ? "Le tue letture" : "Atlante delle fonti"}</LocalizedText><span className="controls-banner-count">{view === "fonti" ? visibleSources.length : filtered.length}</span></span>
+                    <span className="controls-banner-state"><LocalizedText>Lettura</LocalizedText>: <LanguageName code={readingLanguage} /><span aria-hidden="true"> · </span><LocalizedText>Fonti</LocalizedText>: {language === ALL ? <LocalizedText>Tutte</LocalizedText> : <LanguageName code={language} />}{filterCount ? <> · {filterCount} <LocalizedText>filtri</LocalizedText></> : null}</span>
+                    <span className="controls-banner-action"><LocalizedText>Personalizza</LocalizedText><ChevronDown size={17} /></span>
+                  </summary>
+                  <div className="reading-controls-content">
                 <div className="section-heading">
                   <div className="reading-heading-copy">
                     <p className="eyebrow">
@@ -1152,6 +1163,8 @@ export function AggregatorApp() {
                     ) : null}
                   </details>
                 ) : null}
+                  </div>
+                </details>
                 {view === "fonti" ? (
                   <SourcesDirectory
                     sources={visibleSources}
